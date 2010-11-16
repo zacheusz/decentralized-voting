@@ -10,8 +10,8 @@ import Exception.*;
 
 public class Trusted {
     static boolean DEBUG1 = false; // Structure Debug
-    static boolean DEBUG2 = false; // Local Analysis 
-    static boolean DEBUG3 = false; // Global Analysis 
+    static boolean DEBUG2 = false; // Local Analysis
+    static boolean DEBUG3 = false; // Global Analysis
 
     private PublicKey pub;
     private SecretKey sec;

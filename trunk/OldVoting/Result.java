@@ -137,7 +137,7 @@ if (DEBUG1) {System.out.println ("Result.CheckVote.Checkpoint 3");}
 
 if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 1");}
 	i = 0;
-	while ((i < votes.length) && (!CheckVote (votes[i]))) i++;
+	while ((i < votes.length) && (!CheckVote (votes[i]))) i++; //loops till i is the first legal vote
 	
 if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 2");}
 	if (i == votes.length) 
