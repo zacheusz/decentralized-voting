@@ -21,7 +21,7 @@ public class Test {
         System.out.println ("Message 1 = " + msg1);
 
         // Make message 2
-        msg2 = new BigInteger ("42");
+        msg2 = new BigInteger ("1000");
         System.out.println ("Message 2 = " + msg2);
 
         // Encrypt message 1
