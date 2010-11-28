@@ -22,18 +22,17 @@ public class Trusted {
     private BigInteger p_,q_,p,q, m, g;
     private BigInteger[] vk;
     private int pow, l, k, hashbits;
+    private Random rand;
 
     private int keymade = 0;
 
     public Trusted (int bits, int power, int hashsize, int distsize, int needed,
 		    int certainty) {
-        Random rand;
 	BigInteger temp1, temp2;
 	BigInteger ns_m;
-	BigInteger[][] X = new BigInteger[distsize+1][needed];
-	BigInteger[] a = new BigInteger[needed];
-	BigInteger delta, delta_inv, mod, temp, secret;
-	int i, j;
+	
+	BigInteger  secret;
+	int i;
 
 	l = distsize;
 	k = needed;
@@ -87,16 +86,25 @@ if (DEBUG2 || DEBUG3) {System.out.println ("g = " + g + "\ng power = " + temp1);
         temp1 = temp1.multiply (temp2);
         ns_m = n[power-1].multiply (m);
 	secret = temp1.mod (ns_m);
+        sec=new SecretKey(secret, 0);//I used 0 to indicate that this is not a share. this is the whole key
 
 if (DEBUG3) {System.out.println ("Master secret = " + secret);}
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 6");}
-	distsec = new SecretDistributedKey (distsize);
+        distsec = new SecretDistributedKey (l);
 
-	mod = n[power-1].multiply (m);
+    }
+
+public void produceKeyShares(){
+    BigInteger mod,delta, delta_inv, temp;
+    BigInteger[][] X = new BigInteger[l+1][k];
+    BigInteger[] a = new BigInteger[k];
+    int i, j;
+
+    mod = n[pow-1].multiply (m);
 
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 7");}
 	delta = n[0];
-	for (i = 2; i <= distsize; i++)
+	for (i = 2; i <= l; i++)
 	    delta = delta.multiply (new BigInteger ("" + i));
 
 	
@@ -104,29 +112,29 @@ if (DEBUG1) {System.out.println ("Trusted.Checkpoint 7");}
 	delta_inv = delta.modInverse (mod);
 
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 8");}
-	for (i = 0; i <= distsize; i++) {
+	for (i = 0; i <= l; i++) {
 	    X[i][0] = n[0];
 	    X[i][1] = new BigInteger("" + i);
 	}
 
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 9");}
-	for (i = 2; i < needed; i++) {
-	    for (j = 0; j <= distsize; j++)
+	for (i = 2; i < k; i++) {
+	    for (j = 0; j <= l; j++)
 		X[j][i] = (X[j][i-1].multiply (X[j][1])).mod (mod);
 	}
 
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 10");}
-        a[0] = secret;
-	for (i = 1; i < needed; i++) {
+        a[0] = sec.key;
+	for (i = 1; i < k; i++) {
 	    a[i] = new BigInteger (mod.bitLength (), rand);
 	    while (mod.compareTo (a[i]) <= 0)
 		a[i] = new BigInteger (mod.bitLength (), rand);
 	}
 
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 11");}
-	for (i = 0; i < distsize; i++) {
+	for (i = 0; i < l; i++) {
 	    temp = a[0];
-	    for (j = 1; j < needed; j++) {
+	    for (j = 1; j < k; j++) {
 		temp = (temp.add ((a[j].multiply (X[i+1][j])))).mod (mod);
 	    }
 	    distsec.keys[i].key = temp;
@@ -134,20 +142,20 @@ if (DEBUG1) {System.out.println ("Trusted.Checkpoint 11");}
 	}
 
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 12");}
-	temp = new BigInteger (n[power].bitLength (), rand);
+	temp = new BigInteger (n[pow].bitLength (), rand);
         while ((n[0].compareTo (temp.gcd (n[1])) < 0) ||
-               (temp.compareTo (n[power]) >= 0))
-	    temp = new BigInteger (n[power].bitLength (), rand);
+               (temp.compareTo (n[pow]) >= 0))
+	    temp = new BigInteger (n[pow].bitLength (), rand);
 	
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 13");}
-	vk = new BigInteger[distsize+1];
-	vk[0] = (temp.multiply (temp)).mod (n[power]);
+	vk = new BigInteger[l+1];
+	vk[0] = (temp.multiply (temp)).mod (n[pow]);
 	
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 14");}
-	for (i = 0; i < distsize; i++)
+	for (i = 0; i < l; i++)
 	    vk[i+1] = vk[0].modPow (distsec.keys[i].key.multiply
 				       (new BigInteger ("2")),
-				    n[power]);
+				    n[pow]);
 
 if (DEBUG1) {System.out.println ("Trusted.Checkpoint 15");}
     }
@@ -225,6 +233,89 @@ if (DEBUG1) {System.out.println ("Trusted.MakeSelectionElection.Checkpoint 4");}
 	if ((i < 0) || (i >= distsec.keys.length)) return null;
 	return distsec.keys[i];
     }
+    
+    public BigInteger GetN () {
+          return p.multiply (q);
+    }
+    public BigInteger Decrypt (BigInteger cip) {
+
+            BigInteger n = GetN ();
+
+            /* Here the s value that corresponds to cip will be calculated.
+               The -1 is to insure that n's bitlength doesn't divide cip's
+               so we know it has been rounded down and we get the message size.
+               The chance that we get a wrong s is app. 1/n ie. negligible.
+            */
+            int s = (cip.bitLength () - 1)/n.bitLength();
+
+            return Decrypt (cip, s);
+        }
+
+   /** Method for decrypting with surrounding private key. This uses a
+         *  specified s, and will throw an exception if it is not big enough.
+         *  This will be correct with 1/n probability.
+         *  @param cip the ciphertext.
+         *  @param s   the size of s used in the decryption, n<SUP>s+1</SUP> &gt; cip
+         *             or an exception is thrown.
+         *  @return the resulting message.
+         */
+   public BigInteger Decrypt (BigInteger cip, int s) {
+
+            BigInteger temp; // For holding intermidiate results.
+            BigInteger count; // Used for when a BigInteger counter is need.
+
+            BigInteger[] n = new BigInteger[s+1]; // entry i will have n^{i+1}.
+            n[0] = GetN ();
+            for (int i = 0; i < s; i++) n[i+1] = n[i].multiply (n[0]);
+
+            BigInteger ONE = BigInteger.ONE;
+
+            // Find lambda so we can find d.
+            BigInteger p1_q1 = (p.subtract (ONE)).multiply (q.subtract (ONE)); // (p - 1)(q - 1)
+            BigInteger lambda = p1_q1.divide ((p.subtract (ONE)).gcd (q.subtract (ONE)));
+
+            // Find d so we can decrypt.
+            BigInteger d;
+            d = lambda.multiply (lambda.modInverse (n[s-1]));
+
+            // Decrypt cip.
+            BigInteger cip_d; // cip raised to power d.
+            BigInteger[] L = new BigInteger[s]; // Array of L values, index is -1.
+            BigInteger[] mult = new BigInteger[s-1]; // Common mult values in computations.
+            BigInteger msg; // The resulting message.
+
+            cip_d = cip.modPow (d, n[s]);
+
+            // L[i] = ((c^d mod n^{i+2}) - 1) / n
+            for (int i = 0; i < s; i++)
+                L[i] = ((cip_d.mod (n[i+1])).subtract (ONE)).divide (n[0]);
+
+            temp = ONE;  // used to hold (i+1)!
+            count = ONE;
+            for (int i = 1; i < s; i++) {
+                // mult[i] = n^{i+1} / (i+2)! mod n^s   (n^s, so it can be reduced to all n^i)
+                count = count.add (ONE);
+                temp = temp.multiply (count);
+                mult[i-1] = (n[i-1].multiply (temp.modInverse (n[s-1]))).mod (n[s-1]);
+            }
+
+            BigInteger t1, t2; // Temp values.
+            msg = null;
+            for (int j = 1; j <= s; j++) {
+                t1 = L[j-1];
+                t2 = msg;
+                for (int k = 2; k <= j; k++) {
+                    msg = msg.subtract (ONE);
+                    t2 = (t2.multiply (msg)).mod (n[j-1]);
+                    t1 = (t1.subtract (t2.multiply (mult[k-2].mod (n[j-1])))).mod (n[j-1]);
+                }
+                msg = t1;
+            }
+
+            return msg;
+        }
+    
+
 
 }
  

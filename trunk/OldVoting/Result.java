@@ -125,6 +125,21 @@ if (DEBUG1) {System.out.println ("Result.CheckVote.Checkpoint 3");}
 	return true;
     }
 
+public BigInteger CombineVotes ( BigInteger vote1,BigInteger vote2)
+                   throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
+
+	BigInteger result;
+
+if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 1");}
+
+
+result = (vote1.multiply (vote2)).mod (n[power]);
+if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 2");}
+if (DEBUG3) {System.out.println ("Combined Votes = " + result);}
+
+return result;
+    }
+
     public BigInteger Combine (DecodingShare[] cip, Vote[] votes)
                    throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
 

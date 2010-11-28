@@ -19,6 +19,10 @@ public class Vote {
 	z = _z;
 	e = _e;
     }
+    public Vote () {
+        vote=BigInteger.ZERO;
+        
+    }
 
     public String toString () {
 	String str = new String ();

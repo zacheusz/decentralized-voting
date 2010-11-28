@@ -82,7 +82,58 @@ if (DEBUG2) {System.out.println ("return = true");}
 	return true;
     }
 
+   public DecodingShare Decode (BigInteger cip) throws NoLegalVotes,
+                                                    NoSuchAlgorithmException {
+        Random rand = new Random ();
+	DecodingShare share;
+	BigInteger temp, res;
+	int i;
+	BigInteger r, v_rand, m_rand, c, reply;
+	byte[] challenge;
+	MessageDigest hash =  MessageDigest.getInstance ("SHA");
 
+
+
+temp=cip;
+if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 4");}
+	res = (temp.multiply (temp)).mod (n[power]);
+	res = res.modPow (sec.key, n[power]);
+
+if (DEBUG2) {System.out.println ("msg = " + temp + "\nres = " + res);}
+if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 5");}
+        r = new BigInteger ((n[power].bitLength () + 2*pub.signsize), rand);
+
+if (DEBUG2) {System.out.println ("r = " + r);}
+if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 6");}
+	v_rand = pub.verification[0].modPow (r, n[power]);
+	m_rand = temp.modPow (r, n[power]);
+
+if (DEBUG2) {System.out.println ("v^r = " + v_rand + "\nm^r = " + m_rand);}
+if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 7");}
+	hash.update (n[1].toByteArray ());
+	hash.update (temp.toByteArray ());
+	hash.update (res.toByteArray ());
+	hash.update (v_rand.toByteArray ());
+	hash.update (m_rand.toByteArray ());
+	hash.update (pub.verification[0].toByteArray ());
+	hash.update (pub.verification[sec.nr].toByteArray ());
+	challenge = hash.digest ();
+
+if (DEBUG2 || DEBUG3) {System.out.println ("v_0 = " + pub.verification[0] + "\nv_i = " +
+				 pub.verification[sec.nr] + "\nsecret = " +
+				 sec.key);}
+if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 8");}
+	c = (new BigInteger (challenge)).mod (pow2);
+
+if (DEBUG2) {System.out.println ("challenge = " + challenge + "\nchal = " + c);}
+	reply = c.multiply (sec.key);
+	reply = reply.add (reply);
+	reply = reply.add (r);
+
+if (DEBUG2) {System.out.println ("proof = " + reply);}
+if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 9");}
+	return new DecodingShare (res, v_rand, m_rand, reply, sec.nr);
+    }
     public DecodingShare Decode (Vote cip[]) throws NoLegalVotes, 
                                                     NoSuchAlgorithmException {
         Random rand = new Random ();
