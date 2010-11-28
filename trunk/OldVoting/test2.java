@@ -90,9 +90,9 @@ public class test2 {
 	res = new Result (pub);
 
 
-        msg=ciparray[0].vote;
+        temp=ciparray[0].vote;
         for (i = 1; i < votercount; i++) {
-	    msg=res.CombineVotes(msg, ciparray[i].vote);
+	    temp=res.CombineVotes(temp, ciparray[i].vote);
 	}
 
         stop = (new Date ()).getTime ();
@@ -108,13 +108,14 @@ public class test2 {
 
         start = (new Date ()).getTime ();
 	for (i = 0; i < tallycount; i++ ) {
-	    tallyarray[i] = tallies[i].Decode (ciparray); //get the decoding share
+            System.out.print (i);
+	    tallyarray[i] = tallies[i].Decode (temp); //get the decoding share
 	    System.out.print (".");
 	}
 	stop = (new Date ()).getTime ();
 	System.out.println ("\nAvg. Tally time (msec):" + (stop-start)/tallycount);
-
-	System.out.println ("Result of election is: " + res);
+        msg=res.DistDecryptVotes(tallyarray,temp);
+	System.out.println ("Result of election is: " + msg);
 	System.out.println ("");
 
 	res.PrintResult (msg);

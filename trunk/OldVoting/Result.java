@@ -140,7 +140,7 @@ if (DEBUG3) {System.out.println ("Combined Votes = " + result);}
 return result;
     }
 
-    public BigInteger Combine (DecodingShare[] cip, Vote[] votes)
+    public BigInteger DistDecryptVotes (DecodingShare[] cip, BigInteger result)
                    throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
 
 	BigInteger temp, t1, t2, power_d, msg, delta, lambda, w;
@@ -148,21 +148,7 @@ return result;
 	int[] Passed = new int[cip.length];
 	int passptr;
 	int i, j;
-	BigInteger result;
 
-if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 1");}
-	i = 0;
-	while ((i < votes.length) && (!CheckVote (votes[i]))) i++; //loops till i is the first legal vote
-	
-if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 2");}
-	if (i == votes.length) 
-	    throw new NoLegalVotes ("All votes had faulty proofs.");
-
-if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 3");}
-	result = votes[i].vote;
-	for (++i; i < votes.length; i++)
-	    if (CheckVote (votes[i]))
-		result = (result.multiply (votes[i].vote)).mod (n[power]);
 if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 4");}
 if (DEBUG3) {System.out.println ("Combined Votes = " + result);}
 
