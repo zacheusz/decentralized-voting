@@ -125,6 +125,62 @@ if (DEBUG1) {System.out.println ("Result.CheckVote.Checkpoint 3");}
 	return true;
     }
 
+    /** Exception thrown when trying to encrypt or decrypt a message with
+     *  a fixed s, and then message or ciphertext exceeds the modulus size. */
+    static public class MessageToBigException extends Exception {
+        public MessageToBigException () {super ();}
+        public MessageToBigException (String s) {super (s);}
+    }
+
+    /** Exception thrown when trying to combine two ciphertexts that are have
+     *  different estimated s values. */
+    static public class MitchmatchedSizeException extends Exception {
+        public MitchmatchedSizeException () {super ();}
+        public MitchmatchedSizeException (String s) {super (s);}
+    }
+
+        /**
+     * Combines two ciphertexts such that the resulting ciphertext encrypt the
+     * sum of the two plaintexts in the two given encryptions.
+     * @param pub the public key
+     * @param cip1 the first ciphertext
+     * @param cip2 the second ciphertext
+     * @return the combined ciphertext
+     * @throws MitchmatchedSizeException thrown if cip1 and cip2 have different
+     *         sizes.  To avoid this exception use the other CombineCiphertexts
+     *         method.
+     */
+    public static BigInteger CombineCVotes(CPublicKey pub,
+            BigInteger cip1,
+            BigInteger cip2) throws MitchmatchedSizeException {
+
+        int s1 = (cip1.bitLength () - 1)/pub.GetPlaintextModulus(1).bitLength();
+        int s2 = (cip2.bitLength () - 1)/pub.GetPlaintextModulus(1).bitLength();
+        if (s1 != s2) {
+            throw new MitchmatchedSizeException("Sizes of ciphertexts does not match (" + s1 + " != " + s2 + ").");
+        }
+
+        return CombineCVotes(pub, cip1, cip2, s1);
+    }
+
+    /**
+     * Combines two ciphertexts such that the resulting ciphertext encrypt the
+     * sum of the two plaintexts in the two given encryptions.
+     * @param pub the public key
+     * @param cip1 the first ciphertext
+     * @param cip2 the second ciphertext
+     * @param s the s that should be used when handling the ciphertexts
+     * @return the combined ciphertext
+     */
+    public static BigInteger CombineCVotes(CPublicKey pub,
+            BigInteger cip1,
+            BigInteger cip2,
+            int s) {
+
+        return cip1.multiply(cip2).mod(pub.GetCiphertextModulus(s));
+    }
+
+
 public BigInteger CombineVotes ( BigInteger vote1,BigInteger vote2)
                    throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
 

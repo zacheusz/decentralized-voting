@@ -73,10 +73,7 @@ if (DEBUG1) {System.out.println ("PublicKey.2.Checkpoint 3");}
 	signsize = _signsize;
 if (DEBUG1) {System.out.println ("PublicKey.2.Checkpoint 4");}
     }
-     /** Gets the modulus used for ciphertexts with a specific s.
-     *  @param s the size of the message space.
-     *  @return modulus used for encrypting messages of with s.
-     */
+
 
 
 }

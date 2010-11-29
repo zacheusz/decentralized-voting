@@ -1,5 +1,6 @@
 package OldVoting;
 
+import OldVoting.CPublicKey.MessageToBigException;
 import java.math.*;
 import java.util.*;
 import java.security.*;
@@ -36,7 +37,8 @@ public class Voter {
         for (i = 2; i <= power; i++) {
             n[i] = n[i - 1].multiply(n[1]);
         }
-    }   
+    }
+
 
     private void encryptVote(int choice) {
         rand= new Random();
@@ -56,7 +58,7 @@ public class Voter {
         cip = (temp1.multiply(temp2)).mod(n[power]);
     }
 
-    public void produceProof(int choice,BigInteger cip) throws NoSuchAlgorithmException {
+    public void produceProof(int choice) throws NoSuchAlgorithmException {
         int power = n.length - 1;
         int votecount = pub.votes.length;
         BigInteger pow2 = (new BigInteger("2")).pow(pub.signsize);
@@ -182,9 +184,36 @@ public class Voter {
             System.out.println("encrypted vote(" + choice + ") = " + cip);
         }
 
+        produceProof(choice);
+        vote = new Vote(cip, a, challenge, z, e);
+
+        return vote;
+    }
+
+    public Vote CVote(int choice,CPublicKey key) throws IllegalVote, NoSuchAlgorithmException, MessageToBigException {
+
+        Vote vote;
+
+        int power = n.length - 1;
+        int votecount = pub.votes.length;
+
+
+        r_choice = BigInteger.ONE;
+        /* Check that it's a legal plaintext */
+        if ((choice >= votecount) || (choice < 0)) {
+            throw new IllegalVote("Vote index is out of range");
+        }
+        //cip=key.Encrypt(new BigInteger(new Integer(choice).toString()));
+        cip=key.Encrypt(pub.votes[choice]);
+        if (DEBUG2) {
+            System.out.println("encrypted vote(" + choice + ") = " + cip);
+        }
+  //      produceProof(choice);
+
 
         vote = new Vote(cip, a, challenge, z, e);
 
         return vote;
     }
+
 }

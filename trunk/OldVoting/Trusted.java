@@ -247,7 +247,8 @@ if (DEBUG1) {System.out.println ("Trusted.MakeSelectionElection.Checkpoint 4");}
                The chance that we get a wrong s is app. 1/n ie. negligible.
             */
             int s = (cip.bitLength () - 1)/n.bitLength();
-
+            System.out.println("s="+s);
+            System.out.println("pow="+pow);
             return Decrypt (cip, s);
         }
 
@@ -316,6 +317,50 @@ if (DEBUG1) {System.out.println ("Trusted.MakeSelectionElection.Checkpoint 4");}
         }
     
 
+   public BigInteger Decrypt2 (BigInteger cip) {
+
+            BigInteger temp; // For holding intermidiate results.
+            BigInteger count; // Used for when a BigInteger counter is need.
+
+            BigInteger d=sec.key;
+            BigInteger ONE = BigInteger.ONE;
+            int s=pow;
+            // Decrypt cip.
+            BigInteger cip_d; // cip raised to power d.
+            BigInteger[] L = new BigInteger[s]; // Array of L values, index is -1.
+            BigInteger[] mult = new BigInteger[s-1]; // Common mult values in computations.
+            BigInteger msg; // The resulting message.
+
+            cip_d = cip.modPow (d, n[s]);
+
+            // L[i] = ((c^d mod n^{i+2}) - 1) / n
+            for (int i = 0; i < s; i++)
+                L[i] = ((cip_d.mod (n[i+1])).subtract (ONE)).divide (n[0]);
+
+            temp = ONE;  // used to hold (i+1)!
+            count = ONE;
+            for (int i = 1; i < s; i++) {
+                // mult[i] = n^{i+1} / (i+2)! mod n^s   (n^s, so it can be reduced to all n^i)
+                count = count.add (ONE);
+                temp = temp.multiply (count);
+                mult[i-1] = (n[i-1].multiply (temp.modInverse (n[s-1]))).mod (n[s-1]);
+            }
+
+            BigInteger t1, t2; // Temp values.
+            msg = null;
+            for (int j = 1; j <= s; j++) {
+                t1 = L[j-1];
+                t2 = msg;
+                for (int k = 2; k <= j; k++) {
+                    msg = msg.subtract (ONE);
+                    t2 = (t2.multiply (msg)).mod (n[j-1]);
+                    t1 = (t1.subtract (t2.multiply (mult[k-2].mod (n[j-1])))).mod (n[j-1]);
+                }
+                msg = t1;
+            }
+
+            return msg;
+        }
 
 }
  
