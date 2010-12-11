@@ -15,14 +15,13 @@ public class Voter {
     private PublicKey pub;
     private BigInteger[] n;
     private int power;
-
     private BigInteger cip, r;
     private BigInteger temp1, temp2;
     private Random rand;
-    private BigInteger  r_choice;
-    private  byte[] challenge;
-    private BigInteger[] a ;
-    private BigInteger[] z ;
+    private BigInteger r_choice;
+    private byte[] challenge;
+    private BigInteger[] a;
+    private BigInteger[] z;
     private BigInteger[] e;
     private BigInteger response;
 
@@ -39,14 +38,12 @@ public class Voter {
         }
     }
 
-
     private void encryptVote(int choice) {
-        rand= new Random();
-        r = new BigInteger(n[power].bitLength(), rand);
-        while ((r.compareTo(n[power]) >= 0)
-                || ((n[0].compareTo(r.gcd(n[1]))) < 0)) {
-            r = new BigInteger(n[power].bitLength(), rand);
-        }
+//        r = new BigInteger(n[power].bitLength(), rand);
+//        while ((r.compareTo(n[power]) >= 0)
+//                || ((n[0].compareTo(r.gcd(n[1]))) < 0)) {
+//            r = new BigInteger(n[power].bitLength(), rand);
+//        }
         if (DEBUG3) {
             System.out.println("choice = " + choice);
         }
@@ -70,6 +67,7 @@ public class Voter {
         MessageDigest hash = MessageDigest.getInstance("SHA");
 
         r_choice = BigInteger.ONE;
+
 
         hash.update(n[1].toByteArray());
         for (i = 0; i < votecount; i++) {
@@ -166,12 +164,17 @@ public class Voter {
     }
 
     public Vote Vote(int choice) throws IllegalVote, NoSuchAlgorithmException {
-      
+        rand = new Random();
+        r = new BigInteger(n[power].bitLength(), rand);
+        while ((r.compareTo(n[power]) >= 0)
+                || ((n[0].compareTo(r.gcd(n[1]))) < 0)) {
+            r = new BigInteger(n[power].bitLength(), rand);
+        }
         Vote vote;
- 
+
         int power = n.length - 1;
         int votecount = pub.votes.length;
-     
+
 
         r_choice = BigInteger.ONE;
         /* Check that it's a legal plaintext */
@@ -190,10 +193,15 @@ public class Voter {
         return vote;
     }
 
-    public Vote CVote(int choice,CPublicKey key) throws IllegalVote, NoSuchAlgorithmException, MessageToBigException {
+    public Vote CVote(int choice, CPublicKey key) throws IllegalVote, NoSuchAlgorithmException, MessageToBigException {
 
         Vote vote;
-
+        rand = new Random();
+        r = new BigInteger(n[power].bitLength(), rand);
+        while ((r.compareTo(n[power]) >= 0)
+                || ((n[0].compareTo(r.gcd(n[1]))) < 0)) {
+            r = new BigInteger(n[power].bitLength(), rand);
+        }
         int power = n.length - 1;
         int votecount = pub.votes.length;
 
@@ -204,16 +212,15 @@ public class Voter {
             throw new IllegalVote("Vote index is out of range");
         }
         //cip=key.Encrypt(new BigInteger(new Integer(choice).toString()));
-        cip=key.Encrypt(pub.votes[choice]);
+        cip = key.Encrypt(pub.votes[choice]);
         if (DEBUG2) {
             System.out.println("encrypted vote(" + choice + ") = " + cip);
         }
-  //      produceProof(choice);
+        produceProof(choice);
 
 
         vote = new Vote(cip, a, challenge, z, e);
 
         return vote;
     }
-
 }

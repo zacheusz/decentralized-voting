@@ -37,14 +37,25 @@ if (DEBUG1) {System.out.println ("Tally.Checkpoint 2");}
 if (DEBUG1) {System.out.println ("Tally.Checkpoint 3");}
     }
     
-    private boolean CheckVote (Vote vote) throws NoSuchAlgorithmException {
+    public static boolean CheckVote (Vote vote,PublicKey pub) throws NoSuchAlgorithmException {
 	int i;
 	MessageDigest hash = MessageDigest.getInstance("SHA");
 	int votecount = pub.votes.length;
 	BigInteger sum = BigInteger.ZERO;
 	BigInteger temp1, temp2;
 	byte[] challenge;
+//i added these to make it static
+        BigInteger[] n;
+        BigInteger pow2;
+        int power;
+        power = pub.power;
+        n = new BigInteger[power+1];
 
+        n[0] = BigInteger.ONE;
+	n[1] = pub.n;
+	for (i = 2; i <= power; i++) n[i] = n[i-1].multiply (n[1]);
+	pow2 = (new BigInteger ("2")).pow (pub.signsize);
+//
 if (DEBUG1) {System.out.println ("Tally.CheckVote.Checkpoint 1");}
 if (DEBUG2) {System.out.println ("votecount = " + votecount);}
 	hash.update (n[1].toByteArray ());
@@ -146,7 +157,7 @@ if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 9");}
 
 if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 1");}
 	i = 0;
-	while ((i < cip.length) && (!CheckVote (cip[i]))) i++;
+	while ((i < cip.length) && (!CheckVote (cip[i],pub))) i++;
 	
 if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 2");}
 	if (i == cip.length) 
@@ -155,7 +166,7 @@ if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 2");}
 if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 3");}
 	temp = cip[i++].vote;
 	for (; i < cip.length; i++)
-	    if (CheckVote (cip[i]))
+	    if (CheckVote (cip[i],pub))
 		temp = (temp.multiply (cip[i].vote)).mod (n[power]);
 
 if (DEBUG1) {System.out.println ("Tally.Decode.Checkpoint 4");}

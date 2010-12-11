@@ -21,7 +21,7 @@ public class test2 {
     static int tallycount = 10;
     static int mintallies = 10;
     static int power = 2;
-    static int bits = 2048;
+    static int bits = 256;
     static int hashsize = 16;
 
     public static void main (String argv[]) throws NoLegalVotes, WrongLength, 
@@ -69,7 +69,6 @@ public class test2 {
         CPrivateKey cpriv = new CPrivateKey (bits, 64);
         CPublicKey cpub = new CPublicKey (cpriv.GetN ());
 
-
 	System.out.println ("Distributing Secret Keys....");
         for (i = 0; i < tallycount; i++)
 	    tallies[i] = new Tally (trusted.GetSecretDistributedKeyPart (i),pub);//returns the distributed key share
@@ -78,8 +77,8 @@ public class test2 {
 	start = (new Date ()).getTime ();
 	for (i = 0; i < votercount; i++) {
 	    voter = new Voter (pub);
-	//    ciparray[i] = voter.Vote (i % votecount);//vote for arbitrary candidate
-            ciparray[i] = voter.CVote (i % votecount,cpub);//vote for arbitrary candidate
+	    ciparray[i] = voter.Vote (i % votecount);//vote for arbitrary candidate
+        //    ciparray[i] = voter.CVote (i % votecount,cpub);//vote for arbitrary candidate
             System.out.print ("Vote("+i+")= "+i%votecount);
 	    System.out.print (".");
 	}
@@ -95,19 +94,24 @@ public class test2 {
 
         temp=ciparray[0].vote;
         for (i = 1; i < votercount; i++) {
-	//    temp=res.CombineVotes(temp, ciparray[i].vote);
-            temp=res.CombineCVotes(cpub,temp, ciparray[i].vote);
+            if(Tally.CheckVote (ciparray[i],pub)){
+	    temp=res.CombineVotes(temp, ciparray[i].vote);
+                System.out.println("T");
+           // temp=Result.CombineCVotes(cpub,temp, ciparray[i].vote);
+            }
 	}
-
         stop = (new Date ()).getTime ();
 	System.out.println ("\nCombining time (msec):" + (stop-start)/votercount);
-
+/*
         System.out.println ("Decrypting....");
 	start = (new Date ()).getTime ();
         msg=cpriv.Decrypt(temp);
         stop = (new Date ()).getTime ();
 	System.out.println ("Decryption time (msec):" + (stop-start));
-/*
+
+ */
+
+
         System.out.println ("Tallying....");
 
         start = (new Date ()).getTime ();
@@ -120,7 +124,7 @@ public class test2 {
 	System.out.println ("\nAvg. Tally time (msec):" + (stop-start)/tallycount);
         msg=res.DistDecryptVotes(tallyarray,temp);
 
- */
+ 
 	System.out.println ("Result of election is: " + msg);
 	System.out.println ("");
 
