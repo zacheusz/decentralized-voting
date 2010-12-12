@@ -40,7 +40,7 @@ if (DEBUG1) {System.out.println ("Result.Checkpoint 2");}
 if (DEBUG1) {System.out.println ("Result.Checkpoint 3");}
     }
 	
-    private boolean CheckShare (DecodingShare share, BigInteger votes)
+    public boolean CheckShare (DecodingShare share, BigInteger votes)
 	                                        throws NoSuchAlgorithmException {
 	int i;
 	MessageDigest hash = MessageDigest.getInstance("SHA");
@@ -187,6 +187,11 @@ public BigInteger CombineVotes ( BigInteger vote1,BigInteger vote2)
 	BigInteger result;
 
 if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 1");}
+
+if (vote1==BigInteger.ZERO)
+    return vote2;
+else if (vote2 == BigInteger.ZERO)
+    return vote2;
 
 
 result = (vote1.multiply (vote2)).mod (n[power]);

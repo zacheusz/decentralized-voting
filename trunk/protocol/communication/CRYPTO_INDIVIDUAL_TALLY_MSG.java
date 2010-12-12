@@ -9,7 +9,7 @@ public class CRYPTO_INDIVIDUAL_TALLY_MSG extends Message {
 	private Vote tally;
 	
 	public CRYPTO_INDIVIDUAL_TALLY_MSG(NodeID src, NodeID dest, Vote tally) {
-		super(Message.INDIVIDUAL_TALLY_MSG, src, dest);
+		super(Message.CRYPTO_INDIVIDUAL_TALLY_MSG, src, dest);
 		this.tally = tally;
 	}
 	

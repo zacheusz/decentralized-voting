@@ -10,7 +10,7 @@ public class CRYPTO_LOCAL_TALLY_MSG extends Message {
 	private int groupId;
 	
 	public CRYPTO_LOCAL_TALLY_MSG(NodeID src, NodeID dest, Vote tally, int groupId) {
-		super(Message.LOCAL_TALLY_MSG, src, dest);
+		super(Message.CRYPTO_LOCAL_TALLY_MSG, src, dest);
 		this.tally = tally;
 		this.groupId = groupId;
 	}

@@ -9,7 +9,7 @@ public class CRYPTO_BALLOT_MSG extends Message {
 	private Vote vote;
 	
 	public CRYPTO_BALLOT_MSG(NodeID src, NodeID dest, Vote vote) {
-		super(Message.BALLOT, src, dest);
+		super(Message.CRYPTO_BALLOT, src, dest);
 		this.vote = vote;
 	}
 	

@@ -53,6 +53,7 @@ public class CryptoNodeLauncher {
 
 
 
+
 		S_Simulator simulator = new S_Simulator();
 
 		Random r = new MTRandom();
@@ -68,6 +69,7 @@ public class CryptoNodeLauncher {
 			NodeID id = new S_NodeID(i, r.nextInt());
 
 			// Create the node
+
 			CryptoNode node = new CryptoNode(id,simulator,simulator,simulator,bootstrapId,trusted.GetSecretDistributedKeyPart (i-1),pub);
 			// And add to simulation
 			simulator.addNode(node);

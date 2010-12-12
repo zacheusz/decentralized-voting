@@ -16,6 +16,7 @@ public abstract class Message implements Serializable, Cloneable {
         public static final byte CRYPTO_BALLOT = 7; // A crypto ballot
 	public static final byte CRYPTO_LOCAL_TALLY_MSG = 8;
 	public static final byte CRYPTO_INDIVIDUAL_TALLY_MSG = 9;
+	public static final byte CRYPTO_DECRYPTION_SHARE_MSG = 10;
 
 	protected byte header;
 	protected NodeID src;
