@@ -5,10 +5,13 @@ nb=$1
 
 echo "Running $nb experiments"
 
-bport=40136
+#randomly taken ports
+bport=22222
+#changed this bootstrap to localhost
 #bname=peeramidion.irisa.fr
+
 bname=localhost
-pport=39622
+pport=44444
 nodesFile=../deploy/nodesGoodPLOk
 
 cd ../deploy
@@ -22,13 +25,13 @@ for ((i=0;i<nb;i++)) do
   pport_temp=$(($pport+$i))
   echo $pport_temp
   mv tmp$sdate $nodesFile
-   echo 'startedBootstrap'
+#   echo 'startedBootstrap'
   ./startKevinBootstrap.sh $bname:$bport $sdate &
-   echo 'endedKevinNode'
+#   echo 'endedBootstrapNode'
   sleep $delay
-   echo 'startedKevinNode'
+ #  echo 'startedKevinNode'
   ./startKevinNode.sh $nodesFile $bname:$bport $pport_temp $sdate &
-   echo 'endedKevinNode'
+# echo 'endedKevinNode'
   wait
 done
 

@@ -2,7 +2,7 @@
 
 # This script allows to launch Simple Gossip executor
 #
-# Usage: command bootstrap_name:bootstrap_port port timestamp
+w# Usage: command bootstrap_name:bootstrap_port port timestamp
 
 # creating the bootstrapset file from these info (no need to redeploy the whole thing when changing the bootstrap)
 # Everything is set in the boostrap as it is the first script to be run
@@ -10,7 +10,7 @@
 source ../configure.sh
 
 #alpha=`myrand 0.65 0.70`
-
+#changed this to constant alpha since I didn't have the myrand function
 beta=$BETA
 
 function launch () {
@@ -59,10 +59,11 @@ echo -e "\E[32;32mLaunching the experiment on all nodes"; tput sgr0 # green
 i=0
 for node in `tac $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
 do
-   echo 'entered for loop'
+ #  echo 'entered for loop'
    if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
    then
 	#echo 'launch'
+#gave launch a parameter i in order to change the port number of the deployed node
       launch i &
    else
 #	echo 'launch2'
@@ -70,7 +71,7 @@ do
    fi
    i=$(($i+1))
 done
-echo 'exited the loop'
+#echo 'exited the loop'
 wait
 
 ./getOutputs.sh $nodesFile $sdate
