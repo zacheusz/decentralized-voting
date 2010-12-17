@@ -1,0 +1,14 @@
+export PROJECT_NAME="p2pvoting"
+export LOGIN_NAME="irisa_$PROJECT_NAME"
+export BOOTSTRAPCLASSNAME="launchers.executor.BootstrapLauncher"
+export NODELAUNCHERCLASSNAME="launchers.executor.SimpleGossipLauncher"
+export GET_VIEW_FROM_BOOTSTRAP_DELAY="50000"
+export DEFAULT_NODEFILE="../deploy/nodesPLAllNew"
+export DEFAULT_BOOTSTRAP="peeramidion.irisa.fr"
+export SSH_TIMEOUT=30
+export BETA=0.05
+export NB_NODES=450
+export NB_MALICIOUS=20
+export NB_GROUPS=18
+export K=1
+export NB_BALLOTS=$((2*$K+1))
