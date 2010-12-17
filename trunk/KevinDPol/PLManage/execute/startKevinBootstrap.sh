@@ -24,7 +24,11 @@ fi
 echo -e "\e[32;32mUsing bootstrap: $BOOTSTRAP and port $BOOTSTRAP_PORT"; tput sgr0 # green
 
 echo -e "\e[32;32mLaunching bootstrap ($BOOTSTRAP) on port $BOOTSTRAP_PORT at time `date`"; tput sgr0 # green
-ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no $LOGIN_NAME@$BOOTSTRAP "cd /tmp; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS"
+
+#ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no $LOGIN_NAME@$BOOTSTRAP "cd /tmp; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS"
+##changed this to simply perform the operations on localhost without needing ssh
+
+cd /tmp; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS
 
 wait
 

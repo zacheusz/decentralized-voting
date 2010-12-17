@@ -90,7 +90,9 @@ done
 
 wait
 
-sed s/$BOOTSTRAP/\#$BOOTSTRAP\ is\ the\ bootstrap/ nodesGoodPL > nodesGoodPLaftersed
+#sed s/$BOOTSTRAP/\#$BOOTSTRAP\ is\ the\ bootstrap/ nodesGoodPL > nodesGoodPLaftersed
+##changed this to only remove one loalhost and denote it as bootstrap..otherwise all localhosts would be commented out.
+sed '0,/$BOOTSTRAP/s//\#$BOOTSTRAP\ is\ the\ bootstrap/' nodesGoodPL > nodesGoodPLaftersed
 mv nodesGoodPLaftersed nodesGoodPL
 
 echo -e "\e[32;32m\033[1m\rDeployed correctly on `cat nodesGoodPL | wc -l` nodes"; tput sgr0 # green

@@ -9,15 +9,24 @@
 
 source ../configure.sh
 
-alpha=`myrand 0.65 0.70`
+#alpha=`myrand 0.65 0.70`
+
 beta=$BETA
 
 function launch () {
-    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS"
+	GOSSIP_PORT=$(($GOSSIP_PORT+$1))
+#    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS"
+##changed this to simply perform the operations on localhost without needing ssh
+cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS
+
 }
 
 function launch2 () {
-    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha $alpha -beta 0 -decision 0.3 -nbGroups $NB_GROUPS"
+	GOSSIP_PORT=$(($GOSSIP_PORT+$1))
+#    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 0 -decision 0.3 -nbGroups $NB_GROUPS"
+##changed this to simply perform the operations on localhost without needing ssh
+cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 0 -decision 0.3 -nbGroups $NB_GROUPS
+
 }
 
 if [ $# -ne 4 ]
@@ -26,6 +35,7 @@ then
    exit 1;
 else
    nodesFile=$1
+
    if [[ `expr $2 : "[a-zA-Z.]*:[0-9]*"` ]]
    then
       BOOTSTRAP_PORT=${2#*:}
@@ -49,15 +59,18 @@ echo -e "\E[32;32mLaunching the experiment on all nodes"; tput sgr0 # green
 i=0
 for node in `tac $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
 do
+   echo 'entered for loop'
    if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
    then
-      launch &
+	#echo 'launch'
+      launch i &
    else
-      launch2 &
+#	echo 'launch2'
+      launch2 i &
    fi
    i=$(($i+1))
 done
-
+echo 'exited the loop'
 wait
 
 ./getOutputs.sh $nodesFile $sdate

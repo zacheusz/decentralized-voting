@@ -5,9 +5,10 @@ nb=$1
 
 echo "Running $nb experiments"
 
-bport=12346
-bname=peeramidion.irisa.fr
-pport=22222
+bport=40136
+#bname=peeramidion.irisa.fr
+bname=localhost
+pport=39622
 nodesFile=../deploy/nodesGoodPLOk
 
 cd ../deploy
@@ -18,17 +19,25 @@ cd ../execute
 for ((i=0;i<nb;i++)) do
   sdate="`date +\"%y%m%d%H%M%S\"`"
   shuf $nodesFile > tmp$sdate
+  pport_temp=$(($pport+$i))
+  echo $pport_temp
   mv tmp$sdate $nodesFile
+   echo 'startedBootstrap'
   ./startKevinBootstrap.sh $bname:$bport $sdate &
+   echo 'endedKevinNode'
   sleep $delay
-  ./startKevinNode.sh $nodesFile $bname:$bport $pport $sdate &
+   echo 'startedKevinNode'
+  ./startKevinNode.sh $nodesFile $bname:$bport $pport_temp $sdate &
+   echo 'endedKevinNode'
   wait
 done
 
-./check.sh
-./check.sh
 
-for i in 09*; do cd $i; ../getStats.sh > stats; tail -1 stats; cd ..; done
+#commentd out the stats generation for now
+#./check.sh
+#./check.sh
+
+#for i in 09*; do cd $i; ../getStats.sh > stats; tail -1 stats; cd ..; done
 
 
 exit 0
