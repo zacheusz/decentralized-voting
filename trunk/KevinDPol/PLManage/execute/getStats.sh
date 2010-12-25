@@ -38,7 +38,7 @@ echo "   - Group $i: sent tally $(($trueb-$falseb))"
 REAL_TALLY="$REAL_TALLY $(($trueb-$falseb))"
 REAL_TALLY_N=$(($REAL_TALLY_N + $trueb-$falseb))
 
-rcv_tally=`cat *.out | grep "($j):" | grep "tally=" | cut -d'=' -f2 | mysum | cut -d'.' -f1`
+rcv_tally=`cat *.out | grep "($j):" | grep "tally=" | cut -d'=' -f2 | ../mysum | cut -d'.' -f1`rstd=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | ../mystd $REAL_TALLY_N`
 echo "   - Group $j received tally $rcv_tally"
 
 cnt_tally=`cat *.out | grep "($j): local tally" | cut -d':' -f4 | tr '\n' ' '`
@@ -66,11 +66,14 @@ god_error=`grep "reason" *.out | grep -c "God"`
 echo " - Abnormal termination ($nb_stop): Late registration $iam_error, No proxy $proxy_error God: $god_error"
 
 alpha=`grep "Param" *.out | head -1 | cut -d'=' -f2`
-mean=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | myaverage`
-std=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | mystd`
+mean=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | ../myaverage`
+#std=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | mystd`
+grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 > sample.dat
+std='../mystd'
 outputs=`grep "Final" *.out | wc -l`
 ignore=`grep "Final" *.out | grep "_" | wc -l`
-rstd=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | mystd $REAL_TALLY_N`
+#rstd=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | mystd $REAL_TALLY_N`
+rstd=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | ../mystd $REAL_TALLY_N`
 propplus=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | grep -c -v "-"`
 propmoins=`grep "Final" *.out | grep -v "_" | cut -d':' -f4 | cut -d'(' -f2 | cut -d')' -f1 | grep -c "-"`
 alphahat=$(($((500*$REAL_TALLY_N/$nb_voters))+500))

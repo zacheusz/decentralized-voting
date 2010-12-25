@@ -27,10 +27,11 @@ mkdir $DIR
 
 for node in `tac $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
 do
-      scp -i $HOME/.ssh/id_rsa -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node:/tmp/$node$date.out $DIR &
+#      scp -i $HOME/.ssh/id_rsa -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node:/home/$LOGIN_NAME/myfiles/tmp/$node$date.out $DIR &
+	sshpass -e scp -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node:/home/$LOGIN_NAME/myfiles/tmp/$node$date.out $DIR &
 done
 
-scp -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no ${LOGIN_NAME}@$DEFAULT_BOOTSTRAP:/tmp/$DEFAULT_BOOTSTRAP$date.out $DIR 
-
+#scp -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no ${LOGIN_NAME}@$DEFAULT_BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$DEFAULT_BOOTSTRAP$date.out $DIR 
+sshpass -e scp -o StrictHostKeyChecking=no ${LOGIN_NAME}@$DEFAULT_BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$DEFAULT_BOOTSTRAP$date.out $DIR 
 wait
 

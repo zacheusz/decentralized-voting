@@ -2,7 +2,7 @@
 
 # This script allows to launch Simple Gossip executor
 #
-w# Usage: command bootstrap_name:bootstrap_port port timestamp
+# Usage: command bootstrap_name:bootstrap_port port timestamp
 
 # creating the bootstrapset file from these info (no need to redeploy the whole thing when changing the bootstrap)
 # Everything is set in the boostrap as it is the first script to be run
@@ -14,19 +14,32 @@ source ../configure.sh
 beta=$BETA
 
 function launch () {
-	GOSSIP_PORT=$(($GOSSIP_PORT+$1))
-#    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS"
+#	GOSSIP_PORT=$(($GOSSIP_PORT+$1))
+#    sshpass -e ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /home/$LOGIN_NAME/myfiles/tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset$node.txt; /home/$LOGIN_NAME/myfiles/tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset$node.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS"
+    sshpass -e ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /home/$LOGIN_NAME/myfiles/tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset$node.txt; java -classpath package/$PROJECT_NAME/$node/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset$node.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS"
 ##changed this to simply perform the operations on localhost without needing ssh
-cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS
-
+#cd /home/$LOGIN_NAME/myfiles/tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /home/$LOGIN_NAME/myfiles/tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS
+ # exit=$?;
+  #  if [[ $exit -eq 0 ]];
+ #   then
+#	echo 'launched'
+ #   else
+#	echo 'failed'
+#    fi
 }
 
 function launch2 () {
-	GOSSIP_PORT=$(($GOSSIP_PORT+$1))
-#    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 0 -decision 0.3 -nbGroups $NB_GROUPS"
+#	GOSSIP_PORT=$(($GOSSIP_PORT+$1))
+    sshpass -e ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /home/$LOGIN_NAME/myfiles/tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset$node.txt; java -classpath package/$PROJECT_NAME/$node/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset$node.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 0 -decision 0.3 -nbGroups $NB_GROUPS"
 ##changed this to simply perform the operations on localhost without needing ssh
-cd /tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 0 -decision 0.3 -nbGroups $NB_GROUPS
-
+#cd /home/$LOGIN_NAME/myfiles/tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /home/$LOGIN_NAME/myfiles/tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 0 -decision 0.3 -nbGroups $NB_GROUPS
+#  exit=$?;
+#    if [[ $exit -eq 0 ]];
+#    then
+#	echo 'launched'
+#    else
+#	echo 'failed to launch'
+#    fi
 }
 
 if [ $# -ne 4 ]
@@ -62,13 +75,16 @@ do
  #  echo 'entered for loop'
    if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
    then
-	#echo 'launch'
+#	echo 'launch'
 #gave launch a parameter i in order to change the port number of the deployed node
-      launch i &
+#      launch i &
+      launch &
    else
 #	echo 'launch2'
-      launch2 i &
+      launch2 &
+ #     launch2 i &
    fi
+	
    i=$(($i+1))
 done
 #echo 'exited the loop'
