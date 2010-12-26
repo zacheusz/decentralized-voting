@@ -3,8 +3,9 @@
 import Cryptosystem.Cryptosystem.MitchmatchedSizeException;
 import java.math.*;
 import Exception.*;
+import java.io.Serializable;
 
-public class PublicKey {
+public class PublicKey implements Serializable{
     static boolean DEBUG1 = false;
     static boolean DEBUG2 = false;
 

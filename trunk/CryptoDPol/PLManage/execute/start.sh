@@ -22,17 +22,13 @@ cd ../execute
 for ((i=0;i<nb;i++)) do
   sdate="`date +\"%y%m%d%H%M%S\"`"
   shuf $nodesFile > tmp$sdate
- # pport_temp=$(($pport+$i))
-  #echo $pport_temp
   mv tmp$sdate $nodesFile
-#   echo 'startedBootstrap'
+  ./startTrustedThirdParty.sh
   ./startKevinBootstrap.sh $bname:$bport $sdate &
-#   echo 'endedBootstrapNode'
   sleep $delay
- #  echo 'startedKevinNode'
   ./startKevinNode.sh $nodesFile $bname:$bport $pport $sdate &
-#  ./startKevinNode.sh $nodesFile $bname:$bport $pport_temp $sdate &
-# echo 'endedKevinNode'
+
+
   wait
 done
 

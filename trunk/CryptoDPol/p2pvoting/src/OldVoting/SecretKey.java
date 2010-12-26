@@ -1,8 +1,9 @@
 package OldVoting;
 
+import java.io.Serializable;
 import java.math.*;
 
-public class SecretKey {
+public class SecretKey implements Serializable{
 
     public BigInteger key;
     public int nr;

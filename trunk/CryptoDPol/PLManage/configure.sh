@@ -3,7 +3,8 @@ export PROJECT_NAME="p2pvoting"
 #changed login name
 export LOGIN_NAME="harkous"
 export BOOTSTRAPCLASSNAME="launchers.executor.BootstrapLauncher"
-export NODELAUNCHERCLASSNAME="launchers.executor.SimpleGossipLauncher"
+export NODELAUNCHERCLASSNAME="launchers.executor.CryptoGossipLauncher"
+export TRUSTEDTHIRDPARTYCLASS="launchers.executor.CryptoPrepareTrusted"
 export GET_VIEW_FROM_BOOTSTRAP_DELAY="50000"
 export DEFAULT_NODEFILE="../deploy/nodesPLAllNew"
 #export DEFAULT_BOOTSTRAP="peeramidion.irisa.fr"
@@ -17,3 +18,9 @@ export NB_MALICIOUS=1
 export NB_GROUPS=2
 export K=1
 export NB_BALLOTS=$((2*$K+1))
+export VOTECOUNT=3
+export TALLYCOUNT=$NB_NODES
+export MINTALLIES=$(($NB_NODES)/$NB_GROUPS))
+export CERTAINTY=64
+
+

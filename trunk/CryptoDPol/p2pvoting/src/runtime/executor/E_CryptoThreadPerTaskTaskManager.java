@@ -5,28 +5,28 @@ import java.lang.management.OperatingSystemMXBean;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
+import protocol.node.CryptoNode;
 
 
-import protocol.node.SimpleNode;
 import runtime.Receiver;
 import runtime.Task;
 import runtime.TaskManager;
 
-public class E_ThreadPerTaskTaskManager implements TaskManager {
+public class E_CryptoThreadPerTaskTaskManager implements TaskManager {
 	public static Timer timer = new Timer();
 	private Receiver r = null;
 
-	public E_ThreadPerTaskTaskManager() {
+	public E_CryptoThreadPerTaskTaskManager() {
 	}
 
-	public E_ThreadPerTaskTaskManager(Receiver r) {
+	public E_CryptoThreadPerTaskTaskManager(Receiver r) {
 		this.r = r;
 	}
 
-	public void setSimpleNode(Receiver r) {
+
+	public void setCryptoNode(Receiver r) {
 		this.r = r;
 	}
-
 	public void registerTask(Task t) {
 		try {
 			new Thread(new TimerHelper(t)).start();
@@ -79,7 +79,7 @@ public class E_ThreadPerTaskTaskManager implements TaskManager {
 				if (r != null) {
 					header = r.toString() + " -> ";
 					if (!r.isStopped()) {
-						((SimpleNode) r).stopped = true;
+						((CryptoNode) r).stopped = true;
 						r.dump("[ERROR][HIGHLOAD] " + r.toString()
 								+ " late by " + lateness
 								+ " ms !!! (Huge CPU load? Load:"
