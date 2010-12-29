@@ -1,25 +1,31 @@
 package protocol.node;
 
+import java.math.BigInteger;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import protocol.communication.GMAV_MSG;
+//import protocol.communication.HITC_MSG;
 import protocol.communication.HITV_MSG;
 import protocol.communication.IAM_MSG;
 import protocol.communication.Message;
 import protocol.communication.STOP_MSG;
 import runtime.NetworkSend;
-import runtime.NodeID;
+//import runtime.E_CryptoNodeID;
 import runtime.TaskManager;
+import runtime.executor.E_CryptoNodeID;
 
 public class Bootstrap extends Node {
-	private List<NodeID> view;
-
+	private List<E_CryptoNodeID> view;
+	private List<E_CryptoNodeID> proxyView;
+     //   private Map<E_CryptoNodeID,Integer> clientSizes = new HashMap<E_CryptoNodeID, Integer>();
 	private int nbIAMMessagesReceived = 0;
 	private int nbGMAVMessagesReceived = 0;
-	private boolean containsMalicious[] = new boolean[NodeID.NB_GROUPS];
-
+//	private boolean containsMalicious[] = new boolean[E_CryptoNodeID.NB_GROUPS];
+     //   private int proxiesGiven=0;
 
 	boolean sentStart = false;
 
@@ -27,9 +33,11 @@ public class Bootstrap extends Node {
 	// Constructors
 	// **************************************************************************
 
-	public Bootstrap(NodeID id, TaskManager taskManager, NetworkSend networkSend) {
+	public Bootstrap(E_CryptoNodeID id, TaskManager taskManager, NetworkSend networkSend) {
 		super(id,networkSend);
-		this.view = new LinkedList<NodeID>();
+		this.view = new LinkedList<E_CryptoNodeID>();
+          	this.proxyView = new LinkedList<E_CryptoNodeID>();
+              //  proxiesGiven=0;
 		taskManager.registerTask(new SelfDestructTask(), SELF_DESTRUCT_DELAY);
 		dump("Bootstrap " + id.getName() + " is born (nb ballots=" + Node.NB_BALLOTS +")");
 	}
@@ -76,13 +84,16 @@ public class Bootstrap extends Node {
 					System.err.println("Received a msg from null");
 					System.exit(1);
 				}
-				if(msg.isMalicious())
-					containsMalicious[getGroupId(msg.getSrc())] = true;
+//				if(msg.isMalicious())
+//					containsMalicious[msg.getSrc().groupId] = true;
 
-				dump("Received IAM message from " + msg.getSrc() + " (" + getGroupId(msg.getSrc()) + ") "+ ((msg.isMalicious())?" (malicious)":""));
+				dump("Received IAM message from " + msg.getSrc() + " (" + getGroupId(msg.getSrc()) + ") ");//+ ((msg.isMalicious())?" (malicious)":""));
 
 				synchronized(view) {
+                                    synchronized(proxyView){
 					view.add(msg.getSrc());
+                                        proxyView.add(msg.getSrc());
+                                    }
 				}
 
 			} else {
@@ -99,7 +110,16 @@ public class Bootstrap extends Node {
 
 
 	private void receiveGMAV(GMAV_MSG msg) {
-		int viewSize = (msg.getGroupId() == getGroupId(msg.getSrc()))?Node.VIEW_SIZE:Node.NB_BALLOTS;
+
+            boolean PROXYVIEW=true;
+            int viewSize;
+            if (msg.getGroupId() == getGroupId( msg.getSrc()))
+            {
+                PROXYVIEW = false;
+                viewSize = Node.VIEW_SIZE;
+            }
+            else
+                viewSize = Node.NB_BALLOTS;
 
 		synchronized(LOCK) {
 			nbGMAVMessagesReceived++;
@@ -117,47 +137,85 @@ public class Bootstrap extends Node {
 				if (view.contains(msg.getSrc())) {
 					// the peer has registered before
 					synchronized(view) {
+                                            synchronized(proxyView){
+                                              //  synchronized(clientSizes){
 						// build view
 						Collections.shuffle(view);
-						List<NodeID> subView = new LinkedList<NodeID>();
-
-						for(NodeID id: view) {
-							if(getGroupId(id) == msg.getGroupId() && !id.equals(msg.getSrc())) {
+						List<E_CryptoNodeID> subView = new LinkedList<E_CryptoNodeID>();
+                                                if (PROXYVIEW)
+                                                {
+                                                  for(E_CryptoNodeID id: proxyView) {
+							if(getGroupId(id) == msg.getGroupId()) {
 								subView.add(id);
+                                                                proxyView.remove(id);
+                                                                
+                               /*                                 Integer csize=(Integer)clientSizes.get(msg.getSrc());
+                                                                if (csize==null)
+                                                                    clientSizes.put(msg.getSrc(), new Integer(1));
+                                                                else
+                                                                    clientSizes.put(msg.getSrc(),new Integer(csize.intValue()+1) );
+                                                                proxiesGiven++;
+                               */
+                                                                break;
 							}
-							// Maximum size
-							if(subView.size() == viewSize) {
-								break;
-							}
-						}
+
+                                                    }
+                                                }
+                                                else{
+
+
+                                                    for(E_CryptoNodeID id: view) {
+                                                            if(getGroupId(id) == msg.getGroupId() && !id.equals(msg.getSrc())) {
+                                                                    subView.add(id);
+                                                            }
+                                                            // Maximum size
+                                                            if(subView.size() == viewSize) {
+                                                                    break;
+                                                            }
+                                                    }
+                                            }
 						// send the sub-view
-						if(viewSize==Node.NB_BALLOTS && subView.size() < viewSize) {
+						if(PROXYVIEW && subView.size() < viewSize) {
 							dump("Cannot send a subview of size " + viewSize +  " to " + msg.getSrc() +": not enough matching peers");
 						}
 						else {
 							dump("Send a subview of size " + subView.size() + " to " + msg.getSrc());
 						}							
 						try {
-							doSendUDP(new HITV_MSG(nodeId, msg.getSrc(), subView, msg.getGroupId(),containsMalicious[getPreviousGroupId(msg.getSrc())]));
+							doSendUDP(new HITV_MSG(nodeId, msg.getSrc(), subView, msg.getGroupId()));
 						} catch(Exception e) {
 							System.err.println("Unable to send STOP message to late node (" + e.getMessage() +")");
 						}
+                                        /*        if (proxiesGiven==view.size())
+                                                {
+                                                    try {
+                                                        for (E_CryptoNodeID cryptoNode:view)
+                                                        {
+							doSendUDP(new HITC_MSG(nodeId, cryptoNode, clientSizes.get(cryptoNode).intValue(), cryptoNode.groupId));
+                                                        }
+						} catch(Exception e) {
+							System.err.println("Unable to send STOP message to late node (" + e.getMessage() +")");
+						}
+                                            }*/
 					}
-				}
+                                            }
+//				}
 			}
+                        }
+
 		}
 	}
 	
 	private double stdDev() {
-		int groupSizes [] = new int[NodeID.NB_GROUPS];
+		int groupSizes [] = new int[E_CryptoNodeID.NB_GROUPS];
 		double s = 0;
-		double m = view.size()/NodeID.NB_GROUPS;
-		for(NodeID id: view)
+		double m = view.size()/E_CryptoNodeID.NB_GROUPS;
+		for(E_CryptoNodeID id: view)
 			groupSizes[getGroupId(id)]++;
 
-		for(int i=0;i<NodeID.NB_GROUPS;i++)
+		for(int i=0;i<E_CryptoNodeID.NB_GROUPS;i++)
 			s+= (groupSizes[i] - m)*(groupSizes[i] - m);
 		
-		return Math.sqrt(s/NodeID.NB_GROUPS);
+		return Math.sqrt(s/E_CryptoNodeID.NB_GROUPS);
 	}
 }

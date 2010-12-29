@@ -1,14 +1,15 @@
 package protocol.communication;
 
 import protocol.communication.Message;
-import runtime.NodeID;
+import runtime.executor.E_CryptoNodeID;
 import OldVoting.Vote;
+import java.math.BigInteger;
 
 public class CRYPTO_BALLOT_MSG extends Message {
 	private static final long serialVersionUID = 1L;
 	private Vote vote;
 	
-	public CRYPTO_BALLOT_MSG(NodeID src, NodeID dest, Vote vote) {
+	public CRYPTO_BALLOT_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, Vote vote) {
 		super(Message.CRYPTO_BALLOT, src, dest);
 		this.vote = vote;
 	}

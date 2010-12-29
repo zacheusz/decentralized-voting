@@ -1,22 +1,22 @@
 package runtime.executor;
 
-import runtime.NodeID;
+import runtime.executor.E_CryptoNodeID;
 import runtime.NodeIDReader;
 
 public class E_NodeIDReader implements NodeIDReader {
-	public NodeID readBootstrapNodeID(String str) {
+	public E_CryptoNodeID readBootstrapNodeID(String str) {
 		String[] data = str.split(" ");
 		if (data.length < 2) {
 			System.err
-					.println("error! NodeID \"" + str + "\" has a bad format");
+					.println("error! E_CryptoNodeID \"" + str + "\" has a bad format");
 			System.exit(1);
 		}
-		E_NodeID id = new E_NodeID(data[0], Integer.parseInt(data[1]));
+		E_CryptoNodeID id = new E_CryptoNodeID(data[0], Integer.parseInt(data[1]),-1);
 		return id;
 	}
 
-	public NodeID readNodeID(String str, int port) {
-		E_NodeID id = new E_NodeID(str, port);
+	public E_CryptoNodeID readNodeID(String str, int port) {
+		E_CryptoNodeID id = new E_CryptoNodeID(str, port,-1);
 		return id;
 	}
 

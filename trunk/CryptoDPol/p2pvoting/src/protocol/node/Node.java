@@ -10,45 +10,46 @@ import java.util.Set;
 import protocol.communication.Message;
 import protocol.communication.STOP_MSG;
 import runtime.NetworkSend;
-import runtime.NodeID;
 import runtime.Receiver;
 import runtime.Task;
+import runtime.executor.E_CryptoNodeID;
 
 public abstract class Node implements Receiver {
 
 	// Constants
 	public static PrintStream out = null;
 	public static final int VIEW_SIZE = Integer.MAX_VALUE;
-	public static final int NB_BALLOTS = 3;
-	protected static final int SELF_DESTRUCT_DELAY = 8 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
+	public static final int NB_BALLOTS = 1;
+	protected static final int SELF_DESTRUCT_DELAY = 12 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
 	
 	// Fields
-	protected final NodeID nodeId;
+	protected final E_CryptoNodeID nodeId;
 	protected final NetworkSend networkSend;
-	
 	// Mutual exclusion
 	protected final Object LOCK = new Object();
 	
-	public Node(NodeID nodeId, NetworkSend networkSend) {
+	public Node(E_CryptoNodeID nodeId, NetworkSend networkSend) {
 		this.nodeId = nodeId;
 		this.networkSend = networkSend;
+ 
 	}
 	
 	// **************************************************************************
 	// Utility methods
 	// **************************************************************************
-	public static int getGroupId(NodeID id) {
-		int hash = id.hashCode();
+	public static int getGroupId(E_CryptoNodeID id) {
+		/*int hash = id.hashCode();
 		hash = (hash<0)?-hash:hash;
-		return hash % NodeID.NB_GROUPS;
+		return hash % E_CryptoNodeID.NB_GROUPS;*/
+               return id.groupId;
 	}
 	
-	public static int getNextGroupId(NodeID id) {
-		return (getGroupId(id) + 1) % NodeID.NB_GROUPS;
+	public static int getNextGroupId(E_CryptoNodeID id) {
+		return (getGroupId(id) + 1) % E_CryptoNodeID.NB_GROUPS;
 	}
 	
-	public static int getPreviousGroupId(NodeID id) {
-		return (getGroupId(id) + NodeID.NB_GROUPS - 1) % NodeID.NB_GROUPS;
+	public static int getPreviousGroupId(E_CryptoNodeID id) {
+		return (getGroupId(id) + E_CryptoNodeID.NB_GROUPS - 1) % E_CryptoNodeID.NB_GROUPS;
 	}
 	
 	public int getGroupId() {
@@ -63,8 +64,8 @@ public abstract class Node implements Receiver {
 		return getPreviousGroupId(nodeId);
 	}
 	
-	protected static void printView(Set<NodeID> subView) {
-		for(NodeID id: subView) {
+	protected  void printView(Set<E_CryptoNodeID> subView) {
+		for(E_CryptoNodeID id: subView) {
 			System.out.print("" + id + " (" + getGroupId(id) + ") ");
 		}
 		System.out.println();
@@ -107,7 +108,9 @@ public abstract class Node implements Receiver {
 	}
 
 	public void dump(String message) {
-		
+	//	if (!nodeId.name.contains("06"))
+          //          return;
+
 		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
 		if(out != null) {
 			synchronized(out) {

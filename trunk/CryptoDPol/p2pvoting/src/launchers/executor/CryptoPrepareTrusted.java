@@ -19,11 +19,11 @@ public class CryptoPrepareTrusted {
 			i++;
 		}
                 //setup voting
-                CryptoNode.VOTERCOUNT = Integer.parseInt(arguments.get("-votercount"));
+                int VOTERCOUNT = Integer.parseInt(arguments.get("-votercount"));
                 CryptoNode.VOTECOUNT = Integer.parseInt(arguments.get("-votecount"));
-                CryptoNode.TALLYCOUNT = Integer.parseInt(arguments.get("-tallycount"));
+                int TALLYCOUNT = Integer.parseInt(arguments.get("-tallycount"));
                 CryptoNode.MINTALLIES = Integer.parseInt(arguments.get("-mintallies"));
-                CryptoNode.CERTAINTY = Integer.parseInt(arguments.get("-certainty"));
+                int CERTAINTY = Integer.parseInt(arguments.get("-certainty"));
 
                 int power = 2;
                 int bits = 256;
@@ -36,17 +36,17 @@ public class CryptoPrepareTrusted {
                 for (i = 0; i < CryptoNode.VOTECOUNT; i++)
                             vote_names[i] = "Vote " + i;
 
-                trusted = new Trusted (bits, power, hashsize, CryptoNode.TALLYCOUNT, CryptoNode.MINTALLIES, CryptoNode.CERTAINTY);//generates the secret key
+                trusted = new Trusted (bits, power, hashsize, TALLYCOUNT, CryptoNode.MINTALLIES, CERTAINTY);//generates the secret key
                 trusted.produceKeyShares();
                 trusted.MakeSelectionElection ("Gore for president?", vote_names);//generates the public key specific for this setup
                 pub = trusted.GetPublicKey ();//gets the public key shared between the voters
 
-                writeToFile("pubKey",pub);
+                writeToFile("keys/pubKey",pub);
                 SecretKey sec;
-                 for (i =0;i<CryptoNode.VOTERCOUNT;i++)
+                 for (i =0;i<VOTERCOUNT;i++)
                  {
                      sec=trusted.GetSecretDistributedKeyPart(i);
-                     writeToFile("secKey"+i,sec );
+                     writeToFile("keys/secKey"+i,sec );
                  }
 
 

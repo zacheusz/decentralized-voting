@@ -1,8 +1,9 @@
 package OldVoting;
 
+import java.io.Serializable;
 import java.math.*;
 
-public class DecodingShare {
+public class DecodingShare implements Serializable{
 
     public BigInteger share;
     public BigInteger vrandom;

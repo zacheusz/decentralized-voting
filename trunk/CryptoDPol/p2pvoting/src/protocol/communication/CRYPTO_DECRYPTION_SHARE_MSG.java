@@ -2,13 +2,13 @@ package protocol.communication;
 
 import OldVoting.DecodingShare;
 import protocol.communication.Message;
-import runtime.NodeID;
+import runtime.executor.E_CryptoNodeID;
 
 public class CRYPTO_DECRYPTION_SHARE_MSG extends Message {
 	private static final long serialVersionUID = 1L;
 	private DecodingShare share;
 	
-	public CRYPTO_DECRYPTION_SHARE_MSG(NodeID src, NodeID dest, DecodingShare share) {
+	public CRYPTO_DECRYPTION_SHARE_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, DecodingShare share) {
 		super(Message.CRYPTO_DECRYPTION_SHARE_MSG, src, dest);
 		this.share = share;
 	}

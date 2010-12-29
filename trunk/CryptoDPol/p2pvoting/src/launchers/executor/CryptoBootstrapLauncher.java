@@ -8,8 +8,7 @@ import runtime.TaskManager;
 import runtime.executor.E_CryptoConnectionListener;
 import runtime.executor.E_CryptoThreadPerTaskTaskManager;
 import runtime.executor.E_NetworkSend;
-import runtime.executor.E_NodeID;
-import runtime.executor.E_ThreadPerTaskTaskManager;
+import runtime.executor.E_CryptoNodeID;
 
 public class CryptoBootstrapLauncher {
 
@@ -20,15 +19,15 @@ public class CryptoBootstrapLauncher {
 			arguments.put(args[i], args[i + 1]);
 			i++;
 		}
-		Setup.configure(arguments);
+		CryptoSetup.configure(arguments);
 		
 		// From Launcher
 		String name = arguments.get("-name");
 		int port = Integer.parseInt(arguments.get("-port"));
 
-		E_NodeID id = new E_NodeID(name, port);
+		E_CryptoNodeID id = new E_CryptoNodeID(name, port,-1);
 
-		TaskManager t = new E_ThreadPerTaskTaskManager();
+		TaskManager t = new E_CryptoThreadPerTaskTaskManager();
 		NetworkSend networkSend = new E_NetworkSend();
 		Bootstrap bt = new Bootstrap(id, t, networkSend);
 

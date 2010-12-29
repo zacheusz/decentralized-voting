@@ -1,21 +1,22 @@
 package protocol.communication;
 
 import protocol.communication.Message;
-import runtime.NodeID;
+import runtime.executor.E_CryptoNodeID;
 import OldVoting.Vote;
+import java.math.BigInteger;
 
 public class CRYPTO_LOCAL_TALLY_MSG extends Message {
 	private static final long serialVersionUID = 1L;
-	private Vote tally;
+	private BigInteger tally;
 	private int groupId;
 	
-	public CRYPTO_LOCAL_TALLY_MSG(NodeID src, NodeID dest, Vote tally, int groupId) {
+	public CRYPTO_LOCAL_TALLY_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, BigInteger tally, int groupId) {
 		super(Message.CRYPTO_LOCAL_TALLY_MSG, src, dest);
 		this.tally = tally;
 		this.groupId = groupId;
 	}
 	
-	public Vote getTally() {
+	public BigInteger getTally() {
 		return tally;
 	}
 

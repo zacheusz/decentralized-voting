@@ -1,12 +1,13 @@
 package protocol.communication;
 
-import runtime.NodeID;
+
+import runtime.executor.E_CryptoNodeID;
 
 public class GMAV_MSG extends Message {
 	private static final long serialVersionUID = 1L;
 	private int groupId;
 
-	public GMAV_MSG(NodeID src, NodeID dest, int groupId) {
+	public GMAV_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, int groupId) {
 		super(Message.GMAV, src, dest);
 		this.groupId = groupId;
 	}

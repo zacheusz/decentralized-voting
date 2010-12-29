@@ -2,7 +2,7 @@ package protocol.communication;
 
 import java.io.Serializable;
 
-import runtime.NodeID;
+import runtime.executor.E_CryptoNodeID;
 
 public abstract class Message implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
@@ -17,13 +17,14 @@ public abstract class Message implements Serializable, Cloneable {
 	public static final byte CRYPTO_LOCAL_TALLY_MSG = 8;
 	public static final byte CRYPTO_INDIVIDUAL_TALLY_MSG = 9;
 	public static final byte CRYPTO_DECRYPTION_SHARE_MSG = 10;
+//	public static final byte HITC = 11;
 
 	protected byte header;
-	protected NodeID src;
-	protected NodeID dest;
+	protected E_CryptoNodeID src;
+	protected E_CryptoNodeID dest;
 	protected long timestamp;
 
-	public Message(byte header, NodeID src, NodeID dest) {
+	public Message(byte header, E_CryptoNodeID src, E_CryptoNodeID dest) {
 		this.header = header;
 		this.src = src;
 		this.dest = dest;
@@ -34,11 +35,11 @@ public abstract class Message implements Serializable, Cloneable {
 		return header;
 	}
 
-	public NodeID getDest() {
+	public E_CryptoNodeID getDest() {
 		return dest;
 	}
 
-	public NodeID getSrc() {
+	public E_CryptoNodeID getSrc() {
 		return src;
 	}
 

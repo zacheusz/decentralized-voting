@@ -4,22 +4,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 import protocol.communication.Message;
-import runtime.NodeID;
+
+import runtime.executor.E_CryptoNodeID;
 
 public class HITV_MSG extends Message {
 	private static final long serialVersionUID = 1L;
-	private List<NodeID> view;
+	private List<E_CryptoNodeID> view;
 	private int groupId;
-	private boolean knownModulation;
 
-	public HITV_MSG(NodeID src, NodeID dest, List<NodeID> view, int groupId, boolean knownModulation) {
+	public HITV_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, List<E_CryptoNodeID> view, int groupId) {
 		super(Message.HITV, src, dest);
 		this.view = view;
 		this.groupId = groupId;
-		this.knownModulation = knownModulation; 
 	}
 
-	public List<NodeID> getView() {
+	public List<E_CryptoNodeID> getView() {
 		return view;
 	}
 	
@@ -27,17 +26,14 @@ public class HITV_MSG extends Message {
 		return groupId;
 	}
 	
-	public boolean knownModulation() {
-		return knownModulation;
-	}
-	
+
 	@Override
 	public void doCopy(Message msg) {
 		super.doCopy(msg);
 		
 		HITV_MSG m = (HITV_MSG) msg;
-		view = new LinkedList<NodeID>();
-		for (NodeID id : m.view) {
+		view = new LinkedList<E_CryptoNodeID>();
+		for (E_CryptoNodeID id : m.view) {
 			view.add(id);
 		}
 		groupId = m.groupId;

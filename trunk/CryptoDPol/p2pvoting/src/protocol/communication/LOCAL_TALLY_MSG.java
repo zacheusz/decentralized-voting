@@ -1,14 +1,14 @@
 package protocol.communication;
 
 import protocol.communication.Message;
-import runtime.NodeID;
+import runtime.executor.E_CryptoNodeID;
 
 public class LOCAL_TALLY_MSG extends Message {
 	private static final long serialVersionUID = 1L;
 	private int tally;
 	private int groupId;
 	
-	public LOCAL_TALLY_MSG(NodeID src, NodeID dest, int tally, int groupId) {
+	public LOCAL_TALLY_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, int tally, int groupId) {
 		super(Message.LOCAL_TALLY_MSG, src, dest);
 		this.tally = tally;
 		this.groupId = groupId;

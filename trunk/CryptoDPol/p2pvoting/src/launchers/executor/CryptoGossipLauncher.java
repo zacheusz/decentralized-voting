@@ -1,8 +1,11 @@
 package launchers.executor;
 
+
 import OldVoting.PublicKey;
 import OldVoting.SecretKey;
+
 import java.io.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,19 +13,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import protocol.node.CryptoNode;
 
-import protocol.node.SimpleNode;
 import runtime.NetworkSend;
-import runtime.NodeID;
 import runtime.NodeIDReader;
 import runtime.Stopper;
 import runtime.TaskManager;
-import runtime.executor.E_ConnectionListener;
+import runtime.executor.E_CryptoConnectionListener;
+import runtime.executor.E_CryptoNodeID;
+
 import runtime.executor.E_CryptoThreadPerTaskTaskManager;
 import runtime.executor.E_NetworkSend;
-import runtime.executor.E_NodeID;
+
 import runtime.executor.E_NodeIDReader;
 import runtime.executor.E_Stopper;
-import runtime.executor.E_ThreadPerTaskTaskManager;
+
 
 public class CryptoGossipLauncher {
 
@@ -33,34 +36,38 @@ public class CryptoGossipLauncher {
 			arguments.put(args[i], args[i + 1]);
 			i++;
 		}
-		Setup.configure(arguments);
+		CryptoSetup.configure(arguments);
 		
 		// From Launcher
 		String bset = arguments.get("-bset");
 		String name = arguments.get("-name");
 		int port = Integer.parseInt(arguments.get("-port"));
-		int number = Integer.parseInt(arguments.get("-number"));
+                
+                String secKeyFile = arguments.get("-secretKeyFile");
+                String pubKeyFile = arguments.get("-publicKeyFile");
 
+                int groupId = Integer.parseInt(arguments.get("-groupId"));
+		
 		E_NodeIDReader nodeIDReader = new E_NodeIDReader();
-		E_NodeID id = new E_NodeID(name, port);
+		E_CryptoNodeID id = new E_CryptoNodeID(name, port,groupId);
 
-		TaskManager taskManager = new E_ThreadPerTaskTaskManager();
+		TaskManager taskManager = new E_CryptoThreadPerTaskTaskManager();
 		NetworkSend networkSend = new E_NetworkSend();
 
-		Set<NodeID> bootstrapSet = initBootstrapSet(bset, nodeIDReader);
+		Set<E_CryptoNodeID> bootstrapSet = initBootstrapSet(bset, nodeIDReader);
 
 		Stopper stopper = new E_Stopper(taskManager);
 
-                PublicKey pub=(PublicKey) getObject("pubKey");
-                SecretKey sec=(SecretKey) getObject("secKey"+number);
-		
+                PublicKey pub=(PublicKey) getObject(pubKeyFile);
+                SecretKey sec=(SecretKey) getObject(secKeyFile);
+               
 		CryptoNode node = new CryptoNode(id,taskManager,networkSend,stopper,bootstrapSet.iterator().next(),sec,pub);
 
 		((E_CryptoThreadPerTaskTaskManager) taskManager).setCryptoNode(node);
 
-		new Thread(new E_ConnectionListener(port, taskManager, node)).start();
+		new Thread(new E_CryptoConnectionListener(port, taskManager, node)).start();
 	}
- private static Object getObject(String filename)  
+ public static Object getObject(String filename)
         {
         FileInputStream fis = null;
        ObjectInputStream in = null;
@@ -92,15 +99,15 @@ public class CryptoGossipLauncher {
 						+ "-bset boostrapset_file" + "-fileName output_filename");
 	}
 
-	public static Set<NodeID> initBootstrapSet(String bootstrapSetFile,
+	public static Set<E_CryptoNodeID> initBootstrapSet(String bootstrapSetFile,
 			NodeIDReader nodeIDReader) {
 		try {
-			Set<NodeID> bootstrapSet = new HashSet<NodeID>();
+			Set<E_CryptoNodeID> bootstrapSet = new HashSet<E_CryptoNodeID>();
 			FileReader fr = new FileReader(bootstrapSetFile);
 			BufferedReader inBuff = new BufferedReader(fr);
 			String peer = "";
 			while ((peer = inBuff.readLine()) != null) {
-				NodeID id = nodeIDReader.readBootstrapNodeID(peer);
+				E_CryptoNodeID id = nodeIDReader.readBootstrapNodeID(peer);
 				bootstrapSet.add(id);
 			}
 			inBuff.close();
@@ -112,4 +119,7 @@ public class CryptoGossipLauncher {
 			return null;
 		}
 	}
+
+     
+
 }

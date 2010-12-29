@@ -1,8 +1,9 @@
 package OldVoting;
 
+import java.io.Serializable;
 import java.math.*;
 
-public class Vote {
+public class Vote implements Serializable{
 
     public BigInteger vote;
 

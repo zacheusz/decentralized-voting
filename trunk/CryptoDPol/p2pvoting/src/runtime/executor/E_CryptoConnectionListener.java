@@ -159,8 +159,8 @@ public class E_CryptoConnectionListener implements Runnable {
 				e.printStackTrace();
 				// System.exit(0);
 			} catch (ClassNotFoundException cnfe) {
-				System.out
-						.println("ClassNotFoundException receiving message..."
+                            System.out.println("Message Receiver");
+				System.out.println("ClassNotFoundException  receiving message 1..."
 								+ cnfe.getMessage());
 			}
 		}
@@ -191,8 +191,8 @@ public class E_CryptoConnectionListener implements Runnable {
 				// e.printStackTrace();
 				// System.exit(0);
 			} catch (ClassNotFoundException cnfe) {
-				System.out
-						.println("ClassNotFoundException receiving message..."
+                            System.out.println("TCP Thread Receiver");
+				System.out.println("ClassNotFoundException  receiving message 2..."
 								+ cnfe.getMessage());
 			}
 		}

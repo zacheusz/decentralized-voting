@@ -9,3 +9,4 @@ find . -name "*.sh" -print | xargs sed -i 's/ssh -/sshpass -e ssh -/g'
 find . -name "*.sh" -print | xargs sed -i 's/ \/tmp/home\/$LOGIN_NAME\/myfiles\/tmp/g'
 
 find . -name "*.sh" -print | xargs sed -i 's/ home\/$LOGIN_NAME/ \/home\/$LOGIN_NAME/g'
+find . -name "*.java" -print | xargs sed 's/ home\/E_NodeID/E_CryptoNodeID/g'

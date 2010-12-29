@@ -70,7 +70,7 @@ public class E_NetworkSend implements NetworkSend {
 	public void sendUDP(Message msg) throws UnknownHostException, IOException {
 
 		// Receiver
-		E_NodeID id = (E_NodeID) msg.getDest();
+		E_CryptoNodeID id =   msg.getDest();
 		InetAddress client = Inet4Address.getByName(id.getName());
 		// Serialize msg
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -119,7 +119,7 @@ public class E_NetworkSend implements NetworkSend {
 
 		public void execute() throws UnknownHostException, IOException {
 			// Node.nbMsgSent++;
-			E_NodeID id = (E_NodeID) msg.getDest();
+			E_CryptoNodeID id =  msg.getDest();
 			Socket sc = new Socket();
 			try {
 				InetSocketAddress isc = new InetSocketAddress(InetAddress

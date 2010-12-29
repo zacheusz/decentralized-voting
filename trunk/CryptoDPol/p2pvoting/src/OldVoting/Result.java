@@ -188,17 +188,20 @@ public BigInteger CombineVotes ( BigInteger vote1,BigInteger vote2)
 
 if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 1");}
 
-if (vote1==BigInteger.ZERO)
+if (vote1.equals(BigInteger.ZERO))
     return vote2;
-else if (vote2 == BigInteger.ZERO)
-    return vote2;
+else if (vote2 .equals(BigInteger.ZERO))
+    return vote1;
+else
+    {
 
+    result = (vote1.multiply (vote2))
+            .mod (n[power]);
+    if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 2");}
+    if (DEBUG3) {System.out.println ("Combined Votes = " + result);}
 
-result = (vote1.multiply (vote2)).mod (n[power]);
-if (DEBUG1) {System.out.println ("Result.Combine.Checkpoint 2");}
-if (DEBUG3) {System.out.println ("Combined Votes = " + result);}
-
-return result;
+    return result;
+    }
     }
 
     public BigInteger DistDecryptVotes (DecodingShare[] cip, BigInteger result)

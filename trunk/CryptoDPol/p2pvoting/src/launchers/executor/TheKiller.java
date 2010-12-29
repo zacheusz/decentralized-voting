@@ -7,9 +7,8 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import protocol.communication.STOP_MSG;
-import runtime.NodeID;
 import runtime.executor.E_NetworkSend;
-import runtime.executor.E_NodeID;
+import runtime.executor.E_CryptoNodeID;
 
 public class TheKiller {
 
@@ -31,8 +30,8 @@ public class TheKiller {
 		String message = arguments.get("-message");
 		
 		message = (message==null)?"no message":message;
-		NodeID srcId = new E_NodeID("God",0);
-		NodeID destId = new E_NodeID(name,port);
+		E_CryptoNodeID srcId = new E_CryptoNodeID("God",0,-1);
+		E_CryptoNodeID destId = new E_CryptoNodeID(name,port,-1);
 		
 		try {
 				(new E_NetworkSend()).sendUDP(new STOP_MSG(srcId,destId,message));

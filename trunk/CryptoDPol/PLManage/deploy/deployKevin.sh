@@ -17,8 +17,9 @@ function myRsync () {
 #    rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete package $LOGIN_NAME@$node:/tmp 2>/dev/null
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME  -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete package $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp 2>/dev/null
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME  -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete dummy $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp2 2>/dev/null
-rsync -R -p -e "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete bin $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp/package/p2pvoting/$node 2>/dev/null
-#rsync -R -p -e "sshpass -e ssh -l harkous -o StrictHostKeyChecking=no -o ConnectTimeout=20 -o Compression=no -x" --timeout=20 -al --force --delete bin harkous@icbc07pc02.epfl.ch:/home/harkous/myfiles/tmp/package/p2pvoting/icbc07pc02.epfl.ch 2>/dev/null
+
+rsync -R -p -e "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete bin $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME 2>/dev/null
+
 
     exit=$?;
     if [[ $exit -eq 0 ]];
@@ -59,7 +60,7 @@ echo -e "\e[32;32m\033[1m\rPreparation finished!             "; tput sgr0 # gree
 nodes=$nodesFile
 NBOFDEPLOYEDNODES=$((`cat $nodes | grep -iv "#" | cut -d ' ' -f 1 | wc -l`))
 echo -e "\e[32;32mTrying to deploy on $NBOFDEPLOYEDNODES nodes"; tput sgr0 # green
-
+i=0
 for node in `cat $nodes | grep -iv "#" | cut -d ' ' -f 1`
 do
     while [ true ]
@@ -68,17 +69,18 @@ do
 	if [ $nbOfConcurrentJobs -le $simultaneousRSYNC ]
 	then
 	     echo -e "\E[32;40mDeploying on $node"; tput sgr0 # green
-	    myRsync &
+	    myRsync $i &
 	    break
 	else
 	    sleep 1
 	fi
     done
+   i=$(($i+1))
 done
 
 echo -e "\e[32;32mDeploying on \033[1mbootstrap\033[0m\e[0;32m on $BOOTSTRAP"; tput sgr0 # green + bold (bootstrap)
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete package $LOGIN_NAME@$BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp &
-rsync -p -e -R "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete bin $LOGIN_NAME@$BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/package/p2pvoting/$node 2>/dev/null
+rsync -p -e -R "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete bin $LOGIN_NAME@$BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$BOOTSTRAP/package/p2pvoting 2>/dev/null
 #rsync -p -al --exclude '.svn' --delete package /home/$LOGIN_NAME/myfiles/tmp
 #echo rsysnc_END
 while [ true ]

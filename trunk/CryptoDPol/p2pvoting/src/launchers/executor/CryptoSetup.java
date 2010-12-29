@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import protocol.node.Node;
 import protocol.node.CryptoNode;
-import runtime.NodeID;
+import runtime.executor.E_CryptoNodeID;
 
 public abstract class CryptoSetup {
 
@@ -22,8 +22,20 @@ public abstract class CryptoSetup {
 			Node.out = new PrintStream(new BufferedOutputStream(new FileOutputStream(arguments.get("-fileName"))));
 		}
 		if(arguments.get("-nbGroups") != null) {
-			NodeID.NB_GROUPS = Integer.parseInt(arguments.get("-nbGroups"));
-		}		
+			E_CryptoNodeID.NB_GROUPS = Integer.parseInt(arguments.get("-nbGroups"));
+		}
+
+                if(arguments.get("-votecount") != null) {
+                                CryptoNode.VOTECOUNT = Integer.parseInt(arguments.get("-votecount"));
+
+                }
+
+                if(arguments.get("-mintallies") != null) {
+                                    CryptoNode.MINTALLIES = Integer.parseInt(arguments.get("-mintallies"));
+
+                }                
+
+
 	}
 	
 }
