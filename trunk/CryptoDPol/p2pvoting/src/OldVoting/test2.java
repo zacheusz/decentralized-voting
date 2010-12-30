@@ -19,7 +19,7 @@ public class test2 {
     static int votercount = 10;
     static int votecount = 3;
     static int tallycount = 10;
-    static int mintallies = 10;
+    static int mintallies = 5;
     static int power = 2;
     static int bits = 256;
     static int hashsize = 16;
@@ -38,7 +38,9 @@ public class test2 {
 	  
 	Vote[] ciparray = new Vote[votercount]; //array of cipher texts representing the votes
 //	Vote[] virtualciparray;// array of cipher texts representing the scaled version of the votes
-	DecodingShare[] tallyarray =  new DecodingShare[tallycount];//contains the decoding shares
+	DecodingShare[] tallyarray1 =  new DecodingShare[mintallies];//contains the decoding shares
+        DecodingShare[] tallyarray2 =  new DecodingShare[mintallies];//contains the decoding shares
+
 	BigInteger msg, temp;
         BigInteger result;
 	
@@ -71,8 +73,10 @@ public class test2 {
 
 	System.out.println ("Distributing Secret Keys....");
         for (i = 0; i < tallycount; i++)
-	    tallies[i] = new Tally (trusted.GetSecretDistributedKeyPart (i),pub);//returns the distributed key share
-
+        {
+            tallies[i] = new Tally(trusted.GetSecretDistributedKeyPart(i), pub);//returns the distributed key share
+            System.out.println ("secret keys:"+trusted.GetSecretDistributedKeyPart(i));
+        }
 	System.out.println ("Voting....");
 	start = (new Date ()).getTime ();
 	for (i = 0; i < votercount; i++) {
@@ -115,18 +119,21 @@ public class test2 {
         System.out.println ("Tallying....");
 
         start = (new Date ()).getTime ();
-	for (i = 0; i < tallycount; i++ ) {
+	for (i = 0; i < tallycount; i=i+2 ) {
             System.out.print (i);
-	    tallyarray[i] = tallies[i].Decode (temp); //get the decoding share
+	    tallyarray1[i/2] = tallies[i].Decode (temp); //get the decoding share
+	//    tallyarray2[i] = tallies[i].Decode (temp); //get the decoding share
+
 	    System.out.print (".");
 	}
 	stop = (new Date ()).getTime ();
 	System.out.println ("\nAvg. Tally time (msec):" + (stop-start)/tallycount);
-        msg=res.DistDecryptVotes(tallyarray,temp);
+        msg=res.DistDecryptVotes(tallyarray1,temp);
+	System.out.println ("Result of election 1 is: " + msg);
+  //      res.PrintResult (msg);
+   //     msg=res.DistDecryptVotes(tallyarray2,temp);
+   //     System.out.println ("Result of election 2 is: " + msg);
 
- 
-	System.out.println ("Result of election is: " + msg);
-	System.out.println ("");
 
 	res.PrintResult (msg);
 

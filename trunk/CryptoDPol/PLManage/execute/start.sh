@@ -6,12 +6,12 @@ nb=$1
 echo "Running $nb experiments"
 
 #randomly taken ports
-bport=39222
+bport=44577
 #changed this bootstrap to localhost
 #bname=peeramidion.irisa.fr
 
 bname=icbc07pc02.epfl.ch
-pport=34366
+pport=45488
 nodesFile=../deploy/nodesGoodPLOk
 
 ./startTrustedThirdParty.sh

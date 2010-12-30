@@ -43,12 +43,15 @@ public class CryptoPrepareTrusted {
 
                 writeToFile("keys/pubKey",pub);
                 SecretKey sec;
-                 for (i =0;i<VOTERCOUNT;i++)
+                int numGroups=VOTERCOUNT/CryptoNode.MINTALLIES;
+       //         int index;
+         //       for (int j=0;j<numGroups;j++){
+                 for (i =0;i<CryptoNode.MINTALLIES;i++)
                  {
-                     sec=trusted.GetSecretDistributedKeyPart(i);
+                     sec=trusted.GetSecretDistributedKeyPart(i);             
                      writeToFile("keys/secKey"+i,sec );
                  }
-
+           // }
 
 
 

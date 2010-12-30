@@ -83,24 +83,28 @@ echo -e "\E[32;32mLaunching the experiment on all nodes"; tput sgr0 # green
 
 i=0
 gid=0
+j=0
 for node in `tac $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
 do
  #  echo 'entered for loop'
    gid=$(($i%$NB_GROUPS))
-  #echo "gid:" $gid
+   j=$(($i/$NB_GROUPS))
+  echo "gid:" $gid
+  echo "j:" $j
    if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
    then
 #	echo 'launch'
 #gave launch a parameter i in order to change the port number of the deployed node
-      launch $i $gid &
+      launch $j $gid &
 #      launch &
    else
 #	echo 'launch2'
  #     launch2 &
-      launch2 $i $gid &
+      launch2 $j $gid &
    fi
 	
    i=$(($i+1))
+
 done
 #echo 'exited the loop'
 wait
