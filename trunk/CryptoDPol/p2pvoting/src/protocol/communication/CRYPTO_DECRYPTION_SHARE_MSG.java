@@ -7,16 +7,20 @@ import runtime.executor.E_CryptoNodeID;
 public class CRYPTO_DECRYPTION_SHARE_MSG extends Message {
 	private static final long serialVersionUID = 1L;
 	private DecodingShare share;
+        private int shareOrder;
 	
-	public CRYPTO_DECRYPTION_SHARE_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, DecodingShare share) {
+	public CRYPTO_DECRYPTION_SHARE_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, DecodingShare share,int shareOrder) {
 		super(Message.CRYPTO_DECRYPTION_SHARE_MSG, src, dest);
 		this.share = share;
+                this.shareOrder=shareOrder;
 	}
 	
 	public DecodingShare getShare() {
 		return share;
 	}
-	
+	public int getShareOrder() {
+		return shareOrder;
+	}
 	@Override
 	public void doCopy(Message msg) {
 		super.doCopy(msg);

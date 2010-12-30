@@ -68,9 +68,10 @@ public class CryptoNode extends Node {
     protected BigInteger finalResult = BigInteger.ZERO;
     protected DecodingShare nodeResultShare;
     protected Map<E_CryptoNodeID, DecodingShare> resultShares = new HashMap<E_CryptoNodeID, DecodingShare>();
-    //protected DecodingShare[] resultSharesList;
-  //  protected int currentDecodingIndex;
+    protected DecodingShare[] resultSharesList;
+    protected int currentDecodingIndex;
     protected int numIndTallies;
+    protected int shareOrder;
     // Overlay management
     protected boolean receivedPeerView = false;
     protected boolean receivedProxyView = false;
@@ -90,7 +91,8 @@ public class CryptoNode extends Node {
     // **************************************************************************
     // Constructors
     // **************************************************************************
-    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, E_CryptoNodeID bootstrap, SecretKey sec, PublicKey pub) throws Exception {
+    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, E_CryptoNodeID bootstrap, SecretKey sec, PublicKey pub,int shareOrder) throws Exception {
+
         super(nodeId, networkSend);
         this.isMalicious = (Math.random() < MALICIOUS_RATIO);
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
@@ -115,8 +117,10 @@ public class CryptoNode extends Node {
         finalEncryptedResult = BigInteger.ZERO;
         finalResult = BigInteger.ZERO;
         numIndTallies = 0;
-      //  resultSharesList = new DecodingShare[MINTALLIES];
-//        currentDecodingIndex = 0;
+        resultSharesList = new DecodingShare[MINTALLIES];
+        currentDecodingIndex = 0;
+        this.shareOrder=shareOrder;
+
         //         clientsReceived=0;
         //
         for (int i = 0; i < E_CryptoNodeID.NB_GROUPS; i++) {
@@ -326,10 +330,11 @@ public class CryptoNode extends Node {
                     //          dump("Inputs to check share:"+msg.getShare()+" "+finalEncryptedResult);
                     //              if (res.CheckShare(msg.getShare(), finalEncryptedResult)) {
 //                dump("Received Share is legal."+ "from " + msg.getSrc());
-                    resultShares.put(msg.getSrc(), msg.getShare());
-                    //resultSharesList[currentDecodingIndex] = nodeResultShare;
-                    dump("sharesize: "+resultShares.size());
-                    if (isFinalResultCalculated && resultShares.size() == MINTALLIES) {
+                 //   resultShares.put(msg.getSrc(), msg.getShare());
+                    resultSharesList[msg.getShareOrder()] = msg.getShare() ;
+                    currentDecodingIndex++;
+                //    dump("sharesize: "+resultShares.size());
+                    if (isFinalResultCalculated && currentDecodingIndex == MINTALLIES) {
                         taskManager.registerTask(new CloseTallyDecryptionSharing());
                         taskManager.registerTask(new TallyDecryption());
 
@@ -634,11 +639,11 @@ public class CryptoNode extends Node {
 
                             dump("final encrypted:" + finalEncryptedResult.toString());
                             nodeResultShare = tally.Decode(finalEncryptedResult);
-                              resultShares.put(nodeId, nodeResultShare);
-                              dump("sharesize: "+resultShares.size());
-                            //resultSharesList[currentDecodingIndex] = nodeResultShare;
-                            //currentDecodingIndex++;
+                          //    resultShares.put(nodeId, nodeResultShare);
+                            resultSharesList[shareOrder] = nodeResultShare;
+                            currentDecodingIndex++;
                             isFinalResultCalculated = true;
+                            dump("sharesize: "+currentDecodingIndex);
 
 
 
@@ -658,7 +663,7 @@ public class CryptoNode extends Node {
                                 for (E_CryptoNodeID peerId : peerView) {
                                     dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                                     try {
-                                        doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare));
+                                        doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare,shareOrder));
                                     } catch (Exception e) {
                                         dump("TCP: cannot send decryption share");
                                     }
@@ -668,7 +673,7 @@ public class CryptoNode extends Node {
                             }
 
                         }
-                        if (resultShares.size()==MINTALLIES) {
+                        if (currentDecodingIndex==MINTALLIES) {
                             taskManager.registerTask(new CloseTallyDecryptionSharing());
                             isDecryptionSharingOver=true;
                             taskManager.registerTask(new TallyDecryption());
@@ -688,9 +693,9 @@ public class CryptoNode extends Node {
                 dump("TallyDecryption");
 
                 try {
-                            DecodingShare[] shares = (DecodingShare[]) resultShares.values().toArray(new DecodingShare[resultShares.size()]);
+                   //         DecodingShare[] shares = (DecodingShare[]) resultShares.values().toArray(new DecodingShare[resultShares.size()]);
                     //    dump("size: "+currentDecodingIndex);
-                    for (DecodingShare sh : shares) {
+                    for (DecodingShare sh : resultSharesList) {
                         if (res.CheckShare(sh, finalEncryptedResult)) {
                             dump("share ok");
                         } else {
@@ -699,7 +704,7 @@ public class CryptoNode extends Node {
                     }
                     //dump("final input: "+finalEncryptedResult.toString());
 
-                    finalResult = res.DistDecryptVotes(shares, finalEncryptedResult);
+                    finalResult = res.DistDecryptVotes(resultSharesList, finalEncryptedResult);
                     dump("Determined final result:" + finalResult);
       //              try {
         //                Thread.currentThread().sleep(10000);
