@@ -32,6 +32,6 @@ do
 done
 
 #scp -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no ${LOGIN_NAME}@$DEFAULT_BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$DEFAULT_BOOTSTRAP$date.out $DIR 
-sshpass -e scp -o StrictHostKeyChecking=no ${LOGIN_NAME}@$DEFAULT_BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$node/$DEFAULT_BOOTSTRAP$date.out $DIR 
+sshpass -e scp -o StrictHostKeyChecking=no ${LOGIN_NAME}@$DEFAULT_BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$DEFAULT_BOOTSTRAP/$DEFAULT_BOOTSTRAP$date.out $DIR 
 wait
 

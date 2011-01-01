@@ -14,7 +14,7 @@ bname=icbc07pc02.epfl.ch
 pport=$(($RANDOM +10000))
 nodesFile=../deploy/nodesGoodPLOk
 
-./startTrustedThirdParty.sh
+#./startTrustedThirdParty.sh
 
 cd ../deploy
 ./deployKevin.sh $DEFAULT_NODEFILE $bname
@@ -36,10 +36,10 @@ done
 
 
 #commentd out the stats generation for now
-#./check.sh
-#./check.sh
+./check.sh
+./check.sh
 
-#for i in 10*; do cd $i; ../getStats.sh > stats; tail -1 stats; cd ..; done
+for i in 10*; do cd $i; ../getStats.sh > stats; tail -1 stats; cd ..; done
 
 
 exit 0
