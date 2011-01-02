@@ -13,9 +13,9 @@ export DEFAULT_BOOTSTRAP="icbc07pc02.epfl.ch"
 export SSH_TIMEOUT=30
 export BETA=0.05
 #tried deploying on fewer nodes
-export NB_NODES=9
-export NB_MALICIOUS=1
-export NB_GROUPS=2
+export NB_NODES=16
+export NB_MALICIOUS=0
+export NB_GROUPS=3
 export K=1
 #export NB_BALLOTS=$((2*$K+1))
 export NB_BALLOTS=1
@@ -24,3 +24,4 @@ export TALLYCOUNT=$NB_NODES
 export VOTERCOUNT=$(($NB_NODES-1))
 export MINTALLIES=$(($VOTERCOUNT/$NB_GROUPS))
 export CERTAINTY=64
+export BITS=1024
