@@ -2,11 +2,11 @@
 
 # Usage: command nodes_file bootstrap_name [publicator_name]
 
-RSYNC_TIMEOUT="20"
-SSH_TIMEOUT="20"
+RSYNC_TIMEOUT="40"
+SSH_TIMEOUT="40"
 simultaneousRSYNC=100 # it is doubled later (ps a | grep rsync is doubled because of ssh presence)
 simultaneousRSYNC=$(($simultaneousRSYNC*2))
-DEPLOY_LIST="p2pvoting" # list of projects to deploy (must correspond to folders)
+DEPLOY_LIST=$PROJECT_NAME # list of projects to deploy (must correspond to folders)
 
 source ../configure.sh
 
@@ -80,7 +80,7 @@ done
 
 echo -e "\e[32;32mDeploying on \033[1mbootstrap\033[0m\e[0;32m on $BOOTSTRAP"; tput sgr0 # green + bold (bootstrap)
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete package $LOGIN_NAME@$BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp &
-rsync -p -e -R "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete bin $LOGIN_NAME@$BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$BOOTSTRAP/package/p2pvoting 2>/dev/null
+rsync -p -e -R "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete bin $LOGIN_NAME@$BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$BOOTSTRAP/package/$PROJECT_NAME 2>/dev/null
 #rsync -p -al --exclude '.svn' --delete package /home/$LOGIN_NAME/myfiles/tmp
 #echo rsysnc_END
 while [ true ]

@@ -46,7 +46,7 @@ if [ ! -e package ]
 then
     mkdir package
 fi
-rsync -p -al --exclude '.svn' jre package/ 
+#rsync -p -al --exclude '.svn' jre package/ 
 
 for project in $DEPLOY_LIST
 do

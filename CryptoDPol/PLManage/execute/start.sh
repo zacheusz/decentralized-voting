@@ -14,13 +14,20 @@ bname=icbc07pc02.epfl.ch
 pport=$(($RANDOM +10000))
 nodesFile=../deploy/nodesGoodPLOk
 
-./startTrustedThirdParty.sh
+
 
 cd ../deploy
 ./deployKevin.sh $DEFAULT_NODEFILE $bname
 head -$NB_NODES nodesGoodPL | shuf > $nodesFile
 
+START=$(date +%s)
+
+
+
+AFTERTRUSTED=$(date +%s)
+
 cd ../execute
+./startTrustedThirdParty.sh
 for ((i=0;i<nb;i++)) do
   sdate="`date +\"%y%m%d%H%M%S\"`"
   shuf $nodesFile > tmp$sdate
@@ -33,7 +40,13 @@ for ((i=0;i<nb;i++)) do
 
   wait
 done
+END=$(date +%s)
 
+DIFF1=$(( $AFTERTRUSTED - $START ))
+DIFF2=$(( $END - $AFTERTRUSTED ))
+
+echo "time for trusted 3rd party $DIFF1"
+echo "time for voting $DIFF2"
 
 #commentd out the stats generation for now
 ./check.sh
