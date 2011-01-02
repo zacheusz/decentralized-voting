@@ -30,7 +30,7 @@ fi
 
 for node in `tac $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
 do
-    cd "../../p2pvoting/bin/"
+    cd "../../PROJECT_NAME/bin/"
     echo -e "\E[32;32mSending STOP_MSG to $node"; tput sgr0 # green
     java launchers.executor.TheKiller -name $node -port $PORT -message "end of simulation" &
 done
@@ -38,7 +38,7 @@ done
 # We try to keep the bootstrap at last so that not all the participating nodes have an exception...
 # Or maybe we should kill all the nodes once the bootstrap is killed...
 
-cd "../../p2pvoting/bin/"
+cd "../../PROJECT_NAME/bin/"
 echo -e "\E[32;32mSending STOP_MSG to \033[1mbootstrap\033[0m\E[32;32m on $BOOTSTRAP"; tput sgr0 # green + bold (bootstrap)
 java launchers.executor.TheKiller -name $BOOTSTRAP -port $BOOTSTRAP_PORT -message "end of simulation" &
 
