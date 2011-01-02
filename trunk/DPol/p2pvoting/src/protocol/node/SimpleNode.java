@@ -1,6 +1,7 @@
 package protocol.node;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,6 +58,10 @@ public class SimpleNode extends Node {
 	protected final Stopper stopper;
 	
 	// Stats
+
+        private long startInstant=0;
+        private long endInstant=0;
+        private long runningTime=0;
 	public final long startTime;
 	public boolean stopped = false;
 
@@ -131,7 +136,10 @@ public class SimpleNode extends Node {
 	}
 	
 	public String finalMessage() {
-		
+		 endInstant = (new Date ()).getTime ();
+                 runningTime=endInstant-startInstant;
+                 dump("Running Time: "+runningTime);
+                 
 		String s = "Final result";
 		int tmp, finalTally = 0;
 		
@@ -320,7 +328,8 @@ public class SimpleNode extends Node {
 	private class VoteTask implements Task {
 		public void execute() {
 			synchronized (proxyView) {
-				if(!proxyView.isEmpty()) {		
+				if(!proxyView.isEmpty()) {
+                                     	startInstant = (new Date ()).getTime ();
 					boolean ballot = vote;
 					for(NodeID proxyId: proxyView) {
 						dump("Send a '" + ballot + "' ballot to " + proxyId);
