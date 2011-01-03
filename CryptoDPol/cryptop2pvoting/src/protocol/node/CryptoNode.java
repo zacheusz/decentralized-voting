@@ -36,7 +36,7 @@ public class CryptoNode extends Node {
     private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 39000;				// Duration of the joining phase: 19 seconds to get peers
     private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 1000;
     //                                1  second  to get proxies
-    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 30000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 15000;// Delay before voting: 50 seconds
     private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 120 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
@@ -304,6 +304,19 @@ public class CryptoNode extends Node {
         }
     }
 
+       private class receiveSelfIndividualTallyTask implements Task {
+		public void execute() {
+            try {
+                receiveIndividualTally(new CRYPTO_INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
+            } catch (NoLegalVotes ex) {
+                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NotEnoughTallies ex) {
+                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            }
+    }
     private void receiveIndividualTally(CRYPTO_INDIVIDUAL_TALLY_MSG msg) throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
         synchronized (LOCK) {
             
@@ -503,16 +516,17 @@ public class CryptoNode extends Node {
                 } else {
                     dump("Cannot vote: no proxy view");
                 }
-            }
-     //  }}
+       //     }
+     //  }
+        }
     }
 
     	private class AttemptSelfDestruct implements Task {
 		public void execute() {
-                              dump("isGlobalCountingOver:"+isGlobalCountingOver);
-                            dump("isVoteTaskOver:"+isVoteTaskOver);
-                            dump("isIndivSendingOver:"+isIndivSendingOver);
-                            dump("isResultOutputed:"+isResultOutputed);
+//                              dump("isGlobalCountingOver:"+isGlobalCountingOver);
+//                            dump("isVoteTaskOver:"+isVoteTaskOver);
+//                            dump("isIndivSendingOver:"+isIndivSendingOver);
+//                            dump("isResultOutputed:"+isResultOutputed);
                     synchronized(LOCK) {
                       if (isGlobalCountingOver&&isVoteTaskOver&&isIndivSendingOver&&isResultOutputed){
 
@@ -532,21 +546,15 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                try {
+          
                     //actually close the local vote session
                     dump("CloseLocalElectionTask");
                     isLocalVoteOver = true;
                     //	dump("tally=" + ((individualTally>0)?"+":"") + individualTally);
                     // schedule local counting
-                    receiveIndividualTally(new CRYPTO_INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
+                    taskManager.registerTask(new receiveSelfIndividualTallyTask());
                     taskManager.registerTask(new LocalCounting()); //, ((long) (Math.random() * COUNTING_PERIOD)));
-                } catch (NoLegalVotes ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NoSuchAlgorithmException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NotEnoughTallies ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                }
+             
             }
         }
     }
@@ -679,7 +687,7 @@ public class CryptoNode extends Node {
            dump("GlobalCountingTask at begin");
 
             synchronized (LOCK) {
-                synchronized (proxyView) {
+         //       synchronized (proxyView) {
                     if(!isGlobalCountingOver){
                     
                         dump("GlobalCountingTask");
@@ -711,7 +719,7 @@ public class CryptoNode extends Node {
                             dump("still not done");
                     }
                 }
-            }
+      //      }
         }
     }
 
@@ -719,7 +727,7 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                synchronized (peerView) {
+             //   synchronized (peerView) {
                     dump("LocalCounting");
 
                     if (!peerView.isEmpty()) {
@@ -737,7 +745,7 @@ public class CryptoNode extends Node {
                         receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot count: no peer view"));
                     }
                 }
-            }
+        //    }
         }
     }
 
@@ -778,7 +786,7 @@ public class CryptoNode extends Node {
                         }
 
 
-                        synchronized (peerView) {
+//                        synchronized (peerView) {
                             if (!peerView.isEmpty()) {
                                 for (E_CryptoNodeID peerId : peerView) {
                                     dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
@@ -793,7 +801,7 @@ public class CryptoNode extends Node {
                                 receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
                             }
 
-                        }
+                        //}
                         if (currentDecodingIndex==MINTALLIES) {
                             taskManager.registerTask(new CloseTallyDecryptionSharing());
                             isDecryptionSharingOver=true;

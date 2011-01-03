@@ -128,7 +128,7 @@ public class SimpleNode extends Node {
 
 	@Override
 	public void receive(Message msg) {
-            		synchronized (LOCK) {
+            	//	synchronized (LOCK) {
 
 		try {
 			switch (msg.getHeader()) {
@@ -156,7 +156,7 @@ public class SimpleNode extends Node {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	//}
     }
 	public boolean isStopped() {
 		return stopped;
@@ -438,7 +438,8 @@ private void receiveHITC(HITC_MSG msg) {
 				else {
 					dump("Cannot vote: no proxy view");
 				}
-			//}
+			//
+                 //          }
             //        }
 		}
 	}
