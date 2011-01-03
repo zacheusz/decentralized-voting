@@ -29,7 +29,7 @@ public class SimpleNode extends Node {
 	private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 39000;				// Duration of the joining phase: 19 seconds to get peers
 	private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 1000;
 																				//                                1  second  to get proxies
-	private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 50000;// Delay before voting: 50 seconds
+	private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 15000;// Delay before voting: 50 seconds
 	private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 60 * 1000; 				// Duration of the local voting phase: 1 minute
 	private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
 	private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
@@ -45,6 +45,9 @@ public class SimpleNode extends Node {
 	protected boolean isLocalVoteOver = false;
 	protected boolean isLocalCountingOver = false;
 	protected boolean isGlobalCountingOver = false;
+        protected boolean isVoteTaskOver = false;
+        protected boolean isIndivSendingOver = false;
+        protected boolean isLocalSendingOver = false;
 
 	protected boolean vote;
 	protected boolean isMalicious;
@@ -125,6 +128,8 @@ public class SimpleNode extends Node {
 
 	@Override
 	public void receive(Message msg) {
+            		synchronized (LOCK) {
+
 		try {
 			switch (msg.getHeader()) {
 			case Message.STOP:
@@ -152,7 +157,7 @@ public class SimpleNode extends Node {
 			e.printStackTrace();
 		}
 	}
-
+    }
 	public boolean isStopped() {
 		return stopped;
 	}
@@ -247,7 +252,8 @@ private void receiveHITC(HITC_MSG msg) {
                                 if (clientSize==clientsReceived)
                                 {
                                     taskManager.registerTask(new CloseLocalElectionTask());
-                                    receiveIndividualTally(new INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
+                                    taskManager.registerTask(new receiveSelfIndividualTallyTask());
+                                    
                                 }
 			}
 			else {
@@ -255,8 +261,11 @@ private void receiveHITC(HITC_MSG msg) {
 			}
 		}
 	}
-	
-
+	private class receiveSelfIndividualTallyTask implements Task {
+		public void execute() {
+                receiveIndividualTally(new INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
+            }
+    }
 	private void receiveIndividualTally(INDIVIDUAL_TALLY_MSG msg) {
 		synchronized(LOCK) {
 			if(!isLocalCountingOver) {
@@ -284,8 +293,11 @@ private void receiveHITC(HITC_MSG msg) {
 		}
 		dump("Before Lock Received a local tally (" + msg.getTally() + ") from " + msg.getSrc()+" from " +groupId);
 		synchronized(LOCK) {
-			synchronized(localTallySets[groupId]) {
-				synchronized(localTallies) {
+                System.out.println("entered receive loc");
+			synchronized(localTallies) {
+                            synchronized(localTallySets[groupId]) {
+				
+                                synchronized(numLocalTallies) {
 					dump("Received a local tally (" + msg.getTally() + ") from " + msg.getSrc()+" from " +groupId);
 		
 					if(!localTallySets[groupId].containsKey(msg.getSrc())) {
@@ -295,16 +307,21 @@ private void receiveHITC(HITC_MSG msg) {
 
 						if((localTallySets[groupId].size() > DECISION_THRESHOLD * voterView.size())||(numLocalTallies[groupId]==clientSize)) {
 							if(localTallies[groupId] == Integer.MAX_VALUE)
+                                                        {
+                                                            System.out.println("before calling glob");
 								//taskManager.registerTask(new GlobalCountingTask(groupId), DECISION_DELAY);
                                                             taskManager.registerTask(new GlobalCountingTask(groupId));
+                                                    }
 							
 							localTallies[groupId] = mostPresent(localTallySets[groupId].values());
 							dump("Determined local tally (" + localTallies[groupId] + ") for group " + groupId);
 						}
                         
 					}
+                                        System.out.println("exited receive loc");
 				}
 			}
+                    }
 		}
 	}
 	
@@ -380,17 +397,25 @@ private void receiveHITC(HITC_MSG msg) {
 	}
 	
 	private class VoteTask implements Task {
+
 		public void execute() {
-			synchronized (proxyView) {
-                              	startInstant = (new Date ()).getTime ();
+               startInstant = (new Date ()).getTime ();
+
+                    dump("proxyView size: "+proxyView);
+
+
+                //            synchronized (LOCK) {
+               //                 synchronized (proxyView) {
+
 
                                 if (clientSize==0)
                                 {
                                     taskManager.registerTask(new CloseLocalElectionTask());
-                                    receiveIndividualTally(new INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
+                                    taskManager.registerTask(new receiveSelfIndividualTallyTask());
                                 }
 				if(!proxyView.isEmpty()) {		
 					boolean ballot = vote;
+                                        dump("proxyView size: "+proxyView);
 					for(NodeID proxyId: proxyView) {
 						dump("Send a '" + ballot + "' ballot to " + proxyId);
 						try {
@@ -406,11 +431,15 @@ private void receiveHITC(HITC_MSG msg) {
 						}
 						ballot = !ballot;
 					}
+                                        isVoteTaskOver=true;
+                                        taskManager.registerTask(new AttemptSelfDestruct());
+
 				}
 				else {
 					dump("Cannot vote: no proxy view");
 				}
-			}
+			//}
+            //        }
 		}
 	}
 
@@ -427,13 +456,16 @@ private void receiveHITC(HITC_MSG msg) {
 	}
 	private class PreemptCloseLocalElectionTask implements Task {
 		public void execute() {
-			synchronized(LOCK) {
-                                if (!isLocalVoteOver)
-                                {//actually close the local counting session
+                    if (!isLocalVoteOver)
+                        synchronized(LOCK) {
+                            	dump("PreemptCloseLocalElectionTask");
+
+                                
+                                //actually close the local counting session
 				isLocalVoteOver = true;
 
 				taskManager.registerTask(new CloseLocalElectionTask());
-                          }
+                          
 
 			}
 		}
@@ -442,7 +474,7 @@ private void receiveHITC(HITC_MSG msg) {
 	private class CloseLocalCountingTask implements Task {
 		public void execute() {
 			synchronized(LOCK) {
-				
+                        synchronized(localTallies) {
 				//actually close the local counting session
 				isLocalCountingOver = true;
 				
@@ -456,13 +488,15 @@ private void receiveHITC(HITC_MSG msg) {
 				// broadcast result
 				taskManager.registerTask(new GlobalCountingTask(getPreviousGroupId()));
 			}
+                    }
 		}
 	}
         private class PreemptCloseLocalCountingTask implements Task {
         public void execute() {
-                synchronized(LOCK) {
-                        if (!isLocalCountingOver)
-                        {//actually close the local counting session
+              if (!isLocalCountingOver)
+                        {   synchronized(LOCK) {
+                    dump("PreemptCloseLocalCountingTask");
+                       //actually close the local counting session
                         isLocalCountingOver = true;
 
                         taskManager.registerTask(new CloseLocalCountingTask());
@@ -473,9 +507,11 @@ private void receiveHITC(HITC_MSG msg) {
 }
 	private class PreemptCloseGlobalCountingTask implements Task {
         public void execute() {
-                synchronized(LOCK) {
-                        if (!isGlobalCountingOver)
-                        {//actually close the local counting session
+              if (!isGlobalCountingOver)
+                        {  synchronized(LOCK) {
+                      dump("PreemptCloseGlobalCountingTask");
+
+                        //actually close the local counting session
                         isGlobalCountingOver = true;
 
                          taskManager.registerTask(new SelfDestructTask());
@@ -496,18 +532,21 @@ private void receiveHITC(HITC_MSG msg) {
 		public void execute() {
 			// broadcast
 			synchronized(LOCK) {
-				synchronized (proxyView) {
-					synchronized(localTallies) {
+                            System.out.println("entered glob");
+		//		synchronized (proxyView) {
+				//	synchronized(localTallies) {
                                              if(!isGlobalCountingOver){
-                                                 nbSentLocalTallies++;
+                                     //            nbSentLocalTallies++;
+                                                 dump("nbSentLocalTallies: "+nbSentLocalTallies++);
 
 						for(NodeID proxyId: proxyView) {
 							dump("Send local tally (" + localTallies[localTallyGroupId] + ") to " + proxyId);
 							try {
-								doSendTCP(new LOCAL_TALLY_MSG(nodeId, proxyId, localTallies[localTallyGroupId], localTallyGroupId));
+								doSendUDP(new LOCAL_TALLY_MSG(nodeId, proxyId, localTallies[localTallyGroupId], localTallyGroupId));
 							} catch (Exception e) {
-								dump("TCP: cannot broadcast local tally");
+								dump("UDP: cannot broadcast local tally");
 							}
+                                                        //isLocalSendingOver=true;
 						}
                                                 //check if the node has all the groups' tallies
                                      //           boolean done = true;
@@ -524,24 +563,34 @@ private void receiveHITC(HITC_MSG msg) {
 
                                                  if (nbSentLocalTallies==nodeId.NB_GROUPS) {
                                                     isGlobalCountingOver=true;
-                                                    endInstant = (new Date ()).getTime ();
-                                                    runningTime=endInstant-startInstant;
-                                                    dump("Running Time: "+runningTime);
-                                                    taskManager.registerTask(new SelfDestructTask());
-                                                }
+                                                    taskManager.registerTask(new AttemptSelfDestruct());
 
-					}
+                                                }
+                                System.out.println("existed glob");
+			//		}
                                     }
-				}
+		//		}
 			}
 		}
 	}
-	
-	
+	private class AttemptSelfDestruct implements Task {
+		public void execute() {
+                    synchronized(LOCK) {
+                        if (isGlobalCountingOver&&isVoteTaskOver&&isIndivSendingOver){
+                        endInstant = (new Date ()).getTime ();
+                        runningTime=endInstant-startInstant;
+                        dump("Running Time: "+runningTime);
+                        taskManager.registerTask(new SelfDestructTask());
+                        }
+                    }
+
+
+                }
+    }
 	private class LocalCounting implements Task {
 		public void execute() {
 			synchronized(LOCK) {
-				synchronized(peerView) {
+			//	synchronized(peerView) {
 					if(!peerView.isEmpty()) {
 						for(NodeID peerId: peerView) {
 							dump("Send individual tally (" + individualTally + ") to " + peerId);
@@ -551,11 +600,13 @@ private void receiveHITC(HITC_MSG msg) {
 								dump("TCP: cannot send individual tally");
 							}
 						}
+                                                isIndivSendingOver=true;
+                                                taskManager.registerTask(new AttemptSelfDestruct());
 					}
 					else {
 						receiveSTOP(new STOP_MSG(nodeId,nodeId, "cannot count: no peer view"));
 					}
-				}
+			//	}
 			}
 		}
 	}
