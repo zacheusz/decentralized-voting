@@ -15,7 +15,7 @@ export BETA=0.05
 #tried deploying on fewer nodes
 export NB_NODES=31
 export NB_MALICIOUS=0
-export NB_GROUPS=6
+export NB_GROUPS=10
 export K=1
 export NB_BALLOTS=$((2*$K+1))
 #export NB_BALLOTS=1
