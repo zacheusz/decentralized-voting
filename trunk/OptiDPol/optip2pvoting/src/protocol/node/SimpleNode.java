@@ -29,14 +29,14 @@ public class SimpleNode extends Node {
 	private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 39000;				// Duration of the joining phase: 19 seconds to get peers
 	private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 1000;
 																				//                                1  second  to get proxies
-	private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 15000;// Delay before voting: 50 seconds
+	private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 25000;// Delay before voting: 50 seconds
 	private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 60 * 1000; 				// Duration of the local voting phase: 1 minute
 	private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
 	private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
         private static int COUNTING_PERIOD = 30 * 1000;								// Duration of epidemic dissemination: 20 seconds
-        private long startInstant=0;
-        private long endInstant=0;
-        private long runningTime=0;
+//        private long startInstant=0;
+//        private long endInstant=0;
+//        private long runningTime=0;
 	// Fields
 	protected final NodeID bootstrap;
 	
@@ -252,7 +252,9 @@ private void receiveHITC(HITC_MSG msg) {
                                 if (clientSize==clientsReceived)
                                 {
                                     taskManager.registerTask(new CloseLocalElectionTask());
-                                    taskManager.registerTask(new receiveSelfIndividualTallyTask());
+                                //    taskManager.registerTask(new receiveSelfIndividualTallyTask());
+                                    receiveIndividualTally(new INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
+
                                     
                                 }
 			}
@@ -376,9 +378,9 @@ private void receiveHITC(HITC_MSG msg) {
 				}
 				if (!receivedView) {
 					try {
-						doSendUDP(new GMAV_MSG(nodeId, bootstrap, groupId));
+						doSendTCP(new GMAV_MSG(nodeId, bootstrap, groupId));
 					} catch (Exception e) {
-						dump("UDP: cannot get view from bootstrap");
+						dump("TCP: cannot get view from bootstrap");
 					}
 					taskManager.registerTask(this, BOOTSTRAP_CONTACT_TIMEOUT);
 				}
@@ -389,9 +391,9 @@ private void receiveHITC(HITC_MSG msg) {
 	private class AnnouncerTask implements Task {
 		public void execute() {
 			try {
-				doSendUDP(new IAM_MSG(nodeId, bootstrap, getGroupId(),isMalicious));
+				doSendTCP(new IAM_MSG(nodeId, bootstrap, getGroupId(),isMalicious));
 			} catch (Exception e) {
-				dump("UDP: cannot announce myself");
+				dump("TCP: cannot announce myself");
 			}
 		}
 	}
@@ -578,9 +580,7 @@ private void receiveHITC(HITC_MSG msg) {
 		public void execute() {
                     synchronized(LOCK) {
                         if (isGlobalCountingOver&&isVoteTaskOver&&isIndivSendingOver){
-                        endInstant = (new Date ()).getTime ();
-                        runningTime=endInstant-startInstant;
-                        dump("Running Time: "+runningTime);
+                      
                         taskManager.registerTask(new SelfDestructTask());
                         }
                     }

@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.Set;
 
 import protocol.communication.Message;
@@ -22,7 +23,9 @@ public abstract class Node implements Receiver {
 	public static final int VIEW_SIZE = Integer.MAX_VALUE;
 	public static int NB_BALLOTS = 3;
 	protected static final int SELF_DESTRUCT_DELAY = 8 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
-	
+	protected long startInstant=0;
+        protected long endInstant=0;
+        protected long runningTime=0;
 	// Fields
 	protected final NodeID nodeId;
 	protected final NetworkSend networkSend;
@@ -134,6 +137,9 @@ public abstract class Node implements Receiver {
 	protected class SelfDestructTask implements Task {
 		public void execute() {
 			dump(finalMessage());
+                        endInstant = (new Date ()).getTime ();
+                        runningTime=endInstant-startInstant;
+                        dump("Running Time: "+runningTime);
 			receiveSTOP(new STOP_MSG(nodeId, nodeId, "self destruct"));
 		}
 	}

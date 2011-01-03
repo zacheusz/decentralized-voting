@@ -36,7 +36,7 @@ public class CryptoNode extends Node {
     private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 39000;				// Duration of the joining phase: 19 seconds to get peers
     private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 1000;
     //                                1  second  to get proxies
-    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 15000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 25000;// Delay before voting: 50 seconds
     private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 120 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
@@ -319,7 +319,8 @@ public class CryptoNode extends Node {
     }
     private void receiveIndividualTally(CRYPTO_INDIVIDUAL_TALLY_MSG msg) throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
         synchronized (LOCK) {
-            
+            synchronized(localTallies)
+            {
                 if (!isLocalCountingOver) {
                     dump("Received an individual tally (" + msg.getTally() + ") from " + msg.getSrc());
                     //localTally += msg.getTally();
@@ -348,7 +349,7 @@ public class CryptoNode extends Node {
                     dump("Discarded an individual tally message (cause: sent too late)");
                 }
             }
-
+        }
     }
 
     private void receiveDecryptionShare(CRYPTO_DECRYPTION_SHARE_MSG msg) throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
@@ -531,9 +532,9 @@ public class CryptoNode extends Node {
                       if (isGlobalCountingOver&&isVoteTaskOver&&isIndivSendingOver&&isResultOutputed){
 
 
-                        endInstant = (new Date ()).getTime ();
-                        runningTime=endInstant-startInstant;
-                        dump("Running Time: "+runningTime);
+                       // endInstant = (new Date ()).getTime ();
+                     //   runningTime=endInstant-startInstant;
+                   //     dump("Running Time: "+runningTime);
                         taskManager.registerTask(new SelfDestructTask());
                         }
                     }
@@ -550,9 +551,19 @@ public class CryptoNode extends Node {
                     //actually close the local vote session
                     dump("CloseLocalElectionTask");
                     isLocalVoteOver = true;
+                try {
                     //	dump("tally=" + ((individualTally>0)?"+":"") + individualTally);
                     // schedule local counting
-                    taskManager.registerTask(new receiveSelfIndividualTallyTask());
+                    //   taskManager.registerTask(new receiveSelfIndividualTallyTask());
+                    receiveIndividualTally(new CRYPTO_INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
+                } catch (NoLegalVotes ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NoSuchAlgorithmException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NotEnoughTallies ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
                     taskManager.registerTask(new LocalCounting()); //, ((long) (Math.random() * COUNTING_PERIOD)));
              
             }
