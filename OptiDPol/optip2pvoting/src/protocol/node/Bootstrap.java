@@ -19,11 +19,14 @@ import protocol.communication.STOP_MSG;
 import runtime.NetworkSend;
 import runtime.NodeID;
 import runtime.TaskManager;
+import runtime.executor.E_NodeID;
 
 public class Bootstrap extends Node {
-	private List<NodeID> view;
+	private List<E_NodeID> view;
     //    private int [] clientSizes;
         private Map<NodeID,Integer> clientSizes = new HashMap<NodeID, Integer>();
+
+//	private List<E_NodeID> proxyView;
 
         private int proxiesGiven=0;
         private int nbDeadNodes=0;
@@ -42,7 +45,8 @@ public class Bootstrap extends Node {
 
 	public Bootstrap(NodeID id, TaskManager taskManager, NetworkSend networkSend) {
 		super(id,networkSend);
-		this.view = new LinkedList<NodeID>();
+		this.view = new LinkedList<E_NodeID>();
+         // 	this.proxyView = new LinkedList<E_NodeID>();
                 
                 this.taskManager=taskManager;
 
@@ -111,7 +115,10 @@ public class Bootstrap extends Node {
 				dump("Received IAM message from " + msg.getSrc() + " (" + getGroupId(msg.getSrc()) + ") "+ ((msg.isMalicious())?" (malicious)":""));
 
 				synchronized(view) {
-					view.add(msg.getSrc());
+                         //           synchronized(proxyView) {
+					view.add((E_NodeID)msg.getSrc());
+                           //             proxyView.add((E_NodeID)msg.getSrc());
+                           //         }
 				}
 
 			} else {
@@ -158,31 +165,102 @@ public class Bootstrap extends Node {
 				if (view.contains(msg.getSrc())) {
 					// the peer has registered before
 					synchronized(view) {
+                          //                    synchronized(proxyView){
+
 						// build view
 						Collections.shuffle(view);
 						List<NodeID> subView = new LinkedList<NodeID>();
-                                                int ind=0;
+                                             //   int ind=0;
 						for(NodeID id: view) {
 							if(getGroupId(id) == msg.getGroupId() && !id.equals(msg.getSrc())) {
-								subView.add(id);
+                                                         //       System.out.println("view size:"+view.size());
+								
                                                                 if (PROXYVIEW)
                                                                 {
                                                                 csize=(Integer)clientSizes.get(id);
                                                                 if (csize==null)
+                                                                {
+                                                                    System.out.println("case 1");
                                                                     clientSizes.put(id, new Integer(1));
-                                                                else
-                                                                    clientSizes.put(id,new Integer(csize.intValue()+1) );
-                                                                
-
+                                                                    subView.add(id);
+                                                                    }
+                                                                else if((csize.intValue())<Node.NB_BALLOTS)
+                                                                {
+                                                                    System.out.println("case 2 "+ csize.intValue());
+                                                                    clientSizes.put(id, new Integer(csize.intValue() + 1));
+                                                                    subView.add(id);
                                                                 }
+                                                                else
+                                                                {
+                                                                   System.out.println("case 3: "+csize.intValue());
+                                                                    continue;
+                                                                }
+                                                                }
+                                                            else
+                                                                subView.add(id);
 							}
-                                                 
+
 							// Maximum size
 							if(subView.size() == viewSize) {
 								break;
 							}
-                                                    ind++;
+                                              //      ind++;
 						}
+                                                if (PROXYVIEW && subView.size()<viewSize){
+
+                                                     for(NodeID id: view) {
+							if(getGroupId(id) == msg.getGroupId() && !id.equals(msg.getSrc()) &&!subView.contains(id)) {
+                                                            subView.add(id);
+                                                            csize=(Integer)clientSizes.get(id);
+                                                            clientSizes.put(id, new Integer(csize.intValue() + 1));
+                                                            if(subView.size()==viewSize)
+                                                                break;
+
+                                                        }
+
+                                                   }
+                                                }
+
+//                                                 if (PROXYVIEW)
+//                                                {
+////                                                     synchronized(proxyView){
+////                                                     if (proxyView.isEmpty())
+////                                                         proxyView.addAll(view);
+////                                                    }
+//
+//                                                     for(E_NodeID id: view) {
+//							if(getGroupId(id) == msg.getGroupId()) {
+//
+//                                                                subView.add(id);
+//                                                             //   proxyView.remove(id);
+//
+//                                                                csize=(Integer)clientSizes.get(id);
+//                                                                if (csize==null)
+//                                                                    clientSizes.put(id, new Integer(1));
+//                                                                else
+//                                                                    clientSizes.put(id,new Integer(csize.intValue()+1) );
+//
+//                                                                  if(subView.size() == viewSize) {
+//                                                                    break;
+//                                                                    }
+//							}
+//
+//                                                    }
+//
+//                                                }
+//                                                else{
+//
+//
+//                                                    for(E_NodeID id: view) {
+//                                                            if(getGroupId(id) == msg.getGroupId() && !id.equals(msg.getSrc())) {
+//                                                                    subView.add(id);
+//                                                            }
+//                                                            // Maximum size
+//                                                            if(subView.size() == viewSize) {
+//                                                                    break;
+//                                                            }
+//                                                    }
+//                                            }
                                                 dump("proxiesGiven: "+proxiesGiven);
 
                                                 if (proxiesGiven==view.size()) {
@@ -211,7 +289,8 @@ public class Bootstrap extends Node {
 							System.err.println("Unable to send STOP message to late node (" + e.getMessage() +")");
 						}
 					}
-				}
+			//	}
+                            }
 			}
 		}
 	}

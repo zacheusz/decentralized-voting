@@ -13,13 +13,14 @@ import runtime.NetworkSend;
 import runtime.NodeID;
 import runtime.Receiver;
 import runtime.Task;
+import runtime.executor.E_NodeID;
 
 public abstract class Node implements Receiver {
 
 	// Constants
 	public static PrintStream out = null;
 	public static final int VIEW_SIZE = Integer.MAX_VALUE;
-	public static final int NB_BALLOTS = 3;
+	public static int NB_BALLOTS = 3;
 	protected static final int SELF_DESTRUCT_DELAY = 8 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
 	
 	// Fields
@@ -38,9 +39,11 @@ public abstract class Node implements Receiver {
 	// Utility methods
 	// **************************************************************************
 	public static int getGroupId(NodeID id) {
-		int hash = id.hashCode();
-		hash = (hash<0)?-hash:hash;
-		return hash % NodeID.NB_GROUPS;
+//		int hash = id.hashCode();
+//		hash = (hash<0)?-hash:hash;
+//		return hash % NodeID.NB_GROUPS;
+                return ((E_NodeID)id).groupId;
+
 	}
 	
 	public static int getNextGroupId(NodeID id) {

@@ -282,10 +282,11 @@ private void receiveHITC(HITC_MSG msg) {
 		if(groupId == getPreviousGroupId()) {
 			return;
 		}
-		
+		dump("Before Lock Received a local tally (" + msg.getTally() + ") from " + msg.getSrc()+" from " +groupId);
 		synchronized(LOCK) {
 			synchronized(localTallySets[groupId]) {
 				synchronized(localTallies) {
+					dump("Received a local tally (" + msg.getTally() + ") from " + msg.getSrc()+" from " +groupId);
 		
 					if(!localTallySets[groupId].containsKey(msg.getSrc())) {
                                                 numLocalTallies[groupId]++;

@@ -34,9 +34,10 @@ public class SimpleGossipLauncher {
 		String bset = arguments.get("-bset");
 		String name = arguments.get("-name");
 		int port = Integer.parseInt(arguments.get("-port"));
-
+                int groupId = Integer.parseInt(arguments.get("-groupId"));
+                
 		E_NodeIDReader nodeIDReader = new E_NodeIDReader();
-		E_NodeID id = new E_NodeID(name, port);
+		E_NodeID id = new E_NodeID(name, port,groupId);
 
 		TaskManager taskManager = new E_ThreadPerTaskTaskManager();
 		NetworkSend networkSend = new E_NetworkSend();
