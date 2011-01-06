@@ -25,9 +25,9 @@ echo -e "\e[32;32mUsing bootstrap: $BOOTSTRAP and port $BOOTSTRAP_PORT"; tput sg
 
 echo -e "\e[32;32mLaunching bootstrap ($BOOTSTRAP) on port $BOOTSTRAP_PORT at time `date`"; tput sgr0 # green
 
-sshpass -e ssh -o StrictHostKeyChecking=no $LOGIN_NAME@$BOOTSTRAP "cd /home/$LOGIN_NAME/myfiles/tmp/$BOOTSTRAP; java -classpath package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS -nbBallots $NB_BALLOTS"
+cd /home/$LOGIN_NAME/myfiles/tmp/$BOOTSTRAP; java -classpath package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2$BOOTSTRAP_PORT.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS -nbBallots $NB_BALLOTS
 ##changed this to simply perform the operations on localhost without needing ssh
-
+cd -
 #cd /home/$LOGIN_NAME/myfiles/tmp; /home/$LOGIN_NAME/myfiles/tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS
 #java -classpath ../deploy/package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS
 
