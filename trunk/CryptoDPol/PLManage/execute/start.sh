@@ -15,7 +15,6 @@ pport=$(($RANDOM +10000))
 nodesFile=../deploy/nodesGoodPLOk
 
 
-
 cd ../deploy
 ./deployKevin.sh $DEFAULT_NODEFILE $bname
 head -$NB_NODES nodesGoodPL | shuf > $nodesFile

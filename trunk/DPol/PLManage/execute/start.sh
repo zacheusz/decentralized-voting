@@ -16,6 +16,7 @@ nodesFile=../deploy/nodesGoodPLOk
 
 #./startTrustedThirdParty.sh
 
+
 cd ../deploy
 ./deployKevin.sh $DEFAULT_NODEFILE $bname
 head -$NB_NODES nodesGoodPL | shuf > $nodesFile
