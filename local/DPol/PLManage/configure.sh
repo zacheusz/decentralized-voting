@@ -1,7 +1,7 @@
 export PROJECT_NAME="p2pvoting"
 #export LOGIN_NAME="irisa_$PROJECT_NAME"
 #changed login name
-export LOGIN_NAME="harkous"
+export LOGIN_NAME="$LOGIN_NAME"
 export BOOTSTRAPCLASSNAME="launchers.executor.BootstrapLauncher"
 export NODELAUNCHERCLASSNAME="launchers.executor.SimpleGossipLauncher"
 #export TRUSTEDTHIRDPARTYCLASS="launchers.executor.CryptoPrepareTrusted"

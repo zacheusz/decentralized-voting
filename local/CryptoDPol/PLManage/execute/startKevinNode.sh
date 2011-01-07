@@ -38,7 +38,7 @@ cd -
 
 function launch2 () {
 #	GOSSIP_PORT=$(($GOSSIP_PORT+$1))
-rsync -R -p -e "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1 keys/pubKey  $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME
+rsync -R -p -e "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1 keys/pubKey /home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME
 #rsync -R -p -e "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys  $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME
 echo "sent secKey$1 to $node in group $2"
     sshpass -e ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /home/$LOGIN_NAME/myfiles/tmp/$node; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > bootstrapset$node.txt; java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -secretKeyFile package/$PROJECT_NAME/keys/secKey$1 -publicKeyFile package/$PROJECT_NAME/keys/pubKey -fileName $node$date$GOSSIP_PORT.out -bset bootstrapset$node.txt -name $node -port $GOSSIP_PORT -number $1 -alpha 0.7 -beta 0 -decision 0.3 -nbGroups $NB_GROUPS -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES"

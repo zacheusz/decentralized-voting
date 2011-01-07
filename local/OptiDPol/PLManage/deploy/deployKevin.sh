@@ -18,7 +18,7 @@ function myRsync () {
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME  -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete package $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp 2>/dev/null
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME  -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete dummy $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp2 2>/dev/null
 
-rsync -R -p -e "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete bin $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME 2>/dev/null
+rsync -R -p -e --timeout=$RSYNC_TIMEOUT -al --force --delete bin /home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME 2>/dev/null
 
 
     exit=$?;
@@ -80,7 +80,7 @@ done
 
 echo -e "\e[32;32mDeploying on \033[1mbootstrap\033[0m\e[0;32m on $BOOTSTRAP"; tput sgr0 # green + bold (bootstrap)
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete package $LOGIN_NAME@$BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp &
-rsync -p -e -R "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete bin $LOGIN_NAME@$BOOTSTRAP:/home/$LOGIN_NAME/myfiles/tmp/$BOOTSTRAP/package/$PROJECT_NAME 2>/dev/null
+rsync -p -e -R --timeout=$RSYNC_TIMEOUT -al --force --delete bin /home/$LOGIN_NAME/myfiles/tmp/$BOOTSTRAP/package/$PROJECT_NAME 2>/dev/null
 #rsync -p -al --exclude '.svn' --delete package /home/$LOGIN_NAME/myfiles/tmp
 #echo rsysnc_END
 while [ true ]
@@ -102,9 +102,9 @@ done
 
 wait
 
-sed s/$BOOTSTRAP/\#$BOOTSTRAP\ is\ the\ bootstrap/ nodesGoodPL > nodesGoodPLaftersed
+#sed s/$BOOTSTRAP/\#$BOOTSTRAP\ is\ the\ bootstrap/ nodesGoodPL > nodesGoodPLaftersed
 ##changed this to only remove one loalhost and denote it as bootstrap..otherwise all localhosts would be commented out.
-#sed '0,/$BOOTSTRAP/s//\#$BOOTSTRAP\ is\ the\ bootstrap/' nodesGoodPL > nodesGoodPLaftersed
+sed '0,/$BOOTSTRAP/s//\#$BOOTSTRAP\ is\ the\ bootstrap/' nodesGoodPL > nodesGoodPLaftersed
 mv nodesGoodPLaftersed nodesGoodPL
 
 echo -e "\e[32;32m\033[1m\rDeployed correctly on `cat nodesGoodPL | wc -l` nodes"; tput sgr0 # green

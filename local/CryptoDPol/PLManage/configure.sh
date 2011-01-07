@@ -1,7 +1,7 @@
 export PROJECT_NAME="cryptop2pvoting"
 #export LOGIN_NAME="irisa_$PROJECT_NAME"
 #changed login name
-export LOGIN_NAME="user"
+export LOGIN_NAME="hamza"
 export BOOTSTRAPCLASSNAME="launchers.executor.CryptoBootstrapLauncher"
 export NODELAUNCHERCLASSNAME="launchers.executor.CryptoGossipLauncher"
 export TRUSTEDTHIRDPARTYCLASS="launchers.executor.CryptoPrepareTrusted"
@@ -13,9 +13,9 @@ export DEFAULT_BOOTSTRAP="localhost"
 export SSH_TIMEOUT=30
 export BETA=0.05
 #tried deploying on fewer nodes
-export NB_NODES=400
+export NB_NODES=40
 export NB_MALICIOUS=0
-export NB_GROUPS=20
+export NB_GROUPS=5
 export K=1
 #export NB_BALLOTS=$((2*$K+1))
 export NB_BALLOTS=1
