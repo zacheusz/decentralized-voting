@@ -18,8 +18,18 @@ bport=$(($pport-1))
 #bname=peeramidion.irisa.fr
 
 
+#cd ../deploy
+#./deployKevin.sh $DEFAULT_NODEFILE $bname
+cd ../../$PROJECT_NAME/script/executor/
+./compJava.sh
+cd -
+
+rsync -p -al --exclude '.svn' ../../$PROJECT_NAME/bin .
+
+rsync -R -p -e --timeout=40 -al --force --delete bin /home/$LOGIN_NAME/myfiles/tmp/localhost/package/$PROJECT_NAME 
+
 cd ../deploy
-./deployKevin.sh $DEFAULT_NODEFILE $bname
+
 head -$NB_NODES nodesGoodPL | shuf > $nodesFile
 
 cd ../execute
