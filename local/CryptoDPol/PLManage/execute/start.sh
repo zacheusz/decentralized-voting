@@ -17,8 +17,19 @@ bport=$(($pport-1))
 #changed this bootstrap to localhost
 #bname=peeramidion.irisa.fr
 
-cd ../deploy
-./deployKevin.sh $DEFAULT_NODEFILE $bname
+#cd ../deploy
+#./deployKevin.sh $DEFAULT_NODEFILE $bname
+cd ../../$PROJECT_NAME/script/executor/;
+./compJava.sh
+cd -;
+
+rsync -p -al --exclude '.svn' ../../$PROJECT_NAME/bin .
+
+rsync -R -p -e --timeout=40 -al --force --delete bin /home/$LOGIN_NAME/myfiles/tmp/localhost/package/$PROJECT_NAME
+
+cd ../deploy;
+
+
 head -$NB_NODES nodesGoodPL | shuf > $nodesFile
 
 START=$(date +%s)
@@ -27,7 +38,7 @@ START=$(date +%s)
 
 
 
-cd ../execute
+cd ../execute;
 ./startTrustedThirdParty.sh
 AFTERTRUSTED=$(date +%s)
 DIFF1=$(( $AFTERTRUSTED - $START ))

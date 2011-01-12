@@ -27,7 +27,7 @@ echo -e "\e[32;32mLaunching bootstrap ($BOOTSTRAP) on port $BOOTSTRAP_PORT at ti
 
 cd /home/$LOGIN_NAME/myfiles/tmp/$BOOTSTRAP; java -classpath package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2$BOOTSTRAP_PORT.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS -nbBallots $NB_BALLOTS
 ##changed this to simply perform the operations on localhost without needing ssh
-cd -
+cd -;
 #cd /home/$LOGIN_NAME/myfiles/tmp; /home/$LOGIN_NAME/myfiles/tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS
 #java -classpath ../deploy/package/$PROJECT_NAME/bin $BOOTSTRAPCLASSNAME -fileName $BOOTSTRAP-$2.out -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS
 
