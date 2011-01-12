@@ -18,7 +18,8 @@ function myRsync () {
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME  -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete package $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp 2>/dev/null
 #rsync -p -e "sshpass -e ssh -c arcfour -l $LOGIN_NAME  -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete dummy $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp2 2>/dev/null
 
-rsync -R -p -e --timeout=$RSYNC_TIMEOUT -al --force --delete bin /home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME 2>/dev/null
+rsync -R -p -e --timeout=$RSYNC_TIMEOUT -al --force --delete bin /home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME 
+#2>/dev/null
 
 
     exit=$?;
@@ -50,7 +51,10 @@ fi
 
 for project in $DEPLOY_LIST
 do
-    	ant -f ../../$project/build.xml
+ #   	ant -f ../../$project/build.xml
+cd ../../$project/script/executor/
+./compJava.sh
+cd -
 #	rsync -p -al --exclude '.svn' ../../$project/bin package/$project
 	rsync -p -al --exclude '.svn' ../../$project/bin .
 done
