@@ -23,8 +23,8 @@ rsync -R -p -e --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1 keys/
    
 #sshpass -e ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /home/$LOGIN_NAME/myfiles/tmp/$node; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > bootstrapset$node.txt; java -classpath package/$PROJECT_NAME/bin launchers.executor.checkKeys"
 
-  cd /home/$LOGIN_NAME/myfiles/tmp/$node; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > bootstrapset$node$GOSSIP_PORT.txt; java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -secretKeyFile package/$PROJECT_NAME/keys/secKey$1 -publicKeyFile package/$PROJECT_NAME/keys/pubKey -fileName $node$date$GOSSIP_PORT.out -bset bootstrapset$node$GOSSIP_PORT.txt -name $node -port $GOSSIP_PORT -number $1 -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES
-cd -
+  cd /home/$LOGIN_NAME/myfiles/tmp/$node; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > bootstrapset$node$GOSSIP_PORT.txt; java  -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -secretKeyFile package/$PROJECT_NAME/keys/secKey$1 -publicKeyFile package/$PROJECT_NAME/keys/pubKey -fileName $node$date$GOSSIP_PORT.out -bset bootstrapset$node$GOSSIP_PORT.txt -name $node -port $GOSSIP_PORT -number $1 -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES
+cd -;
 ##changed this to simply perform the operations on localhost without needing ssh
 #cd /home/$LOGIN_NAME/myfiles/tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /home/$LOGIN_NAME/myfiles/tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS
  # exit=$?;
@@ -113,10 +113,10 @@ wait
 
 #./getOutputs.sh $nodesFile $sdate
 
-sort $nodesFile > $sdate/$fileName
+#sort $nodesFile > $sdate/$fileName
 
-cd $sdate
-ls *.out | sed "s/\t/\n/g" | sed "s/$date.out//g" | sort > list
-cd ..
+#cd $sdate
+#ls *.out | sed "s/\t/\n/g" | sed "s/$date.out//g" | sort > list
+#cd ..
 
 exit 0
