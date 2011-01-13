@@ -121,9 +121,9 @@ public abstract class Node implements Receiver {
 				out.flush();
 			}
 		}
-		synchronized(System.out) {
+//		synchronized(System.out) {
 			System.out.println(msg);
-		}
+//		}
 
 	}
 	

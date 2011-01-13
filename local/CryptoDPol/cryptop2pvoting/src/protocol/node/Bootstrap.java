@@ -65,11 +65,7 @@ public class Bootstrap extends Node {
 		}
 		break;
                 case Message.DEAD: {
-			nbDeadNodes++;
-                        dump("Dead nodes: "+nbDeadNodes);
-                        if (nbDeadNodes==view.size())
-                            taskManager.registerTask(new SelfDestructTask());
-
+		receiveDEAD();
 
 		}
 		break;
@@ -85,6 +81,14 @@ public class Bootstrap extends Node {
 	// **************************************************************************
 	// Message handlers
 	// **************************************************************************
+	private void receiveDEAD(){
+        synchronized(LOCK) {
+                nbDeadNodes++;
+                if (nbDeadNodes==view.size())
+                        taskManager.registerTask(new SelfDestructTask());
+       }
+	}
+
 
 	private void receiveIAM(IAM_MSG msg) {
 		synchronized(LOCK) {

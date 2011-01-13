@@ -20,19 +20,19 @@ bport=$(($pport-1))
 
 #cd ../deploy
 #./deployKevin.sh $DEFAULT_NODEFILE $bname
-cd ../../$PROJECT_NAME/script/executor/
+cd ../../$PROJECT_NAME/script/executor/;
 ./compJava.sh
-cd -
+cd -;
 
 rsync -p -al --exclude '.svn' ../../$PROJECT_NAME/bin .
 
 rsync -R -p -e --timeout=40 -al --force --delete bin /home/$LOGIN_NAME/myfiles/tmp/localhost/package/$PROJECT_NAME 
 
-cd ../deploy
+cd ../deploy;
 
 head -$NB_NODES nodesGoodPL | shuf > $nodesFile
 
-cd ../execute
+cd ../execute;
 for ((i=0;i<nb;i++)) do
   sdate="`date +\"%y%m%d%H%M%S\"`"
   shuf $nodesFile > tmp$sdate

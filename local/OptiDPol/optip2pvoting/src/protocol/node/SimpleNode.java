@@ -30,10 +30,10 @@ public class SimpleNode extends Node {
 	private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 1000;
 																				//                                1  second  to get proxies
 	private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 25000;// Delay before voting: 50 seconds
-	private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 60 * 1000; 				// Duration of the local voting phase: 1 minute
-	private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
-	private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
-        private static int COUNTING_PERIOD = 30 * 1000;								// Duration of epidemic dissemination: 20 seconds
+	private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 20 * 1000; 				// Duration of the local voting phase: 1 minute
+	private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
+	private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
+        private static int COUNTING_PERIOD = 20 * 1000;								// Duration of epidemic dissemination: 20 seconds
 //        private long startInstant=0;
 //        private long endInstant=0;
 //        private long runningTime=0;
@@ -175,12 +175,11 @@ public class SimpleNode extends Node {
 
                 try {
                     doSendTCP(new DEAD_MSG(nodeId, bootstrap));
-                } catch (UnknownHostException ex) {
-                    Logger.getLogger(SimpleNode.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(SimpleNode.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            
+		    dump("sent a dead message");
+               }catch (Exception e) {
+		dump("TCP: cannot send dead message to bootstrap");
+		} 
+	
 		return s + "(" + finalTally + ")";	
 		
 	}
