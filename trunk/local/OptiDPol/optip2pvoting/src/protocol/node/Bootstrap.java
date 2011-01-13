@@ -59,6 +59,7 @@ public class Bootstrap extends Node {
 	// **************************************************************************
 
 	public void receive(Message msg) {
+	
 		switch (msg.getHeader()) {
 		case Message.STOP:
 			receiveSTOP((STOP_MSG) msg);
@@ -80,17 +81,14 @@ public class Bootstrap extends Node {
 		}
                 break;
                case Message.DEAD: {
-                    nbDeadNodes++;
-                    dump("Dead nodes: "+nbDeadNodes);
-                    if (nbDeadNodes==view.size())
-                        taskManager.registerTask(new SelfDestructTask());
-               }
+
+               receiveDEAD();
+		}
                 break;
 		default: 
 			System.err.println("Message ignored: from" + msg.getSrc() + " to " + nodeId + "(type = " + msg.getHeader() + ")");
 		}
-	}
-
+		}
 	public boolean isStopped() {
 		return false;
 	}
@@ -98,7 +96,13 @@ public class Bootstrap extends Node {
 	// **************************************************************************
 	// Message handlers
 	// **************************************************************************
-
+private void receiveDEAD(){
+	synchronized(LOCK) {
+		nbDeadNodes++;
+		if (nbDeadNodes==view.size())
+                        taskManager.registerTask(new SelfDestructTask());
+       } 
+}
 	private void receiveIAM(IAM_MSG msg) {
 		synchronized(LOCK) {
 			nbIAMMessagesReceived++;

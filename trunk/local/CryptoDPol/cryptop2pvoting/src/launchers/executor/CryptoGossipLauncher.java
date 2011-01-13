@@ -60,7 +60,7 @@ public class CryptoGossipLauncher {
 
                 PublicKey pub=(PublicKey) getObject(pubKeyFile);
                 SecretKey sec=(SecretKey) getObject(secKeyFile);
-                int shareOrder=Integer.parseInt(secKeyFile.substring(secKeyFile.length()-1));
+                int shareOrder=Integer.parseInt(arguments.get("-shareOrder"));
 		CryptoNode node = new CryptoNode(id,taskManager,networkSend,stopper,bootstrapSet.iterator().next(),sec,pub,shareOrder);
 
 		((E_CryptoThreadPerTaskTaskManager) taskManager).setCryptoNode(node);

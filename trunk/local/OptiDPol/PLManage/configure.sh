@@ -13,7 +13,7 @@ export DEFAULT_BOOTSTRAP="localhost"
 export SSH_TIMEOUT=20
 export BETA=0.05
 #tried deploying on fewer nodes
-export NB_NODES=100
+export NB_NODES=200
 export NB_MALICIOUS=0
 export NB_GROUPS=10
 export K=4
