@@ -25,14 +25,14 @@ public class SimpleNode extends Node {
 	public static long DECISION_DELAY = 10000;									// Delay before making a decision for localTally
 	public static double VOTE_RATIO = 0.5;
 	public static double MALICIOUS_RATIO = 0.1;
-	private final static int BOOTSTRAP_CONTACT_TIMEOUT = 5000;
-	private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 39000;				// Duration of the joining phase: 19 seconds to get peers
-	private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 1000;
+	private final static int BOOTSTRAP_CONTACT_TIMEOUT = 10000;
+	private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 200000;				// Duration of the joining phase: 19 seconds to get peers
+	private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 200000;
 																				//                                1  second  to get proxies
-	private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 25000;// Delay before voting: 50 seconds
-	private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 20 * 1000; 				// Duration of the local voting phase: 1 minute
-	private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
-	private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
+	private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 200000;// Delay before voting: 50 seconds
+	private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 940 * 1000; 				// Duration of the local voting phase: 1 minute
+	private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 120 * 1000;		// Duration of the local counting phase: 1 minute
+	private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY +120 * 1000;		// Duration of the local counting phase: 1 minute
         private static int COUNTING_PERIOD = 20 * 1000;								// Duration of epidemic dissemination: 20 seconds
 //        private long startInstant=0;
 //        private long endInstant=0;
@@ -48,7 +48,8 @@ public class SimpleNode extends Node {
         protected boolean isVoteTaskOver = false;
         protected boolean isIndivSendingOver = false;
         protected boolean isLocalSendingOver = false;
-
+	protected boolean isFinalResultCalculated = false;
+		
 	protected boolean vote;
 	protected boolean isMalicious;
 	protected boolean knownModulation = true;
@@ -173,13 +174,7 @@ public class SimpleNode extends Node {
 			finalTally += (tmp==Integer.MAX_VALUE)?0:tmp;
 		}
 
-                try {
-                    doSendTCP(new DEAD_MSG(nodeId, bootstrap));
-		    dump("sent a dead message");
-               }catch (Exception e) {
-		dump("TCP: cannot send dead message to bootstrap");
-		} 
-	
+		      
 		return s + "(" + finalTally + ")";	
 		
 	}
@@ -294,7 +289,7 @@ private void receiveHITC(HITC_MSG msg) {
 		}
 		dump("Before Lock Received a local tally (" + msg.getTally() + ") from " + msg.getSrc()+" from " +groupId);
 		synchronized(LOCK) {
-                System.out.println("entered receive loc");
+//                System.out.println("entered receive loc");
 			synchronized(localTallies) {
                             synchronized(localTallySets[groupId]) {
 				
@@ -309,7 +304,7 @@ private void receiveHITC(HITC_MSG msg) {
 						if((localTallySets[groupId].size() > DECISION_THRESHOLD * voterView.size())||(numLocalTallies[groupId]==clientSize)) {
 							if(localTallies[groupId] == Integer.MAX_VALUE)
                                                         {
-                                                            System.out.println("before calling glob");
+                                                           // System.out.println("before calling glob");
 								//taskManager.registerTask(new GlobalCountingTask(groupId), DECISION_DELAY);
                                                             taskManager.registerTask(new GlobalCountingTask(groupId));
                                                     }
@@ -319,7 +314,7 @@ private void receiveHITC(HITC_MSG msg) {
 						}
                         
 					}
-                                        System.out.println("exited receive loc");
+                                      //  System.out.println("exited receive loc");
 				}
 			}
                     }
@@ -534,7 +529,7 @@ private void receiveHITC(HITC_MSG msg) {
 		public void execute() {
 			// broadcast
 			synchronized(LOCK) {
-                            System.out.println("entered glob");
+                         //   System.out.println("entered glob");
 		//		synchronized (proxyView) {
 				//	synchronized(localTallies) {
                                              if(!isGlobalCountingOver){
@@ -565,21 +560,42 @@ private void receiveHITC(HITC_MSG msg) {
 
                                                  if (nbSentLocalTallies==nodeId.NB_GROUPS) {
                                                     isGlobalCountingOver=true;
-                                                    taskManager.registerTask(new AttemptSelfDestruct());
+                                                    taskManager.registerTask(new CalculateFinalResult());
 
                                                 }
-                                System.out.println("existed glob");
+                               // System.out.println("existed glob");
 			//		}
                                     }
 		//		}
 			}
 		}
 	}
+	private class CalculateFinalResult implements Task {
+		public void execute() {
+                    synchronized(LOCK) {
+                        if (!isFinalResultCalculated){
+			System.out.println(finalMessage());
+			
+			try {
+			    doSendTCP(new DEAD_MSG(nodeId, bootstrap));
+			    dump("sent a dead message");
+			  }catch (Exception e) {
+				dump("TCP: cannot send dead message to bootstrap");
+			} 
+
+			isFinalResultCalculated=true;
+                        taskManager.registerTask(new AttemptSelfDestruct());
+                        }
+                    }
+
+
+                }
+    }
 	private class AttemptSelfDestruct implements Task {
 		public void execute() {
                     synchronized(LOCK) {
-                        if (isGlobalCountingOver&&isVoteTaskOver&&isIndivSendingOver){
-                      
+                        if (isGlobalCountingOver&&isVoteTaskOver&&isIndivSendingOver&&isFinalResultCalculated){
+
                         taskManager.registerTask(new SelfDestructTask());
                         }
                     }

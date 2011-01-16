@@ -140,7 +140,7 @@ public class Bootstrap extends Node {
 		synchronized(LOCK) {
 			nbGMAVMessagesReceived++;
 			if (nbGMAVMessagesReceived == 1) {
-				dump("Received " + nbIAMMessagesReceived + " == "	+ view.size() + " IAM messages (before first GMAV)");
+				System.out.println("Received " + nbIAMMessagesReceived + " == "	+ view.size() + " IAM messages (before first GMAV)");
 				dump("Std dev of group sizes " + stdDev());
 				dump("Received first GMAV");
 			}

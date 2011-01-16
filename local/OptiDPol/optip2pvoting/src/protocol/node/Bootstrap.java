@@ -99,6 +99,7 @@ public class Bootstrap extends Node {
 private void receiveDEAD(){
 	synchronized(LOCK) {
 		nbDeadNodes++;
+		System.out.println(nbDeadNodes);
 		if (nbDeadNodes==view.size())
                         taskManager.registerTask(new SelfDestructTask());
        } 
@@ -156,7 +157,7 @@ private void receiveDEAD(){
 		synchronized(LOCK) {
 			nbGMAVMessagesReceived++;
 			if (nbGMAVMessagesReceived == 1) {
-				dump("Received " + nbIAMMessagesReceived + " == "	+ view.size() + " IAM messages (before first GMAV)");
+				System.out.println("Received " + nbIAMMessagesReceived + " == "	+ view.size() + " IAM messages (before first GMAV)");
 				dump("Std dev of group sizes " + stdDev());
 				dump("Received first GMAV");
 			}
@@ -184,19 +185,19 @@ private void receiveDEAD(){
                                                                 csize=(Integer)clientSizes.get(id);
                                                                 if (csize==null)
                                                                 {
-                                                                    System.out.println("case 1");
+                                               //                     System.out.println("case 1");
                                                                     clientSizes.put(id, new Integer(1));
                                                                     subView.add(id);
                                                                     }
                                                                 else if((csize.intValue())<Node.NB_BALLOTS)
                                                                 {
-                                                                    System.out.println("case 2 "+ csize.intValue());
+                                                                //    System.out.println("case 2 "+ csize.intValue());
                                                                     clientSizes.put(id, new Integer(csize.intValue() + 1));
                                                                     subView.add(id);
                                                                 }
                                                                 else
                                                                 {
-                                                                   System.out.println("case 3: "+csize.intValue());
+                                                                 //  System.out.println("case 3: "+csize.intValue());
                                                                     continue;
                                                                 }
                                                                 }
