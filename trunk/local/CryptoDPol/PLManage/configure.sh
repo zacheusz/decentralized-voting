@@ -13,9 +13,9 @@ export DEFAULT_BOOTSTRAP="localhost"
 export SSH_TIMEOUT=30
 export BETA=0.05
 #tried deploying on fewer nodes
-export NB_NODES=400
+export NB_NODES=200
 export NB_MALICIOUS=0
-export NB_GROUPS=40
+export NB_GROUPS=10
 export K=1
 #export NB_BALLOTS=$((2*$K+1))
 export NB_BALLOTS=1
@@ -24,4 +24,4 @@ export TALLYCOUNT=$NB_NODES
 export VOTERCOUNT=$(($NB_NODES))
 export MINTALLIES=$(((($VOTERCOUNT/$NB_GROUPS))))
 export CERTAINTY=64
-export BITS=256
+export BITS=1024

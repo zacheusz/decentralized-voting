@@ -24,6 +24,9 @@ function launch () {
 #sshpass -e ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /home/$LOGIN_NAME/myfiles/tmp/$node; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > bootstrapset$node.txt; java -classpath package/$PROJECT_NAME/bin launchers.executor.checkKeys"
 
 cd /home/$LOGIN_NAME/myfiles/tmp/$node; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > bootstrapset$node$GOSSIP_PORT.txt; java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date$GOSSIP_PORT.out -bset bootstrapset$node$GOSSIP_PORT.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -groupId $1 -nbBallots $NB_BALLOTS
+rm bootstrapset$node$GOSSIP_PORT.txt;
+rm $node$date$GOSSIP_PORT.out;
+
 cd -;
 ##changed this to simply perform the operations on localhost without needing ssh
 #cd /home/$LOGIN_NAME/myfiles/tmp; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > package/bootstrapset.txt; /home/$LOGIN_NAME/myfiles/tmp/package/jre/bin/java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date.out -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 1 -decision 0.3 -nbGroups $NB_GROUPS
@@ -42,6 +45,9 @@ function launch2 () {
 #rsync -R -p -e "sshpass -e ssh -l $LOGIN_NAME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys  $LOGIN_NAME@$node:/home/$LOGIN_NAME/myfiles/tmp/$node/package/$PROJECT_NAME
 #echo "sent secKey$1 to $node in group $2"
 cd /home/$LOGIN_NAME/myfiles/tmp/$node; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > bootstrapset$node$GOSSIP_PORT.txt; java -classpath package/$PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -fileName $node$date$GOSSIP_PORT.out -bset bootstrapset$node$GOSSIP_PORT.txt -name $node -port $GOSSIP_PORT -alpha 0.7 -beta 0 -decision 0.3 -nbGroups $NB_GROUPS -groupId $1 -nbBallots $NB_BALLOTS
+rm bootstrapset$node$GOSSIP_PORT.txt;
+rm $node$date$GOSSIP_PORT.out;
+
 cd -;
 # sshpass -e ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd /home/$LOGIN_NAME/myfiles/tmp/$node; echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > bootstrapset$node.txt; java -classpath package/$PROJECT_NAME/bin launchers.executor.checkKeys"
 
