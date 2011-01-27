@@ -175,11 +175,9 @@ public class SimpleNode extends Node {
 
                 try {
                     doSendTCP(new DEAD_MSG(nodeId, bootstrap));
-                } catch (UnknownHostException ex) {
-                    Logger.getLogger(SimpleNode.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(SimpleNode.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                }  catch (Exception e) {
+			dump("TCP: cannot send dead message to bootstrap");
+            }
             
 		return s + "(" + finalTally + ")";	
 		
