@@ -51,7 +51,8 @@ public class Bootstrap extends Node {
                 this.taskManager=taskManager;
 
 		taskManager.registerTask(new SelfDestructTask(), SELF_DESTRUCT_DELAY);
-		dump("Bootstrap " + id.getName() + " is born (nb ballots=" + Node.NB_BALLOTS +")");
+//		dump("Bootstrap " + id.getName() + " is born (nb ballots=" + Node.NB_BALLOTS +")");
+		dump("Bootstrap " + id.getName() + " is born (nb ballots=" + getNB_BALLOTS() +")");  // Modif getNB_BALLOTS()
 	}
 
 	// **************************************************************************
@@ -137,6 +138,7 @@ public class Bootstrap extends Node {
 	private void receiveGMAV(GMAV_MSG msg) throws UnknownHostException, IOException {
             boolean PROXYVIEW=true;
             int viewSize;
+	    int nb_BALLOTS=((E_NodeID)msg.getSrc()).NB_BALLOTS;// Modif  lire le NB_BALLOTs de l'emetteur de message
             if (msg.getGroupId() == getGroupId( msg.getSrc()))
             {
                 PROXYVIEW = false;
@@ -144,7 +146,8 @@ public class Bootstrap extends Node {
             }
             else
             {
-                viewSize = Node.NB_BALLOTS;
+               // viewSize = Node.NB_BALLOTS;
+		viewSize = nb_BALLOTS;	
                 proxiesGiven++;
             }
             Integer csize;
@@ -184,7 +187,8 @@ public class Bootstrap extends Node {
                                                                     clientSizes.put(id, new Integer(1));
                                                                     subView.add(id);
                                                                     }
-                                                                else if((csize.intValue())<Node.NB_BALLOTS)
+                                                              //  else if((csize.intValue())<Node.NB_BALLOTS)
+								else if((csize.intValue())<nb_BALLOTS)  	// Modif 
                                                                 {
                                                                     System.out.println("case 2 "+ csize.intValue());
                                                                     clientSizes.put(id, new Integer(csize.intValue() + 1));
@@ -277,7 +281,8 @@ public class Bootstrap extends Node {
 
                                                 }
 						// send the sub-view
-						if(viewSize==Node.NB_BALLOTS && subView.size() < viewSize) {
+						//if(viewSize==Node.NB_BALLOTS && subView.size() < viewSize) {
+						if(viewSize==nb_BALLOTS && subView.size() < viewSize) { 		// Modif
 							dump("Cannot send a subview of size " + viewSize +  " to " + msg.getSrc() +": not enough matching peers");
 						}
 						else {
