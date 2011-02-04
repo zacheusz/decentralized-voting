@@ -24,8 +24,8 @@ public abstract class Setup {
 		if(arguments.get("-nbGroups") != null) {
 			NodeID.NB_GROUPS = Integer.parseInt(arguments.get("-nbGroups"));
             }
-		if(arguments.get("-nbBallots") != null) {
-			Node.NB_BALLOTS = Integer.parseInt(arguments.get("-nbBallots"));
+		if(arguments.get("-nbBallots_MAX") != null) {			// Modif Ajout _MAX
+			Node.NB_BALLOTS = Integer.parseInt(arguments.get("-nbBallots_MAX")); // Modif Ajout __MAX
 
 		}		
 	}

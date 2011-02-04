@@ -12,7 +12,7 @@ public class E_NodeID extends NodeID implements Externalizable {
 	public String name;
 	public int port;
       	public int groupId=-1;
-
+	public int NB_BALLOTS;			//NB_BALLOTS d'un noeud
 
 	public E_NodeID() {
 	}
@@ -21,6 +21,7 @@ public class E_NodeID extends NodeID implements Externalizable {
 		this.name = name;
 		this.port = port;
                 this.groupId=groupId;
+		this.NB_BALLOTS=GM_NB_BALLOTS();			// NB_BALLOTS = GM_NB_BALLOTS();
 	}
         
         public E_NodeID(String name, int port) {
@@ -67,5 +68,15 @@ public class E_NodeID extends NodeID implements Externalizable {
 		out.writeInt(port);
                 out.writeInt(groupId);
 
+	}
+
+	private int GM_NB_BALLOTS() {				//Fonction retournant aléatoirement 1 ou NB_BALLOTS_MAX
+	int lower = 1;
+	int higher = 10;
+	int random = (int)(Math.random()* (higher-lower)) + lower;
+	if ((random%3 == 0)||(random%5 == 0)) //0,1,2,4,8,7
+		return Node.NB_BALLOTS_MAX;
+	else 
+		return 1;		//3,5,6,9
 	}
 }
