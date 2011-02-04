@@ -21,7 +21,8 @@ public abstract class Node implements Receiver {
 	// Constants
 	public static PrintStream out = null;
 	public static final int VIEW_SIZE = Integer.MAX_VALUE;
-	public static int NB_BALLOTS = 3;
+	//public static int NB_BALLOTS = 3;
+	public static int NB_BALLOTS_MAX = 3;				//Nombre Maximale de Ballot que peut avoir un noeud   Modif
 	protected static final int SELF_DESTRUCT_DELAY = 8 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
 	protected long startInstant=0;
         protected long endInstant=0;
@@ -48,7 +49,11 @@ public abstract class Node implements Receiver {
                 return ((E_NodeID)id).groupId;
 
 	}
-	
+
+	public static int getNB_BALLOTS(NodeID id) {			// Fonction retournant le NB_BALLOTS d'un noeud a partir de son NodeID  Modif
+		return ((E_NodeID)id).NB_BALLOTS;
+	}
+
 	public static int getNextGroupId(NodeID id) {
 		return (getGroupId(id) + 1) % NodeID.NB_GROUPS;
 	}
@@ -67,6 +72,10 @@ public abstract class Node implements Receiver {
 	
 	public int getPreviousGroupId() {
 		return getPreviousGroupId(nodeId);
+	}
+
+	public int getNB_BALLOTS() {				//Fonction retourant le NB_BALLOTS d'un noeud      Modif
+		return getNB_BALLOTS(nodeId);
 	}
 	
 	protected static void printView(Set<NodeID> subView) {
@@ -113,8 +122,8 @@ public abstract class Node implements Receiver {
 	}
 
 	public void dump(String message) {
-		
-		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
+		String msg = "Node " + nodeId + " , GroupId (" + getGroupId(nodeId) +  ") , NB_BALLOTS("+ getNB_BALLOTS(nodeId) + ": " + message; // Modif Ajout NB_BALLOTS au niveau affichage
+		//String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
 		if(out != null) {
 			synchronized(out) {
 				out.println(msg);
