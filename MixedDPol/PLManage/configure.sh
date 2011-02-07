@@ -1,4 +1,4 @@
-export PROJECT_NAME="optip2pvoting"
+export PROJECT_NAME="mixedp2pvoting"
 #export LOGIN_NAME="irisa_$PROJECT_NAME"
 #changed login name
 export LOGIN_NAME="benkaouz"
