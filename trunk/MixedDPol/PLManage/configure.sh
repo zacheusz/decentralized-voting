@@ -1,7 +1,7 @@
 export PROJECT_NAME="optip2pvoting"
 #export LOGIN_NAME="irisa_$PROJECT_NAME"
 #changed login name
-export LOGIN_NAME="harkous"
+export LOGIN_NAME="benkaouz"
 export BOOTSTRAPCLASSNAME="launchers.executor.BootstrapLauncher"
 export NODELAUNCHERCLASSNAME="launchers.executor.SimpleGossipLauncher"
 #export TRUSTEDTHIRDPARTYCLASS="launchers.executor.CryptoPrepareTrusted"
@@ -9,7 +9,7 @@ export GET_VIEW_FROM_BOOTSTRAP_DELAY="50000"
 export DEFAULT_NODEFILE="../deploy/nodesPLAllNew"
 #export DEFAULT_BOOTSTRAP="peeramidion.irisa.fr"
 #changed bootstrap to localhost
-export DEFAULT_BOOTSTRAP="icbc07pc02.epfl.ch"
+export DEFAULT_BOOTSTRAP="localhost"
 export SSH_TIMEOUT=20
 export BETA=0.05
 #tried deploying on fewer nodes
