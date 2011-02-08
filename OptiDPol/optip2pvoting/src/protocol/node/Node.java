@@ -22,7 +22,7 @@ public abstract class Node implements Receiver {
 	public static PrintStream out = null;
 	public static final int VIEW_SIZE = Integer.MAX_VALUE;
 	public static int NB_BALLOTS = 3;
-	protected static final int SELF_DESTRUCT_DELAY = 8 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
+	protected static final int SELF_DESTRUCT_DELAY = 12 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
 	protected long startInstant=0;
         protected long endInstant=0;
         protected long runningTime=0;
@@ -113,8 +113,8 @@ public abstract class Node implements Receiver {
 	}
 
 	public void dump(String message) {
-		
-		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
+		return;
+/*		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
 		if(out != null) {
 			synchronized(out) {
 				out.println(msg);
@@ -124,6 +124,7 @@ public abstract class Node implements Receiver {
 		synchronized(System.out) {
 			System.out.println(msg);
 		}
+*/
 	}
 	
 	public String finalMessage() {
@@ -136,10 +137,10 @@ public abstract class Node implements Receiver {
 	
 	protected class SelfDestructTask implements Task {
 		public void execute() {
-			dump(finalMessage());
-                        endInstant = (new Date ()).getTime ();
+			endInstant = (new Date ()).getTime ();
+//			System.out.println(finalMessage());
                         runningTime=endInstant-startInstant;
-                        dump("Running Time: "+runningTime);
+                        System.out.println("Running Time: "+runningTime);
 			receiveSTOP(new STOP_MSG(nodeId, nodeId, "self destruct"));
 		}
 	}

@@ -65,11 +65,7 @@ public class Bootstrap extends Node {
 		}
 		break;
                 case Message.DEAD: {
-			nbDeadNodes++;
-                        dump("Dead nodes: "+nbDeadNodes);
-                        if (nbDeadNodes==view.size())
-                            taskManager.registerTask(new SelfDestructTask());
-
+		receiveDEAD();
 
 		}
 		break;
@@ -85,6 +81,14 @@ public class Bootstrap extends Node {
 	// **************************************************************************
 	// Message handlers
 	// **************************************************************************
+	private void receiveDEAD(){
+        synchronized(LOCK) {
+                nbDeadNodes++;
+                if (nbDeadNodes==view.size())
+                        taskManager.registerTask(new SelfDestructTask());
+       }
+	}
+
 
 	private void receiveIAM(IAM_MSG msg) {
 		synchronized(LOCK) {
@@ -136,7 +140,7 @@ public class Bootstrap extends Node {
 		synchronized(LOCK) {
 			nbGMAVMessagesReceived++;
 			if (nbGMAVMessagesReceived == 1) {
-				dump("Received " + nbIAMMessagesReceived + " == "	+ view.size() + " IAM messages (before first GMAV)");
+				System.out.println("Received " + nbIAMMessagesReceived + " == "	+ view.size() + " IAM messages (before first GMAV)");
 				dump("Std dev of group sizes " + stdDev());
 				dump("Received first GMAV");
 			}
