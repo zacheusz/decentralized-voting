@@ -21,7 +21,7 @@ public abstract class Node implements Receiver {
 	public static PrintStream out = null;
 	public static final int VIEW_SIZE = Integer.MAX_VALUE;
 	public static final int NB_BALLOTS = 1;
-	protected static final int SELF_DESTRUCT_DELAY = 8 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
+	protected static final int SELF_DESTRUCT_DELAY = 12 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
 	protected long startInstant=0;
         protected long endInstant=0;
         protected long runningTime=0;
@@ -112,9 +112,9 @@ public abstract class Node implements Receiver {
 
 	public void dump(String message) {
 	//	if (!nodeId.name.contains("06"))
-          //        return;
-
-		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
+                 return;
+		
+	/*	String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
 		if(out != null) {
 			synchronized(out) {
 				out.println(msg);
@@ -124,7 +124,10 @@ public abstract class Node implements Receiver {
 		synchronized(System.out) {
 			System.out.println(msg);
 		}
+*/
+
 	}
+
 	
 	public String finalMessage() {
 		return "Bye bye";
@@ -139,7 +142,7 @@ public abstract class Node implements Receiver {
             public void execute() {
                         endInstant = (new Date ()).getTime ();
                         runningTime=endInstant-startInstant;
-                        dump("Running Time: "+runningTime);
+                      	System.out.println("Running Time: "+runningTime);
 			//dump(finalMessage());
 			receiveSTOP(new STOP_MSG(nodeId, nodeId, "self destruct"));
 		}

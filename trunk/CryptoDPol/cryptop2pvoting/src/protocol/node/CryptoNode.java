@@ -32,18 +32,18 @@ public class CryptoNode extends Node {
     public static long DECISION_DELAY = 10000;									// Delay before making a decision for localTally
     public static double VOTE_RATIO = 0.5;
     public static double MALICIOUS_RATIO = 0.1;
-    private final static int BOOTSTRAP_CONTACT_TIMEOUT = 5000;
-    private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 39000;				// Duration of the joining phase: 19 seconds to get peers
-    private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 1000;
+    private final static int BOOTSTRAP_CONTACT_TIMEOUT = 10000;
+    private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 40000;				// Duration of the joining phase: 19 seconds to get peers
+    private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 40000;
     //                                1  second  to get proxies
-    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 25000;// Delay before voting: 50 seconds
-    private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 120 * 1000; 				// Duration of the local voting phase: 1 minute
-    private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_DecryptionSharing_DELAY = CLOSE_GLOBAL_COUNTING_DELAY + 10 * 1000;
-    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 10 * 1000;
-    private static int SELF_DESTRUCT_DELAY = CLOSE_TallyDecryption_DELAY + 20 * 1000;
-    private static int COUNTING_PERIOD = 30 * 1000;								// Duration of epidemic dissemination: 20 seconds
+    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 40000;// Delay before voting: 50 seconds
+    private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 540 * 1000; 				// Duration of the local voting phase: 1 minute
+    private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 120 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 120 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_DecryptionSharing_DELAY = CLOSE_GLOBAL_COUNTING_DELAY + 120 * 1000;
+    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 120 * 1000;
+    private static int SELF_DESTRUCT_DELAY = CLOSE_TallyDecryption_DELAY + 120 * 1000;
+    private static int COUNTING_PERIOD = 50 * 1000;								// Duration of epidemic dissemination: 20 seconds
     public static int VOTECOUNT;
     public static int MINTALLIES;
     // Fields
@@ -361,7 +361,11 @@ public class CryptoNode extends Node {
                     //              if (res.CheckShare(msg.getShare(), finalEncryptedResult)) {
 //                dump("Received Share is legal."+ "from " + msg.getSrc());
                  //   resultShares.put(msg.getSrc(), msg.getShare());
-                    resultSharesList[msg.getShareOrder()] = msg.getShare() ;
+                    if (resultSharesList[msg.getShareOrder()]!=null)
+			dump("existing order");
+	       	
+		resultSharesList[msg.getShareOrder()] = msg.getShare() ;
+
                     currentDecodingIndex++;
                     dump("sharesize: "+currentDecodingIndex);
                 //    dump("sharesize: "+resultShares.size());
@@ -404,7 +408,8 @@ public class CryptoNode extends Node {
                     if (localTallies[groupId].equals(BigInteger.ZERO)) {
                         localTallies[groupId] = msg.getTally();
                         dump("set local tally of group" + groupId);
-                        taskManager.registerTask(new GlobalCountingTask(groupId));
+                        
+			taskManager.registerTask(new GlobalCountingTask(groupId));
 
                     }
                     //    dump("Determined local tally (" + localTallies[groupId] + ") for group " + groupId);
@@ -524,13 +529,19 @@ public class CryptoNode extends Node {
 
     	private class AttemptSelfDestruct implements Task {
 		public void execute() {
-//                              dump("isGlobalCountingOver:"+isGlobalCountingOver);
-//                            dump("isVoteTaskOver:"+isVoteTaskOver);
-//                            dump("isIndivSendingOver:"+isIndivSendingOver);
-//                            dump("isResultOutputed:"+isResultOutputed);
+                      //       System.out.println("isGlobalCountingOver:"+isGlobalCountingOver);
+                        //    System.out.println("isVoteTaskOver:"+isVoteTaskOver);
+                          //  System.out.println("isIndivSendingOver:"+isIndivSendingOver);
+                            //System.out.println("isResultOutputed:"+isResultOutputed);
                     synchronized(LOCK) {
                       if (isGlobalCountingOver&&isVoteTaskOver&&isIndivSendingOver&&isResultOutputed){
-
+/*		       try {
+			    doSendTCP(new DEAD_MSG(nodeId, bootstrap));
+			    dump("sent a dead message");
+			  }catch (Exception e) {
+				dump("TCP: cannot send dead message to bootstrap");
+			} 
+*/
 
                        // endInstant = (new Date ()).getTime ();
                      //   runningTime=endInstant-startInstant;
@@ -703,6 +714,8 @@ public class CryptoNode extends Node {
                     
                         dump("GlobalCountingTask");
                         nbSentLocalTallies++;
+			   if (localTallyGroupId != nodeId.groupId) { //we don't send this value to the next group since it is the originator
+
                         for (E_CryptoNodeID proxyId : proxyView) {
                             dump("Send local tally (" + localTallies[localTallyGroupId] + ") to " + proxyId);
                             try {
@@ -712,6 +725,7 @@ public class CryptoNode extends Node {
                             }
                             break; //only send to one proxy.
                         }
+			}	
                         //check if the node has all the groups' tallies
                   //      boolean done = true;
 //                        for (BigInteger mytally : localTallies) {
@@ -721,7 +735,8 @@ public class CryptoNode extends Node {
 //                                break;
 //                            }
 //                        }
-                        if (nbSentLocalTallies==nodeId.NB_GROUPS) {
+			dump("nbSentLocalTallies: "+nbSentLocalTallies);
+                        if (nbSentLocalTallies==nodeId.NB_GROUPS) {			
                             taskManager.registerTask(new CloseGlobalCountingTask());
                             isGlobalCountingOver=true;
                             taskManager.registerTask(new AttemptSelfDestruct());
@@ -731,6 +746,7 @@ public class CryptoNode extends Node {
                     }
                 }
       //      }
+		dump("GlobalCountingTask at end");
         }
     }
 
@@ -779,6 +795,9 @@ public class CryptoNode extends Node {
                             dump("final encrypted:" + finalEncryptedResult.toString());
                             nodeResultShare = tally.Decode(finalEncryptedResult);
                           //    resultShares.put(nodeId, nodeResultShare);
+			  if (resultSharesList[shareOrder]!=null)
+                        	dump("existing order");
+
                             resultSharesList[shareOrder] = nodeResultShare;
                             currentDecodingIndex++;
                             isFinalResultCalculated = true;

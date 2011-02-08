@@ -59,6 +59,7 @@ public class Bootstrap extends Node {
 	// **************************************************************************
 
 	public void receive(Message msg) {
+	
 		switch (msg.getHeader()) {
 		case Message.STOP:
 			receiveSTOP((STOP_MSG) msg);
@@ -80,17 +81,14 @@ public class Bootstrap extends Node {
 		}
                 break;
                case Message.DEAD: {
-                    nbDeadNodes++;
-                    dump("Dead nodes: "+nbDeadNodes);
-                    if (nbDeadNodes==view.size())
-                        taskManager.registerTask(new SelfDestructTask());
-               }
+
+               receiveDEAD();
+		}
                 break;
 		default: 
 			System.err.println("Message ignored: from" + msg.getSrc() + " to " + nodeId + "(type = " + msg.getHeader() + ")");
 		}
-	}
-
+		}
 	public boolean isStopped() {
 		return false;
 	}
@@ -98,7 +96,14 @@ public class Bootstrap extends Node {
 	// **************************************************************************
 	// Message handlers
 	// **************************************************************************
-
+private void receiveDEAD(){
+	synchronized(LOCK) {
+		nbDeadNodes++;
+		System.out.println(nbDeadNodes);
+		if (nbDeadNodes==view.size())
+                        taskManager.registerTask(new SelfDestructTask());
+       } 
+}
 	private void receiveIAM(IAM_MSG msg) {
 		synchronized(LOCK) {
 			nbIAMMessagesReceived++;
@@ -152,7 +157,7 @@ public class Bootstrap extends Node {
 		synchronized(LOCK) {
 			nbGMAVMessagesReceived++;
 			if (nbGMAVMessagesReceived == 1) {
-				dump("Received " + nbIAMMessagesReceived + " == "	+ view.size() + " IAM messages (before first GMAV)");
+				System.out.println("Received " + nbIAMMessagesReceived + " == "	+ view.size() + " IAM messages (before first GMAV)");
 				dump("Std dev of group sizes " + stdDev());
 				dump("Received first GMAV");
 			}
@@ -180,19 +185,19 @@ public class Bootstrap extends Node {
                                                                 csize=(Integer)clientSizes.get(id);
                                                                 if (csize==null)
                                                                 {
-                                                                    System.out.println("case 1");
+                                               //                     System.out.println("case 1");
                                                                     clientSizes.put(id, new Integer(1));
                                                                     subView.add(id);
                                                                     }
                                                                 else if((csize.intValue())<Node.NB_BALLOTS)
                                                                 {
-                                                                    System.out.println("case 2 "+ csize.intValue());
+                                                                //    System.out.println("case 2 "+ csize.intValue());
                                                                     clientSizes.put(id, new Integer(csize.intValue() + 1));
                                                                     subView.add(id);
                                                                 }
                                                                 else
                                                                 {
-                                                                   System.out.println("case 3: "+csize.intValue());
+                                                                 //  System.out.println("case 3: "+csize.intValue());
                                                                     continue;
                                                                 }
                                                                 }
