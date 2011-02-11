@@ -95,7 +95,7 @@ do
             echo -e "\e[32;32m\033[1m\rWaiting for $(($nbOfConcurrentJobs/2)) nodes, `cat nodesGoodPL | wc -l` good nodes so far \c"; tput sgr0 # green
 	else
             echo -e "\e[32;32m\033[1m\rWaiting for $(($nbOfConcurrentJobs/2)) node, `cat nodesGoodPL | wc -l` good nodes so far \c"; tput sgr0 # green
-	fi
+	-p -efi
 	sleep 0.2
     fi
 done

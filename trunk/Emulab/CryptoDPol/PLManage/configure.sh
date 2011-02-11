@@ -25,3 +25,6 @@ export VOTERCOUNT=$(($NB_NODES))
 export MINTALLIES=$(((($VOTERCOUNT/$NB_GROUPS))))
 export CERTAINTY=64
 export BITS=1024
+export bname=node1
+export bport=12346
+export pport=22222
