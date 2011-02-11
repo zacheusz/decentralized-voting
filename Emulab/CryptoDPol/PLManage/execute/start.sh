@@ -7,54 +7,36 @@ echo "Running $nb experiments"
 
 
 
-#bname=icbc07pc02.epfl.ch
-bname=localhost
-pport=$(($RANDOM +10000))
 nodesFile=../deploy/nodesGoodPLOk
 
-#randomly taken ports
-bport=$(($pport-1))
-#changed this bootstrap to localhost
-#bname=peeramidion.irisa.fr
-
-#cd ../deploy
-#./deployKevin.sh $DEFAULT_NODEFILE $bname
 cd ../../$PROJECT_NAME/script/executor/;
 ./compJava.sh
 cd -;
 
-rsync -p -al --exclude '.svn' ../../$PROJECT_NAME/bin .
-
-rsync -R -p -e --timeout=40 -al --force --delete bin /home/$LOGIN_NAME/myfiles/tmp/localhost/package/$PROJECT_NAME
+rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete ../../$PROJECT_NAME/bin $LOGIN_NAME@$node:$HOME/$PROJECT_NAME
 
 cd ../deploy;
 
 
 head -$NB_NODES nodesGoodPL | shuf > $nodesFile
 
-START=$(date +%s)
-
-
-
 
 
 cd ../execute;
+
+START=$(date +%s)
 ./startTrustedThirdParty.sh
 AFTERTRUSTED=$(date +%s)
 DIFF1=$(( $AFTERTRUSTED - $START ))
 echo "time for trusted 3rd party $DIFF1"
+
 for ((i=0;i<nb;i++)) do
-  sdate="`date +\"%y%m%d%H%M%S\"`"
-  shuf $nodesFile > tmp$sdate
- # pport_temp=$(($pport+$i))
-
-  mv tmp$sdate $nodesFile
-
-  ./startKevinBootstrap.sh $bname:$bport $sdate &
+#  sdate="`date +\"%y%m%d%H%M%S\"`"
+#  shuf $nodesFile > tmp$sdate
+#  mv tmp$sdate $nodesFile
+  ./startKevinBootstrap.sh $bname:$bport  &
   sleep $delay
-  ./startKevinNode.sh $nodesFile $bname:$bport $pport $sdate &
-
-
+  ./startKevinNode.sh $nodesFile $bname:$bport $pport  &
   wait
 done
 END=$(date +%s)
