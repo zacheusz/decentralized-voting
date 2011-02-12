@@ -14,7 +14,7 @@ cd ../../$PROJECT_NAME/script/executor/;
 ./compJava.sh
 cd -;
 
-ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@node-1.Polling.abstracts.emulab.net "mkdir $HOME/CryptoDPol; echo $bname $BOOTSTRAP_PORT 0 > $PROJECT_HOME/bootstrapset.txt"
+ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@node-1.Polling.abstracts.emulab.net "mkdir $HOME/CryptoDPol; echo $bname $bport 0 > $PROJECT_HOME/bootstrapset.txt"
 cd ../../;
 rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i /home/harkous/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete $PROJECT_NAME/bin/ $LOGIN_NAME@node-1.Polling.abstracts.emulab.net:$BINHOME
 cd -;
