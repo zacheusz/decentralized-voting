@@ -10,13 +10,13 @@ echo "Running $nb experiments"
 nodesFile=../deploy/nodesGoodPLOk
 
 node=$bname
-#cd ../../$PROJECT_NAME/script/executor/;
-#./compJava.sh
-#cd -;
+cd $PROJECT_HOME/script/executor/;
+./compJava.sh
+cd -;
 
-ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > $HOME/bootstrapset.txt"
-cd ../../;
-rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete $PROJECT_NAME/bin $LOGIN_NAME@$node:$HOME/$PROJECT_NAME
+ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@node-1.Polling.abstracts.emulab.net "echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > $PROJECT_HOME/bootstrapset.txt"
+cd ../../;	
+rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i /home/harkous/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete $PROJECT_NAME/bin/ $LOGIN_NAME@node-1.Polling.abstracts.emulab.net:$BINHOME
 cd -;
 
 cd ../deploy;
@@ -26,7 +26,7 @@ head -$NB_NODES nodesGoodPL | shuf > $nodesFile
 
 
 
-cd ../execute;
+cd -;
 
 START=$(date +%s)
 ./startTrustedThirdParty.sh
