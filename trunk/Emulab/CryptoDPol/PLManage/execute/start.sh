@@ -9,13 +9,15 @@ echo "Running $nb experiments"
 
 nodesFile=../deploy/nodesGoodPLOk
 
+node=$bname
 #cd ../../$PROJECT_NAME/script/executor/;
 #./compJava.sh
 #cd -;
 
 ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "echo $BOOTSTRAP $BOOTSTRAP_PORT 0 > $HOME/bootstrapset.txt"
-rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete ../../$PROJECT_NAME/bin $LOGIN_NAME@$node:$HOME/$PROJECT_NAME
-
+cd ../../;
+rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete $PROJECT_NAME/bin $LOGIN_NAME@$node:$HOME/$PROJECT_NAME
+cd -;
 
 cd ../deploy;
 

@@ -29,3 +29,5 @@ export BITS=128
 export bname=node-1
 export bport=12346
 export pport=22222
+export BOOTSTRAP=$bname
+export BOOTSTRAP_PORT=$bport
