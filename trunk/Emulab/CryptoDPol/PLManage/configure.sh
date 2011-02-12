@@ -2,6 +2,7 @@ export PROJECT_NAME="cryptop2pvoting"
 #export LOGIN_NAME="irisa_$PROJECT_NAME"
 #changed login name
 export LOGIN_NAME="harkous"
+export HOME=/users/$LOGIN_NAME
 export BOOTSTRAPCLASSNAME="launchers.executor.CryptoBootstrapLauncher"
 export NODELAUNCHERCLASSNAME="launchers.executor.CryptoGossipLauncher"
 export TRUSTEDTHIRDPARTYCLASS="launchers.executor.CryptoPrepareTrusted"

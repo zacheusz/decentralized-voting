@@ -15,13 +15,8 @@ beta=$BETA
 
 function launch () {
     rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1 keys/pubKey  $LOGIN_NAME@$node:$HOME/$PROJECT_NAME
-    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd $HOME; /proj/abstracts/jre/bin/java -classpath $PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -bset $HOME/$PROJECT_NAME/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_NAME/keys/secKey$1 -publicKeyFile $PROJECT_NAME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -number $1" 
+    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd $HOME; /proj/abstracts/jre/bin/java -classpath $PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -bset $HOME/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_NAME/keys/secKey$1 -publicKeyFile $PROJECT_NAME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -number $1 -nbBallots $NB_BALLOTS" 
 }
-
-#function launch2 () {
-#    rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1 keys/pubKey $HOME/$PROJECT_NAME
-#    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "cd $HOME; /proj/abstracts/jre/bin/java -classpath $PROJECT_NAME/bin $NODELAUNCHERCLASSNAME -bset package/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha $alpha -beta 0 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile package/$PROJECT_NAME/keys/secKey$1 -publicKeyFile $PROJECT_NAME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -number $1" 
-#}
 
 if [ $# -ne 4 ]
 then
@@ -36,7 +31,7 @@ else
       BOOTSTRAP=${2%:*}
       echo bootstrap: $BOOTSTRAP
    else
-      BOOTSTRAP=${2%:*}$HOME/$node/
+      BOOTSTRAP=${2%:*}
       echo $BOOTSTRAP
       echo $BOOTSTRAP_PORT
    fi    
