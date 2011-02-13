@@ -56,6 +56,7 @@ public class Bootstrap extends Node {
 			break;		
 		case Message.IAM: {
 			// A peer advertises itself
+			dump ("received iam ");
 			receiveIAM((IAM_MSG) msg);
 		}
 		break;
