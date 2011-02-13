@@ -33,17 +33,17 @@ public class CryptoNode extends Node {
     public static double VOTE_RATIO = 0.5;
     public static double MALICIOUS_RATIO = 0.1;
     private final static int BOOTSTRAP_CONTACT_TIMEOUT = 10000;
-    private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 40000;				// Duration of the joining phase: 19 seconds to get peers
-    private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 40000;
+    private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 15000;				// Duration of the joining phase: 19 seconds to get peers
+    private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 15000;
     //                                1  second  to get proxies
-    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 40000;// Delay before voting: 50 seconds
-    private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 540 * 1000; 				// Duration of the local voting phase: 1 minute
-    private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 120 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 120 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_DecryptionSharing_DELAY = CLOSE_GLOBAL_COUNTING_DELAY + 120 * 1000;
-    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 120 * 1000;
-    private static int SELF_DESTRUCT_DELAY = CLOSE_TallyDecryption_DELAY + 120 * 1000;
-    private static int COUNTING_PERIOD = 50 * 1000;								// Duration of epidemic dissemination: 20 seconds
+    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 15000;// Delay before voting: 50 seconds
+    private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 490 * 1000; 				// Duration of the local voting phase: 1 minute
+    private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_DecryptionSharing_DELAY = CLOSE_GLOBAL_COUNTING_DELAY + 20 * 1000;
+    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
+    private static int SELF_DESTRUCT_DELAY = CLOSE_TallyDecryption_DELAY + 20 * 1000;
+    private static int COUNTING_PERIOD = 20 * 1000;								// Duration of epidemic dissemination: 20 seconds
     public static int VOTECOUNT;
     public static int MINTALLIES;
     // Fields
