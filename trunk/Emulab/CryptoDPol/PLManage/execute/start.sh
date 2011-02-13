@@ -9,7 +9,7 @@ echo "Running $nb experiments"
 
 nodesFile=../deploy/nodesGoodPLOk
 
-node=$bname
+#node=$bname
 cd ../../$PROJECT_NAME/script/executor/;
 ./compJava.sh
 cd -;
