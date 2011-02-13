@@ -91,6 +91,7 @@ public class Bootstrap extends Node {
 
 
 	private void receiveIAM(IAM_MSG msg) {
+            dump ("iam message received");
 		synchronized(LOCK) {
 			nbIAMMessagesReceived++;
 
