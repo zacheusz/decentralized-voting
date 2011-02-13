@@ -4,6 +4,7 @@ export PROJECT_NAME="cryptop2pvoting"
 export LOGIN_NAME="harkous"
 export HOME=/users/$LOGIN_NAME
 export PROJECT_HOME=$HOME/CryptoDPol
+export SSHHOME=/home/harkous/.ssh/id_rsa
 export BINHOME=$PROJECT_HOME/$PROJECT_NAME/bin
 export BOOTSTRAPCLASSNAME="launchers.executor.CryptoBootstrapLauncher"
 export NODELAUNCHERCLASSNAME="launchers.executor.CryptoGossipLauncher"
