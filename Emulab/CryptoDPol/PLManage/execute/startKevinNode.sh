@@ -14,8 +14,8 @@ alpha=0.70
 beta=$BETA
 
 function launch () {
-    rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1 keys/pubKey  $LOGIN_NAME@$node:$PROJECT_HOME/keys
-    ssh -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "/proj/abstracts/jre/bin/java -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node -port $GOSSIP_PORT -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_HOME/keys/secKey$1 -publicKeyFile $PROJECT_HOME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -number $1 -nbBallots $NB_BALLOTS"
+    rsync -R -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1 keys/pubKey  $LOGIN_NAME@$node:$PROJECT_HOME/keys
+    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "/proj/abstracts/jre/bin/java -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $GOSSIP_PORT -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_HOME/keys/secKey$1 -publicKeyFile $PROJECT_HOME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -number $1 -nbBallots $NB_BALLOTS"
 }
 
 if [ $# -ne 4 ]
@@ -53,6 +53,7 @@ do
    j=$(($i/$NB_GROUPS))
    echo "gid:" $gid
    echo "j:" $j
+   node_local_name=echo `expr match "$node" '\(node-.*[0-9]\)'`
  #  if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
   # then
       launch $j $gid $i &
