@@ -38,9 +38,9 @@ for ((i=0;i<nb;i++)) do
 #  sdate="`date +\"%y%m%d%H%M%S\"`"
 #  shuf $nodesFile > tmp$sdate
 #  mv tmp$sdate $nodesFile
-  ./startKevinBootstrap.sh $bname:$bport  &
+  ./startKevinBootstrap.sh $bname:$bport stamp &
   sleep $delay
-  ./startKevinNode.sh $nodesFile $bname:$bport $pport  &
+  ./startKevinNode.sh $nodesFile $bname:$bport $pport stamp &
   wait
 done
 END=$(date +%s)

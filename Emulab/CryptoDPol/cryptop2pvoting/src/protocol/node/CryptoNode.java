@@ -480,6 +480,7 @@ public class CryptoNode extends Node {
 
         public void execute() {
             try {
+		dump ("sending to bootstrap: "+bootstrap);
                 doSendUDP(new IAM_MSG(nodeId, bootstrap, getGroupId(), isMalicious));
             } catch (Exception e) {
                 dump("UDP: cannot announce myself");
