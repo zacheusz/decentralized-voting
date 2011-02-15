@@ -1,10 +1,14 @@
 package launchers.executor;
-
+/*
 import OldVoting.PublicKey;
 import OldVoting.SecretKey;
-import OldVoting.Trusted;
+import OldVoting.Trusted;*/
 import java.io.*;
 import java.util.HashMap;
+import java.util.Random;
+import paillierp.PaillierThreshold;
+import paillierp.key.KeyGen;
+import paillierp.key.PaillierPrivateThresholdKey;
 
 import protocol.node.CryptoNode;
 
@@ -19,37 +23,45 @@ public class CryptoPrepareTrusted {
 			i++;
 		}
                 //setup voting
-                int VOTERCOUNT = Integer.parseInt(arguments.get("-votercount"));
+              //  int VOTERCOUNT = Integer.parseInt(arguments.get("-votercount"));
                 CryptoNode.VOTECOUNT = Integer.parseInt(arguments.get("-votecount"));
                 int TALLYCOUNT = Integer.parseInt(arguments.get("-tallycount"));
                 CryptoNode.MINTALLIES = Integer.parseInt(arguments.get("-mintallies"));
-                int CERTAINTY = Integer.parseInt(arguments.get("-certainty"));
+            //    int CERTAINTY = Integer.parseInt(arguments.get("-certainty"));
                 int bits = Integer.parseInt(arguments.get("-bits"));
-                int power = 2;
-                //int bits = 256;
+             /*   int power = 2;
+               
                 int hashsize = 16;
-                int i;
+                
                 Trusted trusted;
                 PublicKey pub; // the public key is shared by all the voters
-
+                */
+                int i;
                 String[] vote_names = new String[CryptoNode.VOTECOUNT]; //candidates
                 for (i = 0; i < CryptoNode.VOTECOUNT; i++)
                             vote_names[i] = "Vote " + i;
 
-                trusted = new Trusted (bits, power, hashsize, TALLYCOUNT, CryptoNode.MINTALLIES, CERTAINTY);//generates the secret key
+                /*trusted = new Trusted (bits, power, hashsize, TALLYCOUNT, CryptoNode.MINTALLIES, CERTAINTY);//generates the secret key
                 trusted.produceKeyShares();
                 trusted.MakeSelectionElection ("Gore for president?", vote_names);//generates the public key specific for this setup
                 pub = trusted.GetPublicKey ();//gets the public key shared between the voters
+*/
+                System.out.println(" Create new keypairs .");
+                Random rnd = new Random();
+                PaillierPrivateThresholdKey[] keys =KeyGen.PaillierThresholdKey(bits, TALLYCOUNT, CryptoNode.MINTALLIES, rnd.nextLong());
 
-                writeToFile("keys/pubKey",pub);
-                SecretKey sec;
-                int numGroups=VOTERCOUNT/CryptoNode.MINTALLIES;
+
+         //       writeToFile("keys/pubKey",pub);
+             //   SecretKey sec;
+                PaillierThreshold p;
+                //int numGroups=VOTERCOUNT/CryptoNode.MINTALLIES;
        //         int index;
          //       for (int j=0;j<numGroups;j++){
                  for (i =0;i<CryptoNode.MINTALLIES;i++)
                  {
-                     sec=trusted.GetSecretDistributedKeyPart(i);             
-                     writeToFile("keys/secKey"+i,sec );
+                     //sec=trusted.GetSecretDistributedKeyPart(i);
+                     p=new PaillierThreshold(keys[0]);
+                     writeToFile("keys/secKey"+i,p );
                  }
            // }
 

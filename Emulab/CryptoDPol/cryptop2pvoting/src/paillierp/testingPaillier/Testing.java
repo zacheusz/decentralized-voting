@@ -110,7 +110,7 @@ public class Testing {
         }*/
     }
 
-    static void  getResult(BigInteger result, int candidatesLength,BigInteger[] votes){
+    public static void  getResult(BigInteger result, int candidatesLength,BigInteger[] votes){
 
         BigInteger temp;
         //String []vote_names=new String[candidatesLength];

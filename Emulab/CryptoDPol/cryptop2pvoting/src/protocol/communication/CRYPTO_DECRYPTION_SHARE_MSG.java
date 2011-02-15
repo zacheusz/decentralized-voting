@@ -1,21 +1,22 @@
 package protocol.communication;
 
-import OldVoting.DecodingShare;
+//import OldVoting.DecodingShare;
 import protocol.communication.Message;
 import runtime.executor.E_CryptoNodeID;
+import zkp.DecryptionZKP;
 
 public class CRYPTO_DECRYPTION_SHARE_MSG extends Message {
 	private static final long serialVersionUID = 1L;
-	private DecodingShare share;
+	private DecryptionZKP share;
         private int shareOrder;
 	
-	public CRYPTO_DECRYPTION_SHARE_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, DecodingShare share,int shareOrder) {
+	public CRYPTO_DECRYPTION_SHARE_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, DecryptionZKP share) {
 		super(Message.CRYPTO_DECRYPTION_SHARE_MSG, src, dest);
 		this.share = share;
                 this.shareOrder=shareOrder;
 	}
 	
-	public DecodingShare getShare() {
+	public DecryptionZKP getShare() {
 		return share;
 	}
 	public int getShareOrder() {

@@ -1,9 +1,9 @@
 package launchers.executor;
 
-
+/*
 import OldVoting.PublicKey;
 import OldVoting.SecretKey;
-
+*/
 import java.io.*;
 
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import paillierp.PaillierThreshold;
 import protocol.node.CryptoNode;
 
 import runtime.NetworkSend;
@@ -58,10 +59,12 @@ public class CryptoGossipLauncher {
 
 		Stopper stopper = new E_Stopper(taskManager);
 
-                PublicKey pub=(PublicKey) getObject(pubKeyFile);
+/*                PublicKey pub=(PublicKey) getObject(pubKeyFile);
                 SecretKey sec=(SecretKey) getObject(secKeyFile);
                 int shareOrder=Integer.parseInt(arguments.get("-shareOrder"));
-		CryptoNode node = new CryptoNode(id,taskManager,networkSend,stopper,bootstrapSet.iterator().next(),sec,pub,shareOrder);
+*/
+                 PaillierThreshold sec=(PaillierThreshold) getObject(secKeyFile);
+                CryptoNode node = new CryptoNode(id,taskManager,networkSend,stopper,bootstrapSet.iterator().next(),sec);
 
 		((E_CryptoThreadPerTaskTaskManager) taskManager).setCryptoNode(node);
 
