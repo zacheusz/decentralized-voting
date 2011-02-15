@@ -3,6 +3,7 @@
  */
 package paillierp;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -69,7 +70,7 @@ import zkp.*;
  * @author James Garrity
  * @see AbstractPaillier
  */
-public class PaillierThreshold extends AbstractPaillier{
+public class PaillierThreshold extends AbstractPaillier implements Serializable{
 
 	/*
 	 * Fields
@@ -359,4 +360,5 @@ public class PaillierThreshold extends AbstractPaillier{
 
 		return combineShares(decryptions);
 	}
+
 }

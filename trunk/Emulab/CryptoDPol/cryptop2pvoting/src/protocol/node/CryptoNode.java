@@ -1,7 +1,7 @@
 package protocol.node;
 
-import Exception.NoLegalVotes;
-import Exception.NotEnoughTallies;
+//import Exception.NoLegalVotes;
+//import Exception.NotEnoughTallies;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
@@ -19,11 +19,16 @@ import runtime.Stopper;
 import runtime.Task;
 import runtime.TaskManager;
 
-import OldVoting.*;
+//import OldVoting.*;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
+import paillierp.Paillier;
+import paillierp.PaillierThreshold;
+import paillierp.key.PaillierKey;
 import runtime.executor.E_CryptoNodeID;
+import testingPaillier.Testing;
+import zkp.DecryptionZKP;
 
 public class CryptoNode extends Node {
 
@@ -49,8 +54,8 @@ public class CryptoNode extends Node {
     // Fields
     protected final E_CryptoNodeID bootstrap;
     //Keys
-    PublicKey pub;
-    SecretKey sec;
+//    PublicKey pub;
+//    SecretKey sec;
     // Vote value
     protected boolean hasToken = true;
     protected boolean isLocalVoteOver = false;
@@ -64,10 +69,14 @@ public class CryptoNode extends Node {
     protected boolean isLocalSendingOver = false;
     protected boolean isResultOutputed = false;
 
-
+    protected PaillierKey pubKey;
+    protected Paillier encryptor;
+    protected PaillierThreshold secKey;
+    protected BigInteger Emsg;
+    BigInteger[] votes;
     //protected boolean vote;
-    protected Tally tally;
-    protected Vote vote;
+//    protected Tally tally;
+//    protected Vote vote;
     protected boolean isMalicious;
     protected boolean knownModulation = true;
     protected BigInteger individualTally;
@@ -75,15 +84,17 @@ public class CryptoNode extends Node {
     protected Map<E_CryptoNodeID, BigInteger> individualTallySet = new HashMap<E_CryptoNodeID, BigInteger>();
     protected Map<E_CryptoNodeID, BigInteger>[] localTallySets = new Map[E_CryptoNodeID.NB_GROUPS];
     protected BigInteger localTallies[] = new BigInteger[E_CryptoNodeID.NB_GROUPS];
-    protected Result res;
+ //   protected Result res;
     protected BigInteger finalEncryptedResult = BigInteger.ZERO;
     protected BigInteger finalResult = BigInteger.ZERO;
-    protected DecodingShare nodeResultShare;
+    /*protected DecodingShare nodeResultShare;
     protected Map<E_CryptoNodeID, DecodingShare> resultShares = new HashMap<E_CryptoNodeID, DecodingShare>();
-    protected DecodingShare[] resultSharesList;
+    protected DecodingShare[] resultSharesList;*/
+    protected DecryptionZKP nodeResultShare;
+    protected List <DecryptionZKP> resultSharesList;
     protected int currentDecodingIndex;
     protected int numIndTallies;
-    protected int shareOrder;
+    //protected int shareOrder;
     protected int nbSentLocalTallies=0;
     // Overlay management
     protected boolean receivedPeerView = false;
@@ -105,39 +116,61 @@ public class CryptoNode extends Node {
     // **************************************************************************
     // Constructors
     // **************************************************************************
-    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, E_CryptoNodeID bootstrap, SecretKey sec, PublicKey pub,int shareOrder) throws Exception {
+    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, E_CryptoNodeID bootstrap, PaillierThreshold sec) throws Exception {
 
         super(nodeId, networkSend);
         this.isMalicious = (Math.random() < MALICIOUS_RATIO);
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
 
-        Voter voter; //entity voting
+        votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
+	int bits;
+	BigInteger base, temp;
+	int i;
+        pubKey= sec.getPublicKey();
+        secKey=sec;
+        bits = pubKey.getNS().bitLength() / VOTECOUNT;
+	base = (new BigInteger ("2")).pow (bits);
+	temp = base;
+
+	for (i = 1; i < VOTECOUNT; i++) {
+	    votes[i] = temp;
+	    temp = temp.multiply (base);
+	}
+
+        encryptor = new Paillier(sec.getPublicKey());
+
+        BigInteger msg = BigInteger.valueOf(3);
+        Emsg = encryptor.encrypt(votes[3]);
+
+
+      /*  Voter voter; //entity voting
         voter = new Voter(pub);
         // Random randomGenerator = new Random();
 
         //this.vote = voter.Vote(randomGenerator.nextInt(VOTECOUNT + 1));//vote for arbitrary candidate
         this.vote = voter.Vote(0);
-
+*/
         this.taskManager = taskManager;
         this.bootstrap = bootstrap;
         this.stopper = stopper;
         //
-        this.pub = pub;
+    /*    this.pub = pub;
         this.sec = sec;
         res = new Result(pub);
-        tally = new Tally(sec, pub);//returns the distributed key share
+        tally = new Tally(sec, pub);//returns the distributed key share*/
         this.individualTally = BigInteger.ZERO;
         this.localTally = BigInteger.ZERO;
         finalEncryptedResult = BigInteger.ZERO;
         finalResult = BigInteger.ZERO;
         numIndTallies = 0;
-        resultSharesList = new DecodingShare[MINTALLIES];
+        //resultSharesList = new DecodingShare[MINTALLIES];
+        
         currentDecodingIndex = 0;
-        this.shareOrder=shareOrder;
+        //this.shareOrder=shareOrder;
 
         //         clientsReceived=0;
         //
-        for (int i = 0; i < E_CryptoNodeID.NB_GROUPS; i++) {
+        for ( i = 0; i < E_CryptoNodeID.NB_GROUPS; i++) {
             this.localTallySets[i] = new HashMap<E_CryptoNodeID, BigInteger>();
             this.localTallies[i] = BigInteger.ZERO;
 
@@ -266,7 +299,7 @@ public class CryptoNode extends Node {
     }
     }*/
 
-    private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
+    private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws  NoSuchAlgorithmException {
         synchronized (LOCK) {
             dump("Received a '" + msg.getVote().vote + "' ballot from " + msg.getSrc());
             if (!isLocalVoteOver) {
@@ -275,7 +308,7 @@ public class CryptoNode extends Node {
                 individualTally--;
                 }
                 else {	*/
-                if (Tally.CheckVote(msg.getVote(), pub)) {
+         //       if (Tally.CheckVote(msg.getVote(), pub)) {
                     //individualTally = res.CombineVotes(individualTally, msg.getVote().vote);
 
                     individualTally = msg.getVote().vote;
@@ -289,9 +322,9 @@ public class CryptoNode extends Node {
 
                     //             }
                     //}
-                } else {
-                    dump("Received an illegal ballot from " + msg.getSrc());
-                }
+        //        } else {
+          //          dump("Received an illegal ballot from " + msg.getSrc());
+            //    }
 
                 synchronized (voterView) {
                     if (!voterView.contains(msg.getSrc())) {
@@ -308,16 +341,13 @@ public class CryptoNode extends Node {
 		public void execute() {
             try {
                 receiveIndividualTally(new CRYPTO_INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
-            } catch (NoLegalVotes ex) {
-                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoSuchAlgorithmException ex) {
                 Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (NotEnoughTallies ex) {
-                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
             }
+          
             }
     }
-    private void receiveIndividualTally(CRYPTO_INDIVIDUAL_TALLY_MSG msg) throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
+    private void receiveIndividualTally(CRYPTO_INDIVIDUAL_TALLY_MSG msg) throws NoSuchAlgorithmException {
         synchronized (LOCK) {
             synchronized(localTallies)
             {
@@ -328,7 +358,7 @@ public class CryptoNode extends Node {
                     //         dump("inputs: "+localTally+" "+msg.getTally() );
          //           dump("input1: " + localTally + "\ninput2: " + msg.getTally());
 
-                    localTally = res.CombineVotes(localTally, msg.getTally());
+                    localTally = encryptor.add(localTally, msg.getTally());
            //         dump("output: " + localTally);
                     //       dump("current localtally: "+localTally)    ;
                     numIndTallies++;
@@ -352,7 +382,7 @@ public class CryptoNode extends Node {
         }
     }
 
-    private void receiveDecryptionShare(CRYPTO_DECRYPTION_SHARE_MSG msg) throws NoLegalVotes, NoSuchAlgorithmException, NotEnoughTallies {
+    private void receiveDecryptionShare(CRYPTO_DECRYPTION_SHARE_MSG msg) throws NoSuchAlgorithmException{
         synchronized (LOCK) {
             
                 if (!isDecryptionSharingOver) {
@@ -361,10 +391,10 @@ public class CryptoNode extends Node {
                     //              if (res.CheckShare(msg.getShare(), finalEncryptedResult)) {
 //                dump("Received Share is legal."+ "from " + msg.getSrc());
                  //   resultShares.put(msg.getSrc(), msg.getShare());
-                    if (resultSharesList[msg.getShareOrder()]!=null)
-			dump("existing order");
+          //          if (resultSharesList[msg.getShareOrder()]!=null)
+	//		dump("existing order");
 	       	
-		resultSharesList[msg.getShareOrder()] = msg.getShare() ;
+		resultSharesList.add(msg.getShare()) ;
 
                     currentDecodingIndex++;
                     dump("sharesize: "+currentDecodingIndex);
@@ -500,7 +530,7 @@ public class CryptoNode extends Node {
                      startInstant = (new Date ()).getTime ();
                      
                     for (E_CryptoNodeID proxyId : proxyView) {
-                        dump("Send a '" + vote.vote + "' ballot to " + proxyId);
+                        dump("Send a '" + Emsg + "' ballot to " + proxyId);
                         try {
                             /*	if(isMalicious && ballot) {
                             dump("Corrupted vote to " + proxyId);
@@ -508,7 +538,7 @@ public class CryptoNode extends Node {
                             }
                             else {
                              */
-                            doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, proxyId, vote));
+                            doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, proxyId, Emsg));
                             break;
                             //	}
                         } catch (Exception e) {
@@ -568,12 +598,10 @@ public class CryptoNode extends Node {
                     // schedule local counting
                     //   taskManager.registerTask(new receiveSelfIndividualTallyTask());
                     receiveIndividualTally(new CRYPTO_INDIVIDUAL_TALLY_MSG(nodeId, nodeId, individualTally));
-                } catch (NoLegalVotes ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+            
                 } catch (NoSuchAlgorithmException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NotEnoughTallies ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+            
                 }
 
                     taskManager.registerTask(new LocalCounting()); //, ((long) (Math.random() * COUNTING_PERIOD)));
@@ -785,21 +813,21 @@ public class CryptoNode extends Node {
                     if (!isDecryptionSharingOver) {
                         dump("TallyDecryptionSharing");
                         finalEncryptedResult=BigInteger.ZERO;
-                        try {
+                        
                             for (BigInteger mytally : localTallies) {
 
                          //       dump("input1: " + finalEncryptedResult + "\ninput2: " + mytally);
-                                finalEncryptedResult = res.CombineVotes(finalEncryptedResult, mytally);
+                                finalEncryptedResult = encryptor.add(finalEncryptedResult, mytally);
                            //     dump("output: " + finalEncryptedResult);
                             }
 
                             dump("final encrypted:" + finalEncryptedResult.toString());
-                            nodeResultShare = tally.Decode(finalEncryptedResult);
+                            nodeResultShare = secKey.decryptProof(finalEncryptedResult);
                           //    resultShares.put(nodeId, nodeResultShare);
-			  if (resultSharesList[shareOrder]!=null)
-                        	dump("existing order");
+		//	  if (resultSharesList[shareOrder]!=null)
+                  //      	dump("existing order");
 
-                            resultSharesList[shareOrder] = nodeResultShare;
+                            resultSharesList.add(nodeResultShare);
                             currentDecodingIndex++;
                             isFinalResultCalculated = true;
                             dump("sharesize: "+currentDecodingIndex);
@@ -808,21 +836,14 @@ public class CryptoNode extends Node {
 
 
 
-                        } catch (NoLegalVotes ex) {
-                            Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (NoSuchAlgorithmException ex) {
-                            Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (NotEnoughTallies ex) {
-                            Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
+                   
 
 //                        synchronized (peerView) {
                             if (!peerView.isEmpty()) {
                                 for (E_CryptoNodeID peerId : peerView) {
                                     dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                                     try {
-                                        doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare,shareOrder));
+                                        doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare));
                                     } catch (Exception e) {
                                         dump("TCP: cannot send decryption share");
                                     }
@@ -852,11 +873,11 @@ public class CryptoNode extends Node {
             if (!isTallyDecryptionOver){
                 dump("TallyDecryption");
 
-                try {
+                
                    //         DecodingShare[] shares = (DecodingShare[]) resultShares.values().toArray(new DecodingShare[resultShares.size()]);
                     //    dump("size: "+currentDecodingIndex);
-                    for (DecodingShare sh : resultSharesList) {
-                        if (res.CheckShare(sh, finalEncryptedResult)) {
+                    for ( DecryptionZKP sh : resultSharesList) {
+                        if (sh.verify(finalEncryptedResult)) {
                             dump("share ok");
                         } else {
                             dump("bad share");
@@ -865,7 +886,7 @@ public class CryptoNode extends Node {
                     //dump("final input: "+finalEncryptedResult.toString());
 
 
-                        finalResult = res.DistDecryptVotes(resultSharesList, finalEncryptedResult);
+                        finalResult = secKey.combineShares((DecryptionZKP[]) resultSharesList.toArray());
 
 
                     
@@ -878,13 +899,7 @@ public class CryptoNode extends Node {
                         isTallyDecryptionOver=true;
                         taskManager.registerTask(new ResultOutput());
 
-                } catch (NoLegalVotes ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NoSuchAlgorithmException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NotEnoughTallies ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                }
+             
 
                 }
             }
@@ -895,7 +910,7 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-            res.PrintResult(finalResult);
+            Testing.getResult(finalResult, VOTECOUNT, votes);
                 try {
                     doSendTCP(new DEAD_MSG(nodeId, bootstrap));
                 } catch (UnknownHostException ex) {
