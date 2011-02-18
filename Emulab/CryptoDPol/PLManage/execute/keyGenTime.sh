@@ -1,7 +1,7 @@
 source ../configure.sh
 for ((i=0;i<10;i++)) do
 START=$(date +%s)
-/proj/abstracts/jre/bin/java -classpath ../../$PROJECT_NAME/bin $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -tallycount $TALLYCOUNT -mintallies $MINTALLIES -certainty $CERTAINTY -bits $BITS
+$JAVA_ -classpath ../../$PROJECT_NAME/bin $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -tallycount $TALLYCOUNT -mintallies $MINTALLIES -certainty $CERTAINTY -bits $BITS
 
 AFTERTRUSTED=$(date +%s)
 DIFF1=$(( $AFTERTRUSTED - $START ))

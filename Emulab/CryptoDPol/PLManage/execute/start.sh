@@ -28,11 +28,11 @@ head -$NB_NODES nodesGoodPL | shuf > $nodesFile
 
 cd -;
 
-START=$(date +%s)
-./startTrustedThirdParty.sh
-AFTERTRUSTED=$(date +%s)
-DIFF1=$(( $AFTERTRUSTED - $START ))
-echo "time for trusted 3rd party $DIFF1"
+#START=$(date +%s)
+#./startTrustedThirdParty.sh
+#AFTERTRUSTED=$(date +%s)
+#DIFF1=$(( $AFTERTRUSTED - $START ))
+#echo "time for trusted 3rd party $DIFF1"
 
 for ((i=0;i<nb;i++)) do
 #  sdate="`date +\"%y%m%d%H%M%S\"`"
