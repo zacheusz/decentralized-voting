@@ -301,7 +301,7 @@ public class CryptoNode extends Node {
 
     private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws  NoSuchAlgorithmException {
         synchronized (LOCK) {
-            dump("Received a '" + msg.getVote().vote + "' ballot from " + msg.getSrc());
+            dump("Received a '" + msg.getVote() + "' ballot from " + msg.getSrc());
             if (!isLocalVoteOver) {
                 /*	if(isMalicious && knownModulation && msg.getVote()) {//check this
                 dump("Corrupted ballot from " + msg.getSrc());
@@ -311,7 +311,7 @@ public class CryptoNode extends Node {
          //       if (Tally.CheckVote(msg.getVote(), pub)) {
                     //individualTally = res.CombineVotes(individualTally, msg.getVote().vote);
 
-                    individualTally = msg.getVote().vote;
+                    individualTally = msg.getVote();
                     //                   clientsReceived++;
 
                     taskManager.registerTask(new CloseLocalElectionTask());
