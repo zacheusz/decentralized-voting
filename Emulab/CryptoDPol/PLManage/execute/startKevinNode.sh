@@ -47,7 +47,7 @@ echo -e "\E[32;32mLaunching the experiment on all nodes"; tput sgr0 # green
 i=0
 gid=0
 j=0
-for node in `tac $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
+for node in `tail -r $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
 do
    gid=$(($i%$NB_GROUPS))
    j=$(($i/$NB_GROUPS))
