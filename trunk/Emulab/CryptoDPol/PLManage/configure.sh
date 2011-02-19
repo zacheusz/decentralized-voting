@@ -10,6 +10,7 @@ export BINHOME=$PROJECT_HOME/$PROJECT_NAME/bin
 export JAVA_=/proj/abstracts/jre_os/jre_fedora8/bin/java
 export EXECUTE_PATH=proj/abstracts/polling/Emulab/CryptoDPol/PLManage/execute
 export proxy_node=$full
+export home_node=vhost-1.polling.abstracts.emulab.net
 export BOOTSTRAPCLASSNAME="launchers.executor.CryptoBootstrapLauncher"
 export NODELAUNCHERCLASSNAME="launchers.executor.CryptoGossipLauncher"
 export TRUSTEDTHIRDPARTYCLASS="launchers.executor.CryptoPrepareTrusted"
