@@ -22,7 +22,9 @@ ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOG
 cd ../deploy;
 
 
-head -$NB_NODES nodesGoodPL | shuf > $nodesFile
+#head -$NB_NODES nodesGoodPL | shuf > $nodesFile
+
+head -$NB_NODES nodesGoodPL > $nodesFile
 
 
 
