@@ -2,7 +2,7 @@ package protocol.communication;
 
 import protocol.communication.Message;
 import runtime.executor.E_CryptoNodeID;
-import OldVoting.Vote;
+//import OldVoting.Vote;
 import java.math.BigInteger;
 
 public class CRYPTO_LOCAL_TALLY_MSG extends Message {

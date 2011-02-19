@@ -2,19 +2,19 @@ package protocol.communication;
 
 import protocol.communication.Message;
 import runtime.executor.E_CryptoNodeID;
-import OldVoting.Vote;
+//import OldVoting.Vote;
 import java.math.BigInteger;
 
 public class CRYPTO_BALLOT_MSG extends Message {
 	private static final long serialVersionUID = 1L;
-	private Vote vote;
+	private BigInteger vote;
 	
-	public CRYPTO_BALLOT_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, Vote vote) {
+	public CRYPTO_BALLOT_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, BigInteger vote) {
 		super(Message.CRYPTO_BALLOT, src, dest);
 		this.vote = vote;
 	}
 	
-	public Vote getVote() {
+	public BigInteger getVote() {
 		return vote;
 	}
 	
