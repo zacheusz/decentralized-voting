@@ -85,7 +85,7 @@ public class PaillierKey implements Serializable {
 	protected int k=0;
 	
 	/** Maximum number of bits allowed for keysize. */
-	protected static final int MAX_KEY_SIZE = 512;
+	protected static final int MAX_KEY_SIZE = 2048;
 	
 	/*
 	 * 
