@@ -14,7 +14,7 @@ nodesFile=../deploy/nodesGoodPLOk
 #./compJava.sh
 #cd -;
 
-ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@node-1.Polling.abstracts.emulab.net "mkdir -p $PROJECT_HOME; echo $bname $bport 0 > $PROJECT_HOME/bootstrapset.txt"
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "mkdir -p $PROJECT_HOME; echo $bname $bport 0 > $PROJECT_HOME/bootstrapset.txt"
 #cd ../../;
 #rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete $PROJECT_NAME/bin/ $LOGIN_NAME@node-1.Polling.abstracts.emulab.net:$BINHOME
 #cd -;
