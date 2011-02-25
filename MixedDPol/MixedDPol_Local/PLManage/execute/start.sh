@@ -18,8 +18,8 @@ bport=$(($pport-1))
 #bname=peeramidion.irisa.fr
 
 
-cd ../deploy
-./deployKevin.sh $DEFAULT_NODEFILE $bname
+#cd ../deploy
+#./deployKevin.sh $DEFAULT_NODEFILE $bname
 cd ../../$PROJECT_NAME/script/executor/;
 ./compJava.sh
 cd -;
