@@ -41,7 +41,7 @@ public class Testing {
         //n[pow-1] is n^s
         System.out.println("ns length: "+keys[0].getPublicKey().getNS().bitLength());
         System.out.println("ns+1 length: "+keys[0].getPublicKey().getNSPlusOne().bitLength());
-	bits = keys[0].getPublicKey().getNSPlusOne().bitLength() / candidatesLength;
+	bits = keys[0].getPublicKey().getNS().bitLength() / candidatesLength;
 	base = (new BigInteger ("2")).pow (bits);
 	temp = base;
 
