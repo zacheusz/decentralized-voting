@@ -365,7 +365,7 @@ public class CryptoNode extends Node {
                     //         dump("inputs: "+localTally+" "+msg.getTally() );
          //           dump("input1: " + localTally + "\ninput2: " + msg.getTally());
 
-                    localTally = encryptor.add(localTally, msg.getTally());
+                    localTally = localTally.add( msg.getTally());
            //         dump("output: " + localTally);
                     //       dump("current localtally: "+localTally)    ;
                     numIndTallies++;
@@ -824,7 +824,7 @@ public class CryptoNode extends Node {
                             for (BigInteger mytally : localTallies) {
 
                          //       dump("input1: " + finalEncryptedResult + "\ninput2: " + mytally);
-                                finalEncryptedResult = encryptor.add(finalEncryptedResult, mytally);
+                                finalEncryptedResult = finalEncryptedResult.add(mytally);
                            //     dump("output: " + finalEncryptedResult);
                             }
 
