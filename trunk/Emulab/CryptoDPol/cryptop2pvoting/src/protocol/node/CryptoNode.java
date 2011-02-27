@@ -127,7 +127,7 @@ public class CryptoNode extends Node {
 	BigInteger base, temp;
 	int i;
         secKey=sec;
-        pubKey= sec.getPublicKey();
+        pubKey= sec.getPrivateKey().getPublicKey();
 
         
         bits = pubKey

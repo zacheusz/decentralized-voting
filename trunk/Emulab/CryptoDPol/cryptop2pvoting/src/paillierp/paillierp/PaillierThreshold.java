@@ -70,7 +70,7 @@ import zkp.*;
  * @author James Garrity
  * @see AbstractPaillier
  */
-public class PaillierThreshold extends AbstractPaillier implements Serializable{
+public class PaillierThreshold extends AbstractPaillier {
 
 	/*
 	 * Fields

@@ -35,7 +35,7 @@ import zkp.MultiplicationZKP;
  * @see Paillier
  * @see PaillierThreshold
  */
-public abstract class AbstractPaillier {
+public abstract class AbstractPaillier implements Serializable {
 	
 	/*
 	 * NOTE TO ANY CONTRIBUTORS TO THIS CODE:
