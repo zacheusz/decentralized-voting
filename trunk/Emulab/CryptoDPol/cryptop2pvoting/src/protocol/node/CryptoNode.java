@@ -144,7 +144,7 @@ public class CryptoNode extends Node {
 	    temp = temp.multiply (base);
 	}
 
-        encryptor = new Paillier(sec.getPublicKey());
+        encryptor = new Paillier(pubKey);
 
         BigInteger msg = BigInteger.valueOf(1);
         Emsg = encryptor.encrypt(votes[1]);
