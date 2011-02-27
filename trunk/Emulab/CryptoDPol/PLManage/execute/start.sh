@@ -10,9 +10,9 @@ echo "Running $nb experiments"
 nodesFile=../deploy/nodesGoodPLOk
 
 #node=$bname
-#cd ../../$PROJECT_NAME/script/executor/;
-#./compJava.sh
-#cd -;
+cd ../../$PROJECT_NAME/script/executor/;
+./compJava.sh
+cd -;
 
 ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "mkdir -p $PROJECT_HOME; echo $bname $bport 0 > $PROJECT_HOME/bootstrapset.txt"
 #cd ../../;
@@ -30,11 +30,11 @@ head -$NB_NODES nodesGoodPL > $nodesFile
 
 cd -;
 
-#START=$(date +%s)
-#./startTrustedThirdParty.sh
-#AFTERTRUSTED=$(date +%s)
-#DIFF1=$(( $AFTERTRUSTED - $START ))
-#echo "time for trusted 3rd party $DIFF1"
+START=$(date +%s)
+./startTrustedThirdParty.sh
+AFTERTRUSTED=$(date +%s)
+DIFF1=$(( $AFTERTRUSTED - $START ))
+echo "time for trusted 3rd party $DIFF1"
 
 for ((i=0;i<nb;i++)) do
 #  sdate="`date +\"%y%m%d%H%M%S\"`"
