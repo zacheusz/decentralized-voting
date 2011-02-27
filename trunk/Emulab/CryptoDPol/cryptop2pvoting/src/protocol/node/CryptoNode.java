@@ -130,7 +130,6 @@ public class CryptoNode extends Node {
 	int i;
         secKey=sec;
         pubKey= sec.getPrivateKey().getPublicKey();
-
         
         bits = pubKey.getNS().bitLength()/ VOTECOUNT;
 	base = (new BigInteger ("2")).pow (bits);
