@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Random;
 import paillierp.Paillier;
 import paillierp.PaillierThreshold;
+import paillierp.PartialDecryption;
 import paillierp.key.PaillierKey;
 import runtime.executor.E_CryptoNodeID;
 import testingPaillier.Testing;
@@ -90,8 +91,9 @@ public class CryptoNode extends Node {
     /*protected DecodingShare nodeResultShare;
     protected Map<E_CryptoNodeID, DecodingShare> resultShares = new HashMap<E_CryptoNodeID, DecodingShare>();
     protected DecodingShare[] resultSharesList;*/
-    protected DecryptionZKP nodeResultShare;
-    protected List <DecryptionZKP> resultSharesList=new LinkedList<DecryptionZKP>();
+    protected PartialDecryption nodeResultShare;
+    protected List <PartialDecryption> resultSharesList=new LinkedList<PartialDecryption>();
+    //protected List <DecryptionZKP> resultSharesList=new LinkedList<DecryptionZKP>();
     protected int currentDecodingIndex;
     protected int numIndTallies;
     //protected int shareOrder;
@@ -827,7 +829,7 @@ public class CryptoNode extends Node {
                             }
 
                             dump("final encrypted:" + finalEncryptedResult.toString());
-                            nodeResultShare = secKey.decryptProof(finalEncryptedResult);
+                            nodeResultShare = secKey.decrypt(finalEncryptedResult);
                           //    resultShares.put(nodeId, nodeResultShare);
 		//	  if (resultSharesList[shareOrder]!=null)
                   //      	dump("existing order");
@@ -881,18 +883,18 @@ public class CryptoNode extends Node {
                 
                    //         DecodingShare[] shares = (DecodingShare[]) resultShares.values().toArray(new DecodingShare[resultShares.size()]);
                     //    dump("size: "+currentDecodingIndex);
-                    for ( DecryptionZKP sh : resultSharesList) {
+                 /*   for ( PartialDecryption sh : resultSharesList) {
                         if (sh.verify(finalEncryptedResult)) {
                             dump("share ok");
                         } else {
                             dump("bad share");
                         }
-                    }
+                    }*/
                     //dump("final input: "+finalEncryptedResult.toString());
 
 
-                        finalResult = secKey.combineShares((DecryptionZKP[]) resultSharesList.toArray());
-
+                        //finalResult = secKey.combineShares((DecryptionZKP[]) resultSharesList.toArray());
+                           finalResult = secKey.combineShares((PartialDecryption[]) resultSharesList.toArray());
 
                     
                     dump("Determined final result:" + finalResult);

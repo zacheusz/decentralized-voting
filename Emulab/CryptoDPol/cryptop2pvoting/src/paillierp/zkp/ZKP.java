@@ -5,11 +5,10 @@ package zkp;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-//import java.security.MessageDigest1
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import paillierp.key.PaillierKey;
-import paillierp.zkp.MessageDigest1;
 
 /**
  * An abstract class for non-interactive Zero Knowledge Proofs.  This class
@@ -34,7 +33,7 @@ public abstract class ZKP implements Serializable{
 	/**
 	 * Instance of a hash function.
 	 */
-	protected MessageDigest1 hashFunction; 
+	protected MessageDigest hashFunction; 
 	
 	/*
 	 * 
@@ -55,7 +54,7 @@ public abstract class ZKP implements Serializable{
 	 */
 	public ZKP(String hashFunctionName) {
 		try {
-			this.hashFunction = MessageDigest1.getInstance(hashFunctionName);
+			this.hashFunction = java.security.MessageDigest.getInstance(hashFunctionName);
 		}
 		catch(NoSuchAlgorithmException nsae) {
 			System.out.println("No such algo: "+ nsae.toString());
