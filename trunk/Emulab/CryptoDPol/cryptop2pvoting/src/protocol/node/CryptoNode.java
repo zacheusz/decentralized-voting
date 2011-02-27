@@ -894,9 +894,13 @@ public class CryptoNode extends Node {
 
 
                         //finalResult = secKey.combineShares((DecryptionZKP[]) resultSharesList.toArray());
-                           finalResult = secKey.combineShares((PartialDecryption[]) resultSharesList.toArray());
-
-                    
+                     
+                            PartialDecryption[] decArray=new PartialDecryption[resultSharesList.size()] ;
+                            for (int i=0;i<resultSharesList.size();i++)
+                                decArray[i]=resultSharesList.get(i);
+                            
+                          finalResult = secKey.combineShares(decArray);
+                          
                     dump("Determined final result:" + finalResult);
       //              try {
         //                Thread.currentThread().sleep(10000);
