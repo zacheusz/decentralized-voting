@@ -91,7 +91,7 @@ public class CryptoNode extends Node {
     protected Map<E_CryptoNodeID, DecodingShare> resultShares = new HashMap<E_CryptoNodeID, DecodingShare>();
     protected DecodingShare[] resultSharesList;*/
     protected DecryptionZKP nodeResultShare;
-    protected List <DecryptionZKP> resultSharesList;
+    protected List <DecryptionZKP> resultSharesList=new LinkedList<DecryptionZKP>();
     protected int currentDecodingIndex;
     protected int numIndTallies;
     //protected int shareOrder;
