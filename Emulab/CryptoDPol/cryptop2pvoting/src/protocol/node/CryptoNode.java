@@ -129,6 +129,7 @@ public class CryptoNode extends Node {
         secKey=sec;
         pubKey= sec.getPublicKey();
 
+        
         bits = pubKey
                 .getNS() 
                 .bitLength()
