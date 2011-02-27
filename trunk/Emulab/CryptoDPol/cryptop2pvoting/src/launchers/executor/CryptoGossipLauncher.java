@@ -45,7 +45,7 @@ public class CryptoGossipLauncher {
 		int port = Integer.parseInt(arguments.get("-port"));
                 
                 String secKeyFile = arguments.get("-secretKeyFile");
-                String pubKeyFile = arguments.get("-publicKeyFile");
+          //      String pubKeyFile = arguments.get("-publicKeyFile");
 
                 int groupId = Integer.parseInt(arguments.get("-groupId"));
 		
@@ -63,7 +63,7 @@ public class CryptoGossipLauncher {
                 SecretKey sec=(SecretKey) getObject(secKeyFile);
                 int shareOrder=Integer.parseInt(arguments.get("-shareOrder"));
 */
-                 PaillierThreshold sec=(PaillierThreshold) getObject(secKeyFile);
+                PaillierThreshold sec=(PaillierThreshold) getObject(secKeyFile);
                 CryptoNode node = new CryptoNode(id,taskManager,networkSend,stopper,bootstrapSet.iterator().next(),sec);
 
 		((E_CryptoThreadPerTaskTaskManager) taskManager).setCryptoNode(node);
