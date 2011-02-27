@@ -53,7 +53,7 @@ do
    j=$(($i/$NB_GROUPS))
    echo "gid:" $gid
    echo "j:" $j
-   node_local_name=`expr match "$node" '\(node-[0-9]\)'`
+   node_local_name=`expr match "$node" '\(node-*.[0-9]\)'`
  #  if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
   # then
       launch $j $gid $i &
