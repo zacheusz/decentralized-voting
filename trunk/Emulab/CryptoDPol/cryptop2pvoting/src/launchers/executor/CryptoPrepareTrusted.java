@@ -60,7 +60,7 @@ public class CryptoPrepareTrusted {
                  for (i =0;i<CryptoNode.MINTALLIES;i++)
                  {
                      //sec=trusted.GetSecretDistributedKeyPart(i);
-                     p=new PaillierThreshold(keys[0]);
+                     p=new PaillierThreshold(keys[i]);
                      writeToFile("keys/secKey"+i,p );
                  }
            // }
