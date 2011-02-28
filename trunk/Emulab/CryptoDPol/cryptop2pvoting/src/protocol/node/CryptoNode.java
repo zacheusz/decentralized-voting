@@ -39,10 +39,10 @@ public class CryptoNode extends Node {
     public static double VOTE_RATIO = 0.5;
     public static double MALICIOUS_RATIO = 0.1;
     private final static int BOOTSTRAP_CONTACT_TIMEOUT = 10000;
-    private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 60000;				// Duration of the joining phase: 19 seconds to get peers
-    private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 25000;
+    private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 30000;				// Duration of the joining phase: 19 seconds to get peers
+    private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 15000;
     //                                1  second  to get proxies
-    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 25000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 15000;// Delay before voting: 50 seconds
     private static int CLOSE_VOTE_DELAY = VOTE_DELAY + 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = CLOSE_VOTE_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
@@ -86,8 +86,8 @@ public class CryptoNode extends Node {
     protected Map<E_CryptoNodeID, BigInteger>[] localTallySets = new Map[E_CryptoNodeID.NB_GROUPS];
     protected BigInteger localTallies[] = new BigInteger[E_CryptoNodeID.NB_GROUPS];
  //   protected Result res;
-    protected BigInteger finalEncryptedResult = BigInteger.ZERO;
-    protected BigInteger finalResult = BigInteger.ZERO;
+    protected BigInteger finalEncryptedResult = BigInteger.ONE;
+    protected BigInteger finalResult = BigInteger.ONE;
     /*protected DecodingShare nodeResultShare;
     protected Map<E_CryptoNodeID, DecodingShare> resultShares = new HashMap<E_CryptoNodeID, DecodingShare>();
     protected DecodingShare[] resultSharesList;*/
@@ -163,10 +163,10 @@ public class CryptoNode extends Node {
         this.sec = sec;
         res = new Result(pub);
         tally = new Tally(sec, pub);//returns the distributed key share*/
-        this.individualTally = BigInteger.ZERO;
-        this.localTally = BigInteger.ZERO;
-        finalEncryptedResult = BigInteger.ZERO;
-        finalResult = BigInteger.ZERO;
+        this.individualTally = BigInteger.ONE;
+        this.localTally = BigInteger.ONE;
+        finalEncryptedResult = BigInteger.ONE;
+        finalResult = BigInteger.ONE;
         numIndTallies = 0;
         //resultSharesList = new DecodingShare[MINTALLIES];
         
@@ -177,7 +177,7 @@ public class CryptoNode extends Node {
         //
         for ( i = 0; i < E_CryptoNodeID.NB_GROUPS; i++) {
             this.localTallySets[i] = new HashMap<E_CryptoNodeID, BigInteger>();
-            this.localTallies[i] = BigInteger.ZERO;
+            this.localTallies[i] = BigInteger.ONE;
 
         }
 
@@ -440,7 +440,7 @@ public class CryptoNode extends Node {
                 synchronized (localTallies) {
 
                     dump("Received a local tally (" + msg.getTally() + ") from " + msg.getSrc());
-                    if (localTallies[groupId].equals(BigInteger.ZERO)) {
+                    if (localTallies[groupId].equals(BigInteger.ONE)) {
                         localTallies[groupId] = msg.getTally();
                         dump("set local tally of group" + groupId);
                         
@@ -817,7 +817,7 @@ public class CryptoNode extends Node {
                 
                     if (!isDecryptionSharingOver) {
                         dump("TallyDecryptionSharing");
-                        finalEncryptedResult=BigInteger.ZERO;
+                        finalEncryptedResult=BigInteger.ONE;
                         
                             for (BigInteger mytally : localTallies) {
 
