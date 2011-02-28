@@ -28,7 +28,7 @@ import paillierp.PaillierThreshold;
 import paillierp.PartialDecryption;
 import paillierp.key.PaillierKey;
 import runtime.executor.E_CryptoNodeID;
-import testingPaillier.Testing;
+import paillierp.testingPaillier.Testing;
 import zkp.DecryptionZKP;
 
 public class CryptoNode extends Node {
