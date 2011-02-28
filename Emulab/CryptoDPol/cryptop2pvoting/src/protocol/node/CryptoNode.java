@@ -129,7 +129,9 @@ public class CryptoNode extends Node {
 	BigInteger base, temp;
 	int i;
         secKey=sec;
-        pubKey= sec.getPrivateKey().getPublicKey();
+        pubKey=sec.getPublicKey();
+        encryptor = new Paillier()  ;
+        encryptor.setEncryption(pubKey);
         
         bits = pubKey.getNS().bitLength()/ VOTECOUNT;
 	base = (new BigInteger ("2")).pow (bits);
@@ -141,8 +143,7 @@ public class CryptoNode extends Node {
 	    temp = temp.multiply (base);
 	}
 
-        encryptor = new Paillier(pubKey);
-
+     
         BigInteger msg = BigInteger.valueOf(1);
         Emsg = encryptor.encrypt(votes[1]);
 
@@ -362,7 +363,7 @@ public class CryptoNode extends Node {
                     //         dump("inputs: "+localTally+" "+msg.getTally() );
          //           dump("input1: " + localTally + "\ninput2: " + msg.getTally());
 
-                    localTally = localTally.add( msg.getTally());
+                    localTally = encryptor.add(localTally, msg.getTally());
            //         dump("output: " + localTally);
                     //       dump("current localtally: "+localTally)    ;
                     numIndTallies++;
@@ -821,7 +822,7 @@ public class CryptoNode extends Node {
                             for (BigInteger mytally : localTallies) {
 
                          //       dump("input1: " + finalEncryptedResult + "\ninput2: " + mytally);
-                                finalEncryptedResult = finalEncryptedResult.add(mytally);
+                                finalEncryptedResult =encryptor.add( finalEncryptedResult,mytally);
                            //     dump("output: " + finalEncryptedResult);
                             }
 
