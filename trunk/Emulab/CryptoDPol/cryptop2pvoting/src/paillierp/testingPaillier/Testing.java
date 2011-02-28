@@ -1,4 +1,4 @@
-package testingPaillier;
+package paillierp.testingPaillier;
 
 import paillierp.Paillier;
 import paillierp.PaillierThreshold;
