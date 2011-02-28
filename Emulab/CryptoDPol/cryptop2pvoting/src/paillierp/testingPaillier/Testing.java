@@ -28,7 +28,7 @@ public class Testing {
 
 
       
-        int bits_num = Integer.parseInt(arguments.get("-bits_num"));
+        int bits_num = Integer.parseInt(arguments.get("-bitsnum"));
         int servers = Integer.parseInt(arguments.get("-servers"));
         int threshold = Integer.parseInt(arguments.get("-threshold"));
         int rounds = Integer.parseInt(arguments.get("-rounds"));
