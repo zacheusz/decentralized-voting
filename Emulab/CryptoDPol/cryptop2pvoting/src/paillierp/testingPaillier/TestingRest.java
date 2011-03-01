@@ -152,6 +152,8 @@ public class TestingRest {
 //        printArray(genTime,"genTime");
        printArray(encTime, "encTime");
         printArray(addTime, "addTime");
+        printArray(sharedecTime,"sharedecTime");
+
         printArray(decTime,"decTime");
         printArray(postTime,"postTime");
         
@@ -217,7 +219,7 @@ public class TestingRest {
         for (int i=0;i<A.length;i++){
             System.out.print(A[i]/1000000.0+" ");
         }
-      //  System.out.println('\n');
+        System.out.println('\n');
     }
     public static void getResult(BigInteger result, int candidatesLength, BigInteger[] votes) {
 
