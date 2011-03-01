@@ -561,7 +561,7 @@ public class KeyGen {
 		BigInteger p=null;
 		BigInteger[] res= new BigInteger[2];
 		boolean ok=false;
-		System.out.println("Trying prime");
+	//	System.out.println("Trying prime");
 		do 
 		{    
 

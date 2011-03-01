@@ -3,7 +3,7 @@
 source ../configure.sh
 
 cd ../../$PROJECT_NAME/script/executor/;
-./compJava.sh
+./compJava.sh  2>&1 1>/dev/null;
 cd - 1>/dev/null;
 
 java -classpath ../../$PROJECT_NAME/bin paillierp.testingPaillier.Testing -bitsnum $1 -servers $2 -threshold $3 -rounds $4 -candidatesLength $5
