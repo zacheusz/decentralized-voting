@@ -81,6 +81,7 @@ public class SimpleNode extends Node {
         protected int nbr_INDIVIDUAL_TALLY_MSG=0;
         protected int nbr_LOCAL_TALLY_MSG=0;
         protected int nbr_HITC_MSG=0;
+	protected int total_MSG=0;
 
 	// Runtime functions
 	protected final TaskManager taskManager;
@@ -144,26 +145,32 @@ public class SimpleNode extends Node {
 			case Message.STOP:
 				receiveSTOP((STOP_MSG) msg);
 				nbr_STOP_MSG++;
+				total_MSG++;
 				break;
 			case Message.HITV:
 				receiveHITV(((HITV_MSG) msg));
 				nbr_HITV_MSG++;
+				total_MSG++;
 				break;
 			case Message.BALLOT:
 				receiveBallot((BALLOT_MSG) msg);
 				nbr_BALLOT_MSG++;
+				total_MSG++;
 				break;
 			case Message.INDIVIDUAL_TALLY_MSG:
 				receiveIndividualTally((INDIVIDUAL_TALLY_MSG) msg);
 				nbr_INDIVIDUAL_TALLY_MSG++;
+				total_MSG++;
 				break;
 			case Message.LOCAL_TALLY_MSG:
 				receiveLocalTally((LOCAL_TALLY_MSG) msg);
 				nbr_LOCAL_TALLY_MSG++;
+				total_MSG++;
 				break;
                         case Message.HITC:
                                 receiveHITC((HITC_MSG) msg);
 				nbr_HITC_MSG++;
+				total_MSG++;
                                 break;
 			default:
 				dump("Discarded a message from " + msg.getSrc() + " of type " + msg.getHeader() + "(cause: unknown type)");	
@@ -183,8 +190,9 @@ public class SimpleNode extends Node {
 		int tmp, finalTally = 0;
 
 		dump("Node " + nodeId.getName() + " has received ");
-	       dump(nbr_STOP_MSG + " STOP_MSG, " + nbr_HITV_MSG + " HITV_MSG, " + nbr_BALLOT_MSG + " BALLOT_MSG, " + nbr_INDIVIDUAL_TALLY_MSG + " INDIVIDUAL_TALLY_MSG, " +nbr_LOCAL_TALLY_MSG + " LOCAL_TALLY_MSG, " + nbr_HITC_MSG + " HITC_MSG");
-		
+		dump(nbr_STOP_MSG + " STOP_MSG, " + nbr_HITV_MSG + " HITV_MSG, " + nbr_BALLOT_MSG + " BALLOT_MSG, " + nbr_INDIVIDUAL_TALLY_MSG + " INDIVIDUAL_TALLY_MSG, " +nbr_LOCAL_TALLY_MSG + " LOCAL_TALLY_MSG, " + nbr_HITC_MSG + " HITC_MSG");
+		System.out.println("Total MSG: "+total_MSG);
+	
 		for(int i=0;i<NodeID.NB_GROUPS;i++) {
 			tmp = localTallies[i];
 			s += " " + ((tmp==Integer.MAX_VALUE)?"__":(tmp<0)?tmp:"+" + tmp);
