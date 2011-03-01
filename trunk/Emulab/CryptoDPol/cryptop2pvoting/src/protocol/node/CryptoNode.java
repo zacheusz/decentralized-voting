@@ -919,7 +919,7 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-            Testing.getResult(finalResult, VOTECOUNT, votes);
+            paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
                 try {
                     doSendTCP(new DEAD_MSG(nodeId, bootstrap));
                 } catch (UnknownHostException ex) {

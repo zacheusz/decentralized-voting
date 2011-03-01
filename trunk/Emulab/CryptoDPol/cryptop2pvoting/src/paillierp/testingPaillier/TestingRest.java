@@ -36,7 +36,7 @@ public class TestingRest {
         int candidatesLength = Integer.parseInt(arguments.get("-candidatesLength"));
 
         System.out.println(" Create new keypairs .");
-        long startInstant;
+            long startInstant;
         long[] preTime = new long[rounds];
 
         long[] genTime = new long[rounds];
