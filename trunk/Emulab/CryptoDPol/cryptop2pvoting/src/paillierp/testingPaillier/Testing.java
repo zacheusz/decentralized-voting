@@ -35,7 +35,7 @@ public class Testing {
         int rounds = Integer.parseInt(arguments.get("-rounds"));
         int candidatesLength = Integer.parseInt(arguments.get("-candidatesLength"));
 
-        System.out.println(" Create new keypairs .");
+  //      System.out.println(" Create new keypairs .");
         PaillierPrivateThresholdKey[] keys = null;
         long startInstant;
         long[] preTime = new long[rounds];

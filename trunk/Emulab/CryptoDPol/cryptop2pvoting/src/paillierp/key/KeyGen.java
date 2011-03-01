@@ -199,11 +199,11 @@ public class KeyGen {
 		//First we need to generate p1,q1,p,q all are prime
 		//p1 and q1 are s-1 bit long 
 		//p=2*p1+1, q=2*q1+1
-		System.out.println("Generating p and p1");
+	//	System.out.println("Generating p and p1");
 		BigInteger[] primes=KeyGen.genSafePrimes(s,rnd);
 		p1=primes[0];
 		p=primes[1];
-		System.out.println("Generating q and q1");
+	//	System.out.println("Generating q and q1");
 		do {
 			primes=KeyGen.genSafePrimes(s,rnd);
 			q1=primes[0];
@@ -226,7 +226,7 @@ public class KeyGen {
 		// d=0 mod m and d=1 mod n, using Chinese remainder thm
 		// we can find d using Chinese remainder thm
 		// note that $d=(m. (m^-1 mod n))$
-		System.out.println("Generating d");
+	//	System.out.println("Generating d");
 		d=m.multiply(m.modInverse(n));
 
 		//a[0] is equal to d
@@ -249,7 +249,7 @@ public class KeyGen {
 		//threshold signature paper.
 		BigInteger r=null;
 		boolean ok=false;
-		System.out.println("Generating v");
+	//	System.out.println("Generating v");
 		do
 		{
 			//generate r such that gcd(r,n)=1
@@ -260,12 +260,12 @@ public class KeyGen {
 		// we can now set v to r*r mod nSquare
 		v=(r.multiply(r)).mod(nSquare);
 
-		System.out.println("p :" + p.toString());
-		System.out.println("p1:" + p1.toString());
-		System.out.println("q :" + q.toString());
-		System.out.println("q1:" + q1.toString());
-		System.out.println("d :" + d.toString());
-		System.out.println("v :" + v.toString());
+//		System.out.println("p :" + p.toString());
+//		System.out.println("p1:" + p1.toString());
+//		System.out.println("q :" + q.toString());
+//		System.out.println("q1:" + q1.toString());
+//		System.out.println("d :" + d.toString());
+//		System.out.println("v :" + v.toString());
 
 		//This array holds the resulting keys
 		BigInteger[] shares = new BigInteger[l];
@@ -572,7 +572,7 @@ public class KeyGen {
 			//else
 				//	  System.out.println("Unsuccessful try");
 		}while(ok==false);
-		System.out.println("Finally a good pair");
+//		System.out.println("Finally a good pair");
 		res[0]=p1;
 		res[1]=p;
 		return res;
