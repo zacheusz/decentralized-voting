@@ -69,7 +69,7 @@ public class CryptoPrepareTrusted {
 
 	}
 
-private static void writeToFile(String filename,Object obj){
+public static void writeToFile(String filename,Object obj){
                  FileOutputStream fos = null;
                  ObjectOutputStream out = null;
                  try
