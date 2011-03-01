@@ -150,8 +150,9 @@ public class TestingRest {
         
         printArray (preTime,"preTime");
 //        printArray(genTime,"genTime");
+       printArray(encTime, "encTime");
         printArray(addTime, "addTime");
-        printArray(decTime,"addTime");
+        printArray(decTime,"decTime");
         printArray(postTime,"postTime");
         
         
