@@ -187,7 +187,12 @@ public class SimpleNode extends Node {
 		
 		String s = "Final result";
 		int tmp, finalTally = 0;
-		
+	
+		dump("Node " + nodeId.getName() + " has received ");
+		dump(nbr_STOP_MSG + " STOP_MSG, " + nbr_HITV_MSG + " HITV_MSG, " + nbr_BALLOT_MSG + " BALLOT_MSG, " + nbr_INDIVIDUAL_TALLY_MSG + " INDIVIDUAL_TALLY_MSG, " +nbr_LOCAL_TALLY_MSG + " LOCAL_TALLY_MSG, " + nbr_HITC_MSG + " HITC_MSG");
+		System.out.println("Total MSG: "+total_MSG);
+	
+	
 		for(int i=0;i<NodeID.NB_GROUPS;i++) {
 			tmp = localTallies[i];
 			s += " " + ((tmp==Integer.MAX_VALUE)?"__":(tmp<0)?tmp:"+" + tmp);
