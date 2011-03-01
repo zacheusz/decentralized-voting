@@ -114,7 +114,7 @@ public abstract class Node implements Receiver {
 
 	public void dump(String message) {
 		return;
-/*		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
+		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
 		if(out != null) {
 			synchronized(out) {
 				out.println(msg);
@@ -124,7 +124,7 @@ public abstract class Node implements Receiver {
 		synchronized(System.out) {
 			System.out.println(msg);
 		}
-*/
+
 	}
 	
 	public String finalMessage() {
