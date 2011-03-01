@@ -143,21 +143,33 @@ public class SimpleNode extends Node {
 			switch (msg.getHeader()) {
 			case Message.STOP:
 				receiveSTOP((STOP_MSG) msg);
+				nbr_STOP_MSG++;
+				total_MSG++;
 				break;
 			case Message.HITV:
 				receiveHITV(((HITV_MSG) msg));
+				nbr_HITV_MSG++;
+				total_MSG++;
 				break;
 			case Message.BALLOT:
 				receiveBallot((BALLOT_MSG) msg);
+				nbr_BALLOT_MSG++;
+				total_MSG++;
 				break;
 			case Message.INDIVIDUAL_TALLY_MSG:
 				receiveIndividualTally((INDIVIDUAL_TALLY_MSG) msg);
+				nbr_INDIVIDUAL_TALLY_MSG++;
+				total_MSG++;
 				break;
 			case Message.LOCAL_TALLY_MSG:
 				receiveLocalTally((LOCAL_TALLY_MSG) msg);
+				nbr_LOCAL_TALLY_MSG++;
+				total_MSG++;
 				break;
                         case Message.HITC:
                                 receiveHITC((HITC_MSG) msg);
+				nbr_HITC_MSG++;
+				total_MSG++;
                                 break;
 			default:
 				dump("Discarded a message from " + msg.getSrc() + " of type " + msg.getHeader() + "(cause: unknown type)");	
