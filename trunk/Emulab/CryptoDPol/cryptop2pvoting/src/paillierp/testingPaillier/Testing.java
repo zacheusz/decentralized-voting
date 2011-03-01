@@ -61,6 +61,7 @@ public class Testing {
         }
 
            launchers.executor.CryptoPrepareTrusted.writeToFile("keys/pkeys",p );
+           paillierp.testingPaillier.TestingRest.printArray(genTime,"genTime");
         //       System.out.println(" Six keys are generated , with a threshold of 3.");
 
         /*     System.out.println(" Six people use their keys : p1 , p2 , p3 , p4 , p5 , p6 ");
