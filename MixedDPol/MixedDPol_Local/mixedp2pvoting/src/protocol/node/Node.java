@@ -147,9 +147,10 @@ public abstract class Node implements Receiver {
 	protected class SelfDestructTask implements Task {
 		public void execute() {
 			endInstant = (new Date ()).getTime ();
-			System.out.println(finalMessage());
+//			System.out.println(finalMessage());
                         runningTime=endInstant-startInstant;
                         System.out.println("Running Time: "+runningTime);
+//			System.out.println("Total MSG: "+ total_MSG +"  ");
 			receiveSTOP(new STOP_MSG(nodeId, nodeId, "self destruct"));
 		}
 	}
