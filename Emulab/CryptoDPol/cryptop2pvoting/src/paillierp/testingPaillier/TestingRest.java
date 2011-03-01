@@ -61,7 +61,7 @@ public class TestingRest {
 
            launchers.executor.CryptoPrepareTrusted.writeToFile("keys/pkeys",p );
    */        
-            PaillierThreshold[] p=(PaillierThreshold []) launchers.executor.CryptoGossipLauncher.getObject("keys/pkeys");
+            PaillierThreshold[] p=(PaillierThreshold []) launchers.executor.CryptoGossipLauncher.getObject("/users/harkous/Emulab/CryptoDPol/keys/pkeys");
 
         //       System.out.println(" Six keys are generated , with a threshold of 3.");
 
