@@ -39,7 +39,7 @@ public class TestingRest {
             long startInstant;
         long[] preTime = new long[rounds];
 
-        long[] genTime = new long[rounds];
+    //    long[] genTime = new long[rounds];
         long[] encTime = new long[rounds];
         long[] sharedecTime = new long[rounds];
         long[] decTime = new long[rounds];
@@ -149,7 +149,7 @@ public class TestingRest {
         }
         
         printArray (preTime,"preTime");
-        printArray(genTime,"genTime");
+//        printArray(genTime,"genTime");
         printArray(addTime, "addTime");
         printArray(decTime,"addTime");
         printArray(postTime,"postTime");
