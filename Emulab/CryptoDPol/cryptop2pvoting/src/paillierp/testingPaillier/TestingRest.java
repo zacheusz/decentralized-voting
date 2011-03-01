@@ -134,7 +134,7 @@ public class TestingRest {
                 pshare[k]=p[k].decrypt(Emsg);
             }
             
-            sharedecTime[i] = (long) (System.nanoTime()*1.0/threshold-startInstant);
+            sharedecTime[i] = (System.nanoTime()-startInstant)/threshold;
 
             startInstant = System.nanoTime();
 
