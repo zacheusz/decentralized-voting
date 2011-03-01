@@ -45,6 +45,7 @@ public class TestingRest {
         long[] decTime = new long[rounds];
         long[] addTime = new long[rounds];
         long[] postTime = new long[rounds];
+        int [] sizes=new int[rounds];
 
  /*       PaillierThreshold[] p = new PaillierThreshold[servers];
         
@@ -112,6 +113,8 @@ public class TestingRest {
              Emsg = alice.encrypt(votes[0]);
 
             encTime[j] = System.nanoTime()-startInstant ;
+            sizes[i]=Emsg.toByteArray().length;
+
         }
         
         for (int j = 0; j < rounds; j++) {
@@ -156,6 +159,7 @@ public class TestingRest {
 
         printArray(decTime,"decTime");
         printArray(postTime,"postTime");
+        printArray(sizes, "size");
         
         
         //    System.out.println(" Alice encrypts the message " + msg + " and sends "
@@ -218,6 +222,13 @@ public class TestingRest {
         System.out.print(name+": ");
         for (int i=0;i<A.length;i++){
             System.out.print(A[i]/1000000.0+" ");
+        }
+        System.out.println('\n');
+    }
+        public static void printArray(int [] A,String name){
+        System.out.print(name+": ");
+        for (int i=0;i<A.length;i++){
+            System.out.print(A[i]+" ");
         }
         System.out.println('\n');
     }
