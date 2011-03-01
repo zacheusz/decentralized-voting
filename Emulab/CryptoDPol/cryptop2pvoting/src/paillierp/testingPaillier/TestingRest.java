@@ -13,7 +13,7 @@ import paillierp.key.PaillierPrivateThresholdKey;
 import zkp.DecryptionZKP;
 import launchers.executor.*;
 
-public class Testing {
+public class TestingRest {
 
     public static void main(String[] args) {
         HashMap<String, String> arguments = new HashMap<String, String>();
@@ -36,7 +36,6 @@ public class Testing {
         int candidatesLength = Integer.parseInt(arguments.get("-candidatesLength"));
 
         System.out.println(" Create new keypairs .");
-        PaillierPrivateThresholdKey[] keys = null;
         long startInstant;
         long[] preTime = new long[rounds];
 
@@ -47,7 +46,7 @@ public class Testing {
         long[] addTime = new long[rounds];
         long[] postTime = new long[rounds];
 
-        PaillierThreshold[] p = new PaillierThreshold[servers];
+ /*       PaillierThreshold[] p = new PaillierThreshold[servers];
         
         for (int i = 0; i < rounds; i++) {
             startInstant = System.nanoTime();
@@ -61,6 +60,9 @@ public class Testing {
         }
 
            launchers.executor.CryptoPrepareTrusted.writeToFile("keys/pkeys",p );
+   */        
+            PaillierThreshold[] p=(PaillierThreshold []) launchers.executor.CryptoGossipLauncher.getObject("keys/pkeys");
+
         //       System.out.println(" Six keys are generated , with a threshold of 3.");
 
         /*     System.out.println(" Six people use their keys : p1 , p2 , p3 , p4 , p5 , p6 ");
@@ -76,7 +78,7 @@ public class Testing {
 
 // Alice encrypts a message
         ///////////////////////////////////////////////////
-        /*
+        
         BigInteger Emsg = null;
         BigInteger[] votes = null;
         Paillier alice = null;
@@ -92,7 +94,7 @@ public class Testing {
             //n[pow-1] is n^s
             //   System.out.println("ns length: "+keys[0].getPublicKey().getNS().bitLength());
             //   System.out.println("ns+1 length: "+keys[0].getPublicKey().getNSPlusOne().bitLength());
-            bits = keys[0].getPublicKey().getNS().bitLength() / candidatesLength;
+            bits = p[0].getPublicKey().getNS().bitLength() / candidatesLength;
             base = (new BigInteger("2")).pow(bits);
             temp = base;
 
@@ -104,7 +106,7 @@ public class Testing {
 
             
             startInstant = System.nanoTime();
-            alice = new Paillier(keys[0].getPublicKey());
+            alice = new Paillier(p[0].getPublicKey());
 
           //  BigInteger msg = BigInteger.valueOf(0);
              Emsg = alice.encrypt(votes[0]);
@@ -209,7 +211,6 @@ public class Testing {
         }*/
         
     }
-    /*
     public static void printArray(long [] A,String name){
         System.out.print(name+": ");
         for (int i=0;i<A.length;i++){
@@ -234,5 +235,5 @@ public class Testing {
             temp = temp.divide(votes[i]);
      //       System.out.println(" " + temp);
         }
-    }*/
+    }
 }
