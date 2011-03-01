@@ -74,6 +74,14 @@ public class SimpleNode extends Node {
         protected int []numLocalTallies;
         protected int nbSentLocalTallies=0;
 
+        protected int nbr_STOP_MSG=0;
+        protected int nbr_HITV_MSG=0;
+        protected int nbr_BALLOT_MSG=0;
+        protected int nbr_INDIVIDUAL_TALLY_MSG=0;
+        protected int nbr_LOCAL_TALLY_MSG=0;
+        protected int nbr_HITC_MSG=0;
+        protected int total_MSG=0;
+
 	// Runtime functions
 	protected final TaskManager taskManager;
 	protected final Stopper stopper;
