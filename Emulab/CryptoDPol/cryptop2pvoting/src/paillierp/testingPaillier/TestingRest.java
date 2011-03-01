@@ -113,7 +113,7 @@ public class TestingRest {
              Emsg = alice.encrypt(votes[0]);
 
             encTime[j] = System.nanoTime()-startInstant ;
-            sizes[i]=Emsg.toByteArray().length;
+            sizes[j]=Emsg.toByteArray().length;
 
         }
         
