@@ -159,7 +159,7 @@ public class TestingRest {
 
         printArray(decTime,"decTime");
         printArray(postTime,"postTime");
-        printArray(sizes, "size");
+  //      printArray(sizes, "size");
         
         
         //    System.out.println(" Alice encrypts the message " + msg + " and sends "
