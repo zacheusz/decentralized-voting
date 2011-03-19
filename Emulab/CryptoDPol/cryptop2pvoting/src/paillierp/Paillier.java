@@ -299,8 +299,8 @@ public class Paillier extends AbstractPaillier{
 			num1=rd.nextLong();
 		} while(key.inModN(BigInteger.valueOf(num1)) == false);
 		BigInteger numplusnum1 = BigInteger.valueOf(num).add(BigInteger.valueOf(num1));
-		BigInteger summodnsquare = numplusnum1.mod(key.getN());
-                //BigInteger summodnsquare = testUtils.modAdd(BigInteger.valueOf(num),BigInteger.valueOf(num1),key.getN());
+		//BigInteger summodnsquare = numplusnum1.mod(key.getN());
+                BigInteger summodnsquare = testUtils.modAdd(BigInteger.valueOf(num),BigInteger.valueOf(num1),key.getN());
 		//D(E(num)+E(num1))=num+num1
 		System.out.println(numplusnum1.toString());
 		System.out.println(summodnsquare.toString() + "=\n"

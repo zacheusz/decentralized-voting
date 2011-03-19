@@ -48,7 +48,7 @@ public class Testing {
         long[] postTime = new long[rounds];
 
         PaillierThreshold[] p = new PaillierThreshold[servers];
-        
+            
         for (int i = 0; i < rounds; i++) {
             startInstant = System.nanoTime();
             Random rnd = new Random();
