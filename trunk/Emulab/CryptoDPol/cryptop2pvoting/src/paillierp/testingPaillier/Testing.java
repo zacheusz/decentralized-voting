@@ -60,7 +60,7 @@ public class Testing {
             genTime[i] = System.nanoTime()-startInstant;
         }
 
-//           launchers.executor.CryptoPrepareTrusted.writeToFile("keys/pkeys",p );
+           launchers.executor.CryptoPrepareTrusted.writeToFile("pkeys",p );
            paillierp.testingPaillier.TestingRest.printArray(genTime,"genTime");
         //       System.out.println(" Six keys are generated , with a threshold of 3.");
 

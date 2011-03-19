@@ -285,7 +285,7 @@ public class KeyGen {
 				shares[index] = shares[index].add(a[i].multiply(BigInteger.valueOf((long)Math.pow(X, i))));
                                 //shares[index] = testUtils.modAdd(shares[index],testUtils.modMult(a[i],BigInteger.valueOf((long)Math.pow(X, i)),nm),nm);
 			}
-			//shares[index] = shares[index].mod(nm);
+			shares[index] = shares[index].mod(nm);
 
 			viarray[index] = v.modPow(shares[index].multiply(delta), nSquare);
 		}
