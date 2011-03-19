@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 import paillierp.key.*;
+import paillierp.testingPaillier.testUtils;
 import zkp.EncryptionZKP;
 import zkp.MultiplicationZKP;
 
@@ -194,6 +195,7 @@ public abstract class AbstractPaillier implements Serializable {
 		}
 		
 		return (n.add(BigInteger.ONE).modPow(m, nSPlusOne).multiply(r.modPow(ns, nSPlusOne)).mod(nSPlusOne));
+        //        return testUtils.modMult(n.add(BigInteger.ONE).modPow(m, nSPlusOne),r.modPow(ns, nSPlusOne),nSPlusOne);
 	}
 	
 	/**
@@ -247,6 +249,7 @@ public abstract class AbstractPaillier implements Serializable {
 		if(!(key.inModNSPlusOne(c1))) throw new IllegalArgumentException("c1 must be less than n^(s+1)");
 		if(!(key.inModNSPlusOne(c2))) throw new IllegalArgumentException("c2 must be less than n^(s+1)");
 		return (c1.multiply(c2)).mod(key.getNSPlusOne());	
+                //return testUtils.modMult(c1,c2,key.getNSPlusOne());	
 	}
 
 	/**
@@ -269,6 +272,7 @@ public abstract class AbstractPaillier implements Serializable {
 		if(c1.abs().compareTo(nsplus1) >= 0) throw new IllegalArgumentException("c1 must be less than n^(s+1)");
 		if(c2.abs().compareTo(nsplus1) >= 0) throw new IllegalArgumentException("c2 must be less than n^(s+1)");
 		return (c1.multiply(c2)).mod(nsplus1);
+                //return testUtils.modMult(c1,c2,nsplus1);
 	}
 
 	/**
@@ -353,6 +357,7 @@ public abstract class AbstractPaillier implements Serializable {
 		if(!(key.inModNSPlusOne(c))) throw new IllegalArgumentException("c must be less than n^2");
 		if(!(key.inModNStar(r))) throw new IllegalArgumentException("r must be relatively prime to n and 0<=r<n");
 		return (c.multiply(r.modPow(key.getN(),key.getNSPlusOne()))).mod(key.getNSPlusOne());
+              //  return testUtils.modMult(c,r.modPow(key.getN(),key.getNSPlusOne()),key.getNSPlusOne());
 	}
 
 	/**

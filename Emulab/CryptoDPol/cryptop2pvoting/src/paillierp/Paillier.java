@@ -6,6 +6,7 @@ package paillierp;
 import java.math.*;
 import java.util.Random;
 import paillierp.key.*;
+import paillierp.testingPaillier.testUtils;
 
 /**
  * A simple implementation of the generalized Paillier encryption scheme
@@ -196,6 +197,7 @@ public class Paillier extends AbstractPaillier{
 		//therefore m= d^-1*(c1-1)/n mod n
 		// TODO: Is this true?
 		return (deckey.getDInvs().multiply((c1.subtract(BigInteger.ONE)).divide(deckey.getN()))).mod(deckey.getN());
+               ////// //return testUtils.modMult(testUtils.modMult(deckey.getDInvs(),(c1.subtract(BigInteger.ONE)),deckey.getN()),deckey.getN().modInverse(deckey.getN()),deckey.getN());
 	}
 
 	/*
@@ -298,6 +300,7 @@ public class Paillier extends AbstractPaillier{
 		} while(key.inModN(BigInteger.valueOf(num1)) == false);
 		BigInteger numplusnum1 = BigInteger.valueOf(num).add(BigInteger.valueOf(num1));
 		BigInteger summodnsquare = numplusnum1.mod(key.getN());
+                //BigInteger summodnsquare = testUtils.modAdd(BigInteger.valueOf(num),BigInteger.valueOf(num1),key.getN());
 		//D(E(num)+E(num1))=num+num1
 		System.out.println(numplusnum1.toString());
 		System.out.println(summodnsquare.toString() + "=\n"

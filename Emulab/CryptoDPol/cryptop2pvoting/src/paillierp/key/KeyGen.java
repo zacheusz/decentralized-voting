@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.io.*;
+import paillierp.testingPaillier.testUtils;
+import sun.security.util.BigInt;
 
 /**
  * Generates key pairs for the Paillier encryption scheme.  This set of static
@@ -259,6 +261,7 @@ public class KeyGen {
 		}while(ok==false);
 		// we can now set v to r*r mod nSquare
 		v=(r.multiply(r)).mod(nSquare);
+		//v=testUtils.modMult(r,r,nSquare);
 
 //		System.out.println("p :" + p.toString());
 //		System.out.println("p1:" + p1.toString());
@@ -272,7 +275,7 @@ public class KeyGen {
 		BigInteger[] viarray = new BigInteger[l];
 
 		//delta = l!
-		BigInteger delta = KeyGen.factorial(l);
+		BigInteger delta = KeyGen.factorial(l);//O(n)
 		BigInteger combineSharesConstant = BigInteger.valueOf(4).multiply(delta.multiply(delta)).modInverse(n);
 
 		for(int index = 0; index < l; index++) {
@@ -280,8 +283,9 @@ public class KeyGen {
 			int X = index + 1;
 			for(int i = 0; i < w; i++) {
 				shares[index] = shares[index].add(a[i].multiply(BigInteger.valueOf((long)Math.pow(X, i))));
+                                //shares[index] = testUtils.modAdd(shares[index],testUtils.modMult(a[i],BigInteger.valueOf((long)Math.pow(X, i)),nm),nm);
 			}
-			shares[index] = shares[index].mod(nm);
+			//shares[index] = shares[index].mod(nm);
 
 			viarray[index] = v.modPow(shares[index].multiply(delta), nSquare);
 		}
@@ -376,7 +380,7 @@ public class KeyGen {
 			for(int i = 0; i < w; i++) {
 				shares[index] = shares[index].add(a[i].multiply(BigInteger.valueOf((long)Math.pow(X, i))));
 			}
-			shares[index] = shares[index].mod(nm);
+			//shares[index] = shares[index].mod(nm);
 
 			viarray[index] = v.modPow(shares[index].multiply(delta), nSquare);
 		}
@@ -588,8 +592,9 @@ public class KeyGen {
 		BigInteger res = BigInteger.ONE;
 		for(int i = n; i > 1; i--) {
 			res = res.multiply(BigInteger.valueOf(i));
+                     //   System.out.println(res+"\n");
 		}
 		return res;
 	}
-
+     
 }
