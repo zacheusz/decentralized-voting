@@ -22,9 +22,9 @@ public class Testing {
             i++;
         }
          int bits_num =128;
-        int servers = 480;
-        int threshold = 40;
-        int rounds = 1;
+        int servers = 5;
+        int threshold = 3;
+        int rounds = 2;
         int candidatesLength = 2;
 
 
