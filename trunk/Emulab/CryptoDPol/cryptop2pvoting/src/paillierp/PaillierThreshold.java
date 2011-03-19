@@ -327,8 +327,8 @@ public class PaillierThreshold extends AbstractPaillier {
 						throw new IllegalArgumentException("You cannot have repeated shares.");
 				}
 			}
-			cprime = cprime.multiply(shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare)).mod(nSquare);
-                        //cprime = testUtils.modMult(cprime,shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare),nSquare);
+			//cprime = cprime.multiply(shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare)).mod(nSquare);
+                        cprime = testUtils.modMult(cprime,shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare),nSquare);
                         
 
 
@@ -337,8 +337,8 @@ public class PaillierThreshold extends AbstractPaillier {
 		}
 
 		L = cprime.subtract(BigInteger.ONE).divide(n);
-		  res = L.multiply(deckey.getCombineSharesConstant()).mod(n);
-                //res = testUtils.modMult(L,deckey.getCombineSharesConstant(),n);
+		//  res = L.multiply(deckey.getCombineSharesConstant()).mod(n);
+                res = testUtils.modMult(L,deckey.getCombineSharesConstant(),n);
 
 		return res;
 	}

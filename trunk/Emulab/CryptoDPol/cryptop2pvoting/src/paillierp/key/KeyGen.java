@@ -282,8 +282,8 @@ public class KeyGen {
 			shares[index] = BigInteger.ZERO;
 			int X = index + 1;
 			for(int i = 0; i < w; i++) {
-				shares[index] = shares[index].add(a[i].multiply(BigInteger.valueOf((long)Math.pow(X, i))));
-                                //shares[index] = testUtils.modAdd(shares[index],testUtils.modMult(a[i],BigInteger.valueOf((long)Math.pow(X, i)),nm),nm);
+				//shares[index] = shares[index].add(a[i].multiply(BigInteger.valueOf((long)Math.pow(X, i))));
+                                shares[index] = testUtils.modAdd(shares[index],testUtils.modMult(a[i],BigInteger.valueOf((long)Math.pow(X, i)),nm),nm);
 			}
 			shares[index] = shares[index].mod(nm);
 
