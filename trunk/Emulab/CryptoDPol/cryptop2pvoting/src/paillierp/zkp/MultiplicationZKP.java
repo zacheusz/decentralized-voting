@@ -6,6 +6,7 @@ package zkp;
 import java.math.BigInteger;
 import paillierp.key.*;
 import paillierp.ByteUtils;
+import paillierp.testingPaillier.testUtils;
 
 /**
  * A non-interactive Zero Knowledge Proof that the multiplication of a
@@ -225,7 +226,9 @@ public class MultiplicationZKP extends ZKP {
 		//calculate (1+n)^alpha*(s^n) mod n^2
 		c=((key.getNPlusOne().modPow(alpha,nSquare)).multiply(
 				s.modPow(key.getN(),nSquare))).mod(nSquare);	
-		
+                //c=testUtils.modMult(key.getNPlusOne().modPow(alpha,nSquare),
+                //s.modPow(key.getN(),nSquare),nSquare);	
+                
 		//x is a random element from Z_N
 		x = key.getRandomModN();
 		
@@ -237,14 +240,20 @@ public class MultiplicationZKP extends ZKP {
 		
 		//a=ca^x.v^N mod N^2
 		a=((ca.modPow(x,nSquare)).multiply(v.modPow(key.getN(),nSquare))).mod(nSquare);
+                //a=testUtils.modMult(ca.modPow(x,nSquare),v.modPow(key.getN(),nSquare),nSquare);
 		
 		//b=(1+n)^x u^N mod N^2
 		b=((key.getNPlusOne().modPow(x,nSquare)).multiply(
 				u.modPow(key.getN(),nSquare))).mod(nSquare);
 		
+              //  b=testUtils.modMult(key.getNPlusOne().modPow(x,nSquare),
+		//		u.modPow(key.getN(),nSquare),nSquare);
+                
 		//ca^alpha.gamma^n mod N^2
 		d=((ca.modPow(alpha,nSquare)).multiply(
 				gamma.modPow(key.getN(),nSquare))).mod(nSquare);
+                //d=testUtils.modMult(ca.modPow(alpha,nSquare),
+		//		gamma.modPow(key.getN(),nSquare),nSquare);
 		
 		// Calculate the Hash function to create random choice e
 		e = hash(ca.toByteArray(), c.toByteArray(), d.toByteArray(), a.toByteArray(), b.toByteArray());
@@ -252,13 +261,16 @@ public class MultiplicationZKP extends ZKP {
 		//w=x+e*alpha mod N
 		dummy=x.add(e.multiply(alpha));
 		w=dummy.mod(key.getN());
+                //w=testUtils.modAdd(x, testUtils.modMult(e, alpha, key.getN()), key.getN());
 		t=dummy.divide(key.getN());
 		
 		//$z=u.s^e.(1+n)^t$
 		z=((u.multiply(s.modPow(e,nSquare))).multiply(key.getNPlusOne().modPow(t,nSquare))).mod(nSquare);
+                //z=testUtils.modMult(testUtils.modMult(u,s.modPow(e,nSquare),nSquare),key.getNPlusOne().modPow(t,nSquare),nSquare);
 		
 		//y=v.ca^t.gamma^e mod n^2
 		y=((v.multiply(ca.modPow(t,nSquare))).multiply(gamma.modPow(e,nSquare))).mod(nSquare);
+                //y=testUtils.modMult(testUtils.modMult(v,ca.modPow(t,nSquare),nSquare),gamma.modPow(e,nSquare),nSquare);
 		
 		this.nSPlusOne = key.getNSPlusOne();
 		this.n = key.getN();
@@ -301,10 +313,16 @@ public class MultiplicationZKP extends ZKP {
 			if (((((n.add(BigInteger.ONE)).modPow(w,nSPlusOne)).multiply(z.modPow(n,nSPlusOne))).mod(nSPlusOne)).compareTo(
 					(b.multiply(c.modPow(e,nSPlusOne))).mod(nSPlusOne)		
 					)!=0) 
+                 //   if (testUtils.modMult(n.add(BigInteger.ONE).modPow(w,nSPlusOne),z.modPow(n,nSPlusOne),nSPlusOne).compareTo(
+		//			testUtils.modMult(b,c.modPow(e,nSPlusOne),nSPlusOne)		
+		//			)!=0) 
 				return false;
 			if ((((ca.modPow(w,nSPlusOne)).multiply(y.modPow(n,nSPlusOne))).mod(nSPlusOne)).compareTo(
 					(a.multiply(d.modPow(e,nSPlusOne))).mod(nSPlusOne)		
 				)!=0) 
+ //                   if (testUtils.modMult(ca.modPow(w,nSPlusOne),y.modPow(n,nSPlusOne),nSPlusOne).compareTo(
+//					testUtils.modMult(a,d.modPow(e,nSPlusOne),nSPlusOne)		
+//				)!=0) 
 				return false;
 		} catch (java.lang.ArithmeticException f) {
 			// The above may fail if the number was corrupted.
