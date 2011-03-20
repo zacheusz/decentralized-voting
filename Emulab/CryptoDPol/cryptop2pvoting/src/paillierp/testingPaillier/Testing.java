@@ -21,10 +21,10 @@ public class Testing {
             arguments.put(args[i], args[i + 1]);
             i++;
         }
-         int bits_num =128;
-        int servers = 5;
-        int threshold = 3;
-        int rounds = 2;
+         int bits_num =64;
+        int servers = 9600;
+        int threshold = 10;
+        int rounds = 1;
         int candidatesLength = 2;
 
 

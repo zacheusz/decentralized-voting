@@ -81,6 +81,7 @@ import sun.security.util.BigInt;
  * @author James Garrity
  */
 public class KeyGen {
+        public static BigInteger delta;
    
 	/**
 	 * This function return the keys for the Paillier class
@@ -275,7 +276,7 @@ public class KeyGen {
 		BigInteger[] viarray = new BigInteger[l];
 
 		//delta = l!
-		BigInteger delta = KeyGen.factorial(l);//O(n)
+		delta = KeyGen.factorial(l);//O(n)
 		BigInteger combineSharesConstant = BigInteger.valueOf(4).multiply(delta.multiply(delta)).modInverse(n);
 
 		for(int index = 0; index < l; index++) {
@@ -371,7 +372,7 @@ public class KeyGen {
 		BigInteger[] viarray = new BigInteger[l];
 
 		//delta = l!
-		BigInteger delta = KeyGen.factorial(l);
+		delta = KeyGen.factorial(l);
 		BigInteger combineSharesConstant = BigInteger.valueOf(4).multiply(delta.multiply(delta)).modInverse(n);
 
 		for(int index = 0; index < l; index++) {
