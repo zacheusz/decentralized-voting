@@ -6,6 +6,7 @@
 package paillierp.testingPaillier;
 
 import java.math.BigInteger;
+import paillierp.key.KeyGen;
 import sun.security.util.BigInt;
 
 /**
@@ -16,7 +17,15 @@ public class testUtils {
 public static void main(String[] args) {
  //   System.out.println(modAdd(BigInteger.ONE.multiply(BigInteger.valueOf(31)), BigInteger.ONE, BigInteger.ONE.multiply(BigInteger.valueOf(32))));
  //   System.out.println(modMult(BigInteger.ONE.multiply(BigInteger.valueOf(31)), BigInteger.valueOf(2), BigInteger.valueOf(32)));
-    System.out.println(BigInteger.valueOf(6).modInverse(BigInteger.valueOf(6)));
+   // System.out.println(BigInteger.valueOf(6).modInverse(BigInteger.valueOf(6)));
+  
+    long startInstant;
+
+         startInstant= System.nanoTime();
+
+        System.out.println(KeyGen.factorial(16000));
+         System.out.println(System.nanoTime()-startInstant);
+   
 }
 public static BigInteger modAdd(BigInteger a, BigInteger b, BigInteger n)
         {

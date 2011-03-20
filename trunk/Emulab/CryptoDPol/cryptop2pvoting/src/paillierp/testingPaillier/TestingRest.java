@@ -221,7 +221,7 @@ public class TestingRest {
     public static void printArray(long [] A,String name){
         System.out.print(name+": ");
         for (int i=0;i<A.length;i++){
-            System.out.print(A[i]/1000000.0+" ");
+            System.out.println(A[i]/1000000.0+" ");
         }
         System.out.println('\n');
     }
