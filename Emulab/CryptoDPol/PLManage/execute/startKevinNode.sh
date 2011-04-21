@@ -15,7 +15,7 @@ beta=$BETA
 
 function launch () {
     rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1  $LOGIN_NAME@$node:$PROJECT_HOME/keys/
-    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $GOSSIP_PORT -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_HOME/keys/secKey$1 -publicKeyFile $PROJECT_HOME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -nbBallots $NB_BALLOTS"
+    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $4 -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_HOME/keys/secKey$1 -publicKeyFile $PROJECT_HOME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -nbBallots $NB_BALLOTS"
 }
 
 if [ $# -ne 4 ]
@@ -47,6 +47,7 @@ echo -e "\E[32;32mLaunching the experiment on all nodes"; tput sgr0 # green
 i=0
 gid=0
 j=0
+for (( k=0 ; k<$nodesPerMachine ; k++)) do
 for node in `tac $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
 do
    gid=$(($i%$NB_GROUPS))
@@ -56,13 +57,13 @@ do
    node_local_name=`expr match "$node" '\(node-*.[0-9]\)'`
  #  if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
   # then
-      launch $j $gid $i &
+      launch $j $gid $i $(( $GOSSIP_PORT + $nodesPerMachine  ))&
    #else
    #   launch2 &
    #fi
    i=$(($i+1))
 done
-
+done
 wait
 
 #./getOutputs.sh $nodesFile $sdate
