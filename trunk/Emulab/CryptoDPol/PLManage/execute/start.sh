@@ -36,6 +36,7 @@ AFTERTRUSTED=$(date +%s)
 DIFF1=$(( $AFTERTRUSTED - $START ))
 echo "time for trusted 3rd party $DIFF1"
 
+
 for ((i=0;i<nb;i++)) do
 #  sdate="`date +\"%y%m%d%H%M%S\"`"
 #  shuf $nodesFile > tmp$sdate
@@ -45,6 +46,7 @@ for ((i=0;i<nb;i++)) do
   ./startKevinNode.sh $nodesFile $bname:$bport $pport stamp &
   wait
 done
+
 END=$(date +%s)
 
 
