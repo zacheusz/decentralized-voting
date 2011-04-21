@@ -13,17 +13,17 @@ import paillierp.key.PaillierPrivateThresholdKey;
 import zkp.DecryptionZKP;
 import launchers.executor.*;
 
-public class TestingRest {
+public class TestingCombined {
 
     public static void main(String[] args) {
-        HashMap<String, String> arguments = new HashMap<String, String>();
+            HashMap<String, String> arguments = new HashMap<String, String>();
         for (int i = 0; i < args.length; i++) {
             arguments.put(args[i], args[i + 1]);
             i++;
         }
-         int bits_num =1024;
-        int servers = 1600;
-        int threshold = 80;
+         int bits_num =128;
+        int servers = 480;
+        int threshold = 40;
         int rounds = 1;
         int candidatesLength = 2;
 
@@ -35,19 +35,19 @@ public class TestingRest {
 //        int rounds = Integer.parseInt(arguments.get("-rounds"));
 //        int candidatesLength = Integer.parseInt(arguments.get("-candidatesLength"));
 
-   //     System.out.println(" Create new keypairs .");
-            long startInstant;
+  //      System.out.println(" Create new keypairs .");
+        PaillierPrivateThresholdKey[] keys = null;
+        long startInstant;
         long[] preTime = new long[rounds];
 
-    //    long[] genTime = new long[rounds];
+        long[] genTime = new long[rounds];
         long[] encTime = new long[rounds];
         long[] sharedecTime = new long[rounds];
         long[] decTime = new long[rounds];
         long[] addTime = new long[rounds];
         long[] postTime = new long[rounds];
-        int [] sizes=new int[rounds];
 
- /*       PaillierThreshold[] p = new PaillierThreshold[servers];
+        PaillierThreshold[] p = new PaillierThreshold[servers];
         
         for (int i = 0; i < rounds; i++) {
             startInstant = System.nanoTime();
@@ -60,22 +60,14 @@ public class TestingRest {
             genTime[i] = System.nanoTime()-startInstant;
         }
 
-           launchers.executor.CryptoPrepareTrusted.writeToFile("keys/pkeys",p );
-   */        
-            PaillierThreshold[] p=(PaillierThreshold []) launchers.executor.CryptoGossipLauncher.getObject("pkeys");
+//           launchers.executor.CryptoPrepareTrusted.writeToFile("keys/pkeys",p );
+           paillierp.testingPaillier.TestingRest.printArray(genTime,"genTime");
+       
+   //     System.out.println(" Create new keypairs .");
+          
+        int [] sizes=new int[rounds];
 
-        //       System.out.println(" Six keys are generated , with a threshold of 3.");
 
-        /*     System.out.println(" Six people use their keys : p1 , p2 , p3 , p4 , p5 , p6 ");
-        PaillierThreshold p1 = new PaillierThreshold(keys[0]);
-        PaillierThreshold p2 = new PaillierThreshold(keys[1]);
-        PaillierThreshold p3 = new PaillierThreshold(keys[2]);
-        PaillierThreshold p4 = new PaillierThreshold(keys[3]);
-        PaillierThreshold p5 = new PaillierThreshold(keys[4]);
-        PaillierThreshold p6 = new PaillierThreshold(keys[5]);
-        
-        System.out.println(" Alice is given the public key .");
-         */
 
 // Alice encrypts a message
         ///////////////////////////////////////////////////
@@ -126,17 +118,15 @@ public class TestingRest {
 
         }
         ////////////////////////////////////////
-    //    PartialDecryption [] pshare=new PartialDecryption[threshold];
-        DecryptionZKP [] pshare =new DecryptionZKP[threshold] ;
-
+        PartialDecryption [] pshare=new PartialDecryption[threshold];
+        
         for (int i=0;i<rounds;i++){
             
             startInstant = System.nanoTime();
 
             for (int k=0;k<threshold;k++){
                 
-          //       pshare[k]=p[k].decrypt(Emsg);
-              pshare[k]=p[k].decryptProof(Emsg);
+                pshare[k]=p[k].decrypt(Emsg);
             }
             
             sharedecTime[i] = (System.nanoTime()-startInstant)/threshold;
@@ -164,66 +154,13 @@ public class TestingRest {
   //      printArray(sizes, "size");
         
         
-        //    System.out.println(" Alice encrypts the message " + msg + " and sends "
-        //           + Emsg + " to everyone .");
-// Alice sends Emsg to everyone
-/*
-        System.out.println(" p1 receives the message and tries to decrypt all alone :");
-        BigInteger p1decrypt = p1.decryptOnly(Emsg);
-        if (p1decrypt.equals(msg)) {
-        System.out.println(" p1 succeeds decrypting the message all alone .");
-        } else {
-        System.out.println(" p1 fails decrypting the message all alone . :(");
-        }
         
-        System.out.println(" p2 and p3 receive the message and "
-        + " create a partial decryptions .");
-        DecryptionZKP p2share = p2.decryptProof(Emsg);
-        DecryptionZKP p3share = p3.decryptProof(Emsg);
-        // p2 sends the partial decryption to p3
-        // p3 sends the partial decryption to p2
-        System.out.println(" p2 receives the partial p3 's partial decryption "
-        + "and attempts to decrypt the whole message using its own "
-        + " share twice ");
-        try {
-        BigInteger p2decrypt = p2.combineShares(p2share, p3share, p2share);
-        if (p2decrypt.equals(msg)) {
-        System.out.println(" p2 succeeds decrypting the message with p3 .");
-        } else {
-        System.out.println(" p2 fails decrypting the message with p3. :(");
-        }
-        } catch (IllegalArgumentException e) {
-        System.out.println(" p2 fails decrypting and throws an error ");
-        }*/
-  /*      System.out.println("p4 , p5 , p6 receive Alice 's original message and "
-                + " create partial decryptions .");
-        DecryptionZKP p4share = p4.decryptProof(Emsg);
-        DecryptionZKP p5share = p5.decryptProof(Emsg);
-        DecryptionZKP p6share = p6.decryptProof(Emsg);
-// p4 , p5 , and p6 share each of their partial decryptions with each other
-
-        System.out.println(" p4 receives and combines each partial decryption "
-                + " to decrypt whole message :");
-
-        BigInteger p4decrypt = p4.combineShares(p4share, p6share);
-        getResult(p4decrypt, candidatesLength, votes);
-        BigInteger p5decrypt = p4.combineShares(p5share, p6share);
-        getResult(p5decrypt, candidatesLength, votes);
-        BigInteger p6decrypt = p4.combineShares(p6share, p4share);
-        getResult(p6decrypt, candidatesLength, votes);
-
-        /*      if (p4decrypt.equals(msg)) {
-        
-        System.out.println(" p4 succeeds decrypting the message with p5 and p6.");
-        } else {
-        System.out.println(" p4 fails decrypting the message with p5 and p6.:(");
-        }*/
         
     }
     public static void printArray(long [] A,String name){
         System.out.print(name+": ");
         for (int i=0;i<A.length;i++){
-            System.out.println(A[i]/1000000.0+" ");
+            System.out.print(A[i]/1000000.0+" ");
         }
         System.out.println('\n');
     }
