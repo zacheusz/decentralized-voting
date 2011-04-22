@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import paillierp.key.*;
-import paillierp.testingPaillier.testUtils;
 import zkp.*;
 
 /**
@@ -327,18 +326,14 @@ public class PaillierThreshold extends AbstractPaillier {
 						throw new IllegalArgumentException("You cannot have repeated shares.");
 				}
 			}
-			//cprime = cprime.multiply(shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare)).mod(nSquare);
-                        cprime = testUtils.modMult(cprime,shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare),nSquare);
-                        
-
+			cprime = cprime.multiply(shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare)).mod(nSquare);
 
 			
 			//System.out.print(shares[i]+"^(2*"+lambda+") + ");
 		}
 
 		L = cprime.subtract(BigInteger.ONE).divide(n);
-		//  res = L.multiply(deckey.getCombineSharesConstant()).mod(n);
-                res = testUtils.modMult(L,deckey.getCombineSharesConstant(),n);
+		res = L.multiply(deckey.getCombineSharesConstant()).mod(n);
 
 		return res;
 	}

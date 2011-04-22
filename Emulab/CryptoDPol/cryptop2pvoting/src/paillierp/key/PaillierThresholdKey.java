@@ -130,7 +130,7 @@ public class PaillierThresholdKey extends PaillierKey {
 	public PaillierThresholdKey(BigInteger n, int l, int w, BigInteger v, BigInteger[] viarray, long seed) {
 		super(n, seed);
 		this.l = l;
-		this.delta = KeyGen.delta;
+		this.delta = KeyGen.factorial(l);
 		this.combineSharesConstant = BigInteger.valueOf(4).multiply(delta.multiply(delta)).modInverse(ns);
 		this.w = w;
 		this.v = v;
@@ -170,7 +170,7 @@ public class PaillierThresholdKey extends PaillierKey {
 			BigInteger[] viarray, long seed) {
 		super(n, seed);
 		this.l = l;
-		this.delta = KeyGen.delta;
+		this.delta = KeyGen.factorial(l);
 		this.combineSharesConstant = combineSharesConstant;
 		this.w = w;
 		this.v = v;
