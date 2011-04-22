@@ -38,7 +38,7 @@ public class CryptoNode extends Node {
     public static long DECISION_DELAY = 10000;									// Delay before making a decision for localTally
     public static double VOTE_RATIO = 0.5;
     public static double MALICIOUS_RATIO = 0.1;
-    private final static int BOOTSTRAP_CONTACT_TIMEOUT = 10000;
+    private final static int BOOTSTRAP_CONTACT_TIMEOUT = 40000;
     private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 40000;				// Duration of the joining phase: 19 seconds to get peers
     private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 40000;
     //                                1  second  to get proxies

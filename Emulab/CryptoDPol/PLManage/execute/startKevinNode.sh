@@ -58,6 +58,7 @@ do
  #  if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
   # then
       launch $j $gid $i $(( $GOSSIP_PORT + $k  ))&
+	sleep 1
    #else
    #   launch2 &
    #fi
