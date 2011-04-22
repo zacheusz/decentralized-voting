@@ -1,7 +1,7 @@
 export PROJECT_NAME="cryptop2pvoting"
 #export LOGIN_NAME="irisa_$PROJECT_NAME"
 #changed login name
-export experiment="polling1"
+export experiment="polling"
 export LOGIN_NAME="harkous"
 export HOME=/users/$LOGIN_NAME
 export PROJECT_HOME=$HOME/Emulab/CryptoDPol
@@ -22,15 +22,16 @@ export DEFAULT_BOOTSTRAP="localhost"
 export SSH_TIMEOUT=30
 export BETA=0.05
 #tried deploying on fewer nodes
-export NB_NODES=50
+export NB_NODES=70
 export NB_MALICIOUS=0
 export NB_GROUPS=10
 export K=1
 #export NB_BALLOTS=$((2*$K+1))
 export NB_BALLOTS=1
 export VOTECOUNT=3
-export TALLYCOUNT=$NB_NODES
-export VOTERCOUNT=$(($NB_NODES))
+export nodesPerMachine=2
+export TALLYCOUNT=$(( $nodesPerMachine * $NB_NODES ))
+export VOTERCOUNT=$TALLYCOUNT
 export MINTALLIES=$(((($VOTERCOUNT/$NB_GROUPS))))
 export CERTAINTY=64
 export BITS=128
@@ -44,4 +45,3 @@ export full_bname=$bname.$experiment.abstracts.emulab.net
 #export BOOTSTRAP_PORT=$bport
 export proxy_node=lpdserver.epfl.ch
 export home_node=node-1.$experiment.abstracts.emulab.net
-
