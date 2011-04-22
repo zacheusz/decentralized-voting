@@ -362,7 +362,7 @@ public class CryptoNode extends Node {
                     //              if(Tally.CheckVote (msg.getTally(),pub)){
                     //         dump("inputs: "+localTally+" "+msg.getTally() );
          //           dump("input1: " + localTally + "\ninput2: " + msg.getTally());
-
+                            
                     localTally = encryptor.add(localTally, msg.getTally());
            //         dump("output: " + localTally);
                     //       dump("current localtally: "+localTally)    ;
