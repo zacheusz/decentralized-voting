@@ -21,19 +21,19 @@ public class Testing {
             arguments.put(args[i], args[i + 1]);
             i++;
         }
-         int bits_num =1024;
-        int servers = 1600;
-        int threshold = 80;
-        int rounds = 1;
-        int candidatesLength = 2;
+//         int bits_num =128;
+//        int servers = 5;
+//        int threshold = 3;
+//        int rounds = 2;
+//        int candidatesLength = 2;
 
 
       
-//        int bits_num = Integer.parseInt(arguments.get("-bitsnum"));
-//        int servers = Integer.parseInt(arguments.get("-servers"));
-//        int threshold = Integer.parseInt(arguments.get("-threshold"));
-//        int rounds = Integer.parseInt(arguments.get("-rounds"));
-//        int candidatesLength = Integer.parseInt(arguments.get("-candidatesLength"));
+        int bits_num = Integer.parseInt(arguments.get("-bitsnum"));
+        int servers = Integer.parseInt(arguments.get("-servers"));
+        int threshold = Integer.parseInt(arguments.get("-threshold"));
+        int rounds = Integer.parseInt(arguments.get("-rounds"));
+        int candidatesLength = Integer.parseInt(arguments.get("-candidatesLength"));
 
   //      System.out.println(" Create new keypairs .");
         PaillierPrivateThresholdKey[] keys = null;
@@ -48,7 +48,7 @@ public class Testing {
         long[] postTime = new long[rounds];
 
         PaillierThreshold[] p = new PaillierThreshold[servers];
-            
+        
         for (int i = 0; i < rounds; i++) {
             startInstant = System.nanoTime();
             Random rnd = new Random();
@@ -60,7 +60,7 @@ public class Testing {
             genTime[i] = System.nanoTime()-startInstant;
         }
 
-           launchers.executor.CryptoPrepareTrusted.writeToFile("pkeys",p );
+           launchers.executor.CryptoPrepareTrusted.writeToFile("keys/pkeys",p );
            paillierp.testingPaillier.TestingRest.printArray(genTime,"genTime");
         //       System.out.println(" Six keys are generated , with a threshold of 3.");
 
