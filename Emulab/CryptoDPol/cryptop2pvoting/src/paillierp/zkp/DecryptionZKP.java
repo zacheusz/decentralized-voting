@@ -9,6 +9,7 @@ import paillierp.PartialDecryption;
 import paillierp.key.PaillierPrivateThresholdKey;
 import paillierp.key.PaillierThresholdKey;
 import paillierp.ByteUtils;
+import paillierp.testingPaillier.testUtils;
 
 
 /**
@@ -242,13 +243,16 @@ public class DecryptionZKP extends ZKP {
 		
 		try {
 			// tries to compute the original a = c^4z * ci^(2*-e)
-			BigInteger a = c4.modPow(z, nSPlusOne).multiply(ci2.modPow(e.negate(), nSPlusOne)).mod(nSPlusOne);
-			
+		//	BigInteger a = c4.modPow(z, nSPlusOne).multiply(ci2.modPow(e.negate(), nSPlusOne)).mod(nSPlusOne);
+			BigInteger a = testUtils.modMult(c4.modPow(z, nSPlusOne),ci2.modPow(e.negate(), nSPlusOne),nSPlusOne);
+                        
 			// tries to compute the original b = v^z * vi^(-e)
-			BigInteger b = v.modPow(z, nSPlusOne).multiply(vi.modPow(e.negate(), nSPlusOne)).mod(nSPlusOne);
-	
+		//	BigInteger b = v.modPow(z, nSPlusOne).multiply(vi.modPow(e.negate(), nSPlusOne)).mod(nSPlusOne);
+                        BigInteger b = testUtils.modMult(v.modPow(z, nSPlusOne),vi.modPow(e.negate(), nSPlusOne),nSPlusOne);
+                        
 			// tries to rehash the value H(a, b, c^4, ci)
 			BigInteger e = this.hash(a.toByteArray(),b.toByteArray(),c4.toByteArray(),ci2.toByteArray());
+                        
 	
 			// see if the original hash is equal to the guessed hash
 			if (e.compareTo(this.e) == 0) {
