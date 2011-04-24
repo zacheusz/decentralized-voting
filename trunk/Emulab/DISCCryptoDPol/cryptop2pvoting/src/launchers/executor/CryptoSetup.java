@@ -34,8 +34,16 @@ public abstract class CryptoSetup {
                                     CryptoNode.MINTALLIES = Integer.parseInt(arguments.get("-mintallies"));
 
                 }                
+                if(arguments.get("-nbVoters") != null) {
+                                    CryptoNode.VOTERCOUNT = Integer.parseInt(arguments.get("-nbVoters"));
+                }
+                if(arguments.get("-kvalue") != null) {
+                                    CryptoNode.kvalue = Integer.parseInt(arguments.get("-kvalue"));
+                } 
 
-
-	}
+                if(arguments.get("-nodesPerMachine") != null) {
+                                    CryptoNode.nodesPerMachine = Integer.parseInt(arguments.get("-nodesPerMachine"));
+                } 
+        }
 	
 }
