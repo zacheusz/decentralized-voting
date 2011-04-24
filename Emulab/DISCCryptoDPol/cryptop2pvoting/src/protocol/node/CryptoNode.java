@@ -2,6 +2,7 @@ package protocol.node;
 
 //import Exception.NoLegalVotes;
 //import Exception.NotEnoughTallies;
+import protocol.communication.CLUSTER_ASSIGN_MSG;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
@@ -21,8 +22,14 @@ import runtime.TaskManager;
 
 //import OldVoting.*;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
 import paillierp.Paillier;
 import paillierp.PaillierThreshold;
 import paillierp.PartialDecryption;
@@ -51,7 +58,26 @@ public class CryptoNode extends Node {
     private static int SELF_DESTRUCT_DELAY = CLOSE_TallyDecryption_DELAY + 20 * 1000;
     private static int COUNTING_PERIOD = 20 * 1000;								// Duration of epidemic dissemination: 20 seconds
     public static int VOTECOUNT;
+    public static int VOTERCOUNT;
+    public static int kvalue;
     public static int MINTALLIES;
+    public static int nodesPerMachine;
+    public static ClusterChoice nodeToCluster;
+    public static int chosenCluster;
+    public static int numClusters;
+    public static Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
+     
+    public static Map<E_CryptoNodeID, Integer> finalIDAssignment = new HashMap<E_CryptoNodeID, Integer>();
+     
+    Set<E_CryptoNodeID> smallestCluster;
+    public int numRecvClusterAssign = 0;
+    public int numRecvFinalClusterAssign = 0;
+    public ClusterAssigment clusterAssign;
+    public boolean IAmSmallest =false;
+    public int numLocalTallies;
+    public boolean computedLocalTally=false;
+    public boolean receivedPartialTally=false;
+    protected BigInteger partialTally=BigInteger.ONE;
     // Fields
     protected final E_CryptoNodeID bootstrap;
     //Keys
@@ -224,6 +250,9 @@ public class CryptoNode extends Node {
                     break;
                 case Message.CRYPTO_DECRYPTION_SHARE_MSG:
                     receiveDecryptionShare((CRYPTO_DECRYPTION_SHARE_MSG) msg);
+                    break;
+                case Message.CLUSTER_ASSIGN_MSG:
+                    receiveClusterAssign((CLUSTER_ASSIGN_MSG) msg);
                     break;
                 /*                      case Message.HITC:
                 receiveHITC((HITC_MSG) msg);
@@ -510,6 +539,282 @@ public class CryptoNode extends Node {
         }
     }
 
+    private class positionAnnouncerTask implements Task {
+
+        public void execute() {
+            //choose the cluster
+            numClusters = (int) ((Math.log(VOTERCOUNT) / 2) / (kvalue * Math.log(VOTERCOUNT / 2)));
+            Random generator = new Random();
+            chosenCluster = generator.nextInt(numClusters);
+
+            //spread the data
+            //chose random node 
+
+            E_CryptoNodeID randomNodeID = getRandomNodeID();
+
+            nodeToCluster = new ClusterChoice();
+
+            nodeToCluster.add(chosenCluster, nodeId);
+
+
+            //  startDiffInfo();
+
+
+        }
+    }
+
+    private class randomIDAssignerTask implements Task {
+
+        public void execute() {
+            synchronized (smallestCluster) {
+
+                if (nodeToCluster.getSmallestCluster() == chosenCluster) {
+                    IAmSmallest=true;
+                    Random generator = new Random();
+                    Set<E_CryptoNodeID> currentCluster;
+                    Map<E_CryptoNodeID, Integer> myIDAssignment = new HashMap<E_CryptoNodeID, Integer>();
+                    int assignedOrder = 0;
+                    Iterator it;
+                    //assign random clusters to nodes
+                    for (int i = 0; i < numClusters; i++) {
+                        currentCluster = nodeToCluster.get(chosenCluster);
+
+                        it = currentCluster.iterator();
+
+                        while (it.hasNext()) {
+                            assignedOrder = generator.nextInt((int) Math.pow(VOTERCOUNT, 3));
+                            myIDAssignment.put((E_CryptoNodeID) it.next(), assignedOrder);
+                        }
+                    }
+
+                    //send choices to smallest cluster's member
+                    smallestCluster = nodeToCluster.get(chosenCluster);
+                    aggrIDAssign(myIDAssignment);
+                    for (E_CryptoNodeID peerId : smallestCluster) {
+                        dump("Send cluster assignment to " + peerId);
+                        try {
+                            doSendTCP(new CLUSTER_ASSIGN_MSG(nodeId, peerId, myIDAssignment));
+                        } catch (Exception e) {
+                            dump("TCP: cannot send cluster assignment");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private class finalAssignAnnouncerTask implements Task {
+
+        public void execute() {
+            synchronized (LOCK) {
+                //synchronized (localTallies) {
+            }
+        }
+    }
+
+    private void receiveClusterAssign(CLUSTER_ASSIGN_MSG msg) throws NoSuchAlgorithmException {
+        synchronized (LOCK) {
+            //synchronized (localTallies) {
+
+            dump("Received a cluster assignment from " + msg.getSrc());
+
+            Map<E_CryptoNodeID, Integer> recIDAssign = msg.getIDAssignment();
+            aggrIDAssign(recIDAssign);
+
+            numRecvClusterAssign++;
+
+            if (numRecvClusterAssign == smallestCluster.size() - 1) {
+                
+                clusterAssign=new ClusterAssigment();
+                taskManager.registerTask(new finalAssignAnnouncerTask());
+
+            }
+
+        }
+    }
+
+    private class ClusterAssigment {
+
+        List< Set<E_CryptoNodeID>> nodeToClusterList;
+        public int steps;
+
+        private void add(int chosenCluster, E_CryptoNodeID nodeID) {
+            nodeToClusterList.get(chosenCluster).add(nodeID);
+        }
+
+        private Set<E_CryptoNodeID> get(int cluster) {
+            return nodeToClusterList.get(cluster);
+        }
+
+        public ClusterAssigment() {
+            E_CryptoNodeID id;            
+            int cluster = 0;
+            int count = 1;
+            Set<E_CryptoNodeID> singleSet = null;
+            nodeToClusterList = new LinkedList< Set< E_CryptoNodeID>>();
+            for (Iterator i = sortByValue(IDAssignment).iterator(); i.hasNext();) {
+                id = (E_CryptoNodeID) i.next();                
+                cluster = (int) Math.floor(count / (kvalue * Math.log(VOTERCOUNT)));
+                count++;
+                if (nodeToClusterList.get(cluster) == null) {
+                    singleSet = new HashSet<E_CryptoNodeID>();
+                    singleSet.add(id);
+                } else {
+                    nodeToClusterList.get(cluster).add(id);
+                }
+            }
+        }
+    }
+
+    public static List sortByValue(final Map m) {
+        List keys = new ArrayList();
+        keys.addAll(m.keySet());
+        Collections.sort(keys, new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Object v1 = m.get(o1);
+                Object v2 = m.get(o2);
+                if (v1 == null) {
+                    return (v2 == null) ? 0 : 1;
+                } else if (v1 instanceof Comparable) {
+                    return ((Comparable) v1).compareTo(v2);
+                } else {
+                    return 0;
+                }
+            }
+        });
+        return keys;
+    }
+
+    private void receiveFinalClusterAssign(CLUSTER_ASSIGN_MSG msg) throws NoSuchAlgorithmException {
+        synchronized (LOCK) {
+            //synchronized (localTallies) {
+
+            dump("Received a final cluster assignment from " + msg.getSrc());
+
+            Map<E_CryptoNodeID, Integer> recIDAssign = msg.getIDAssignment();
+            mergeIDAssign(recIDAssign);
+
+            numRecvFinalClusterAssign++;
+
+            if (IDAssignment.size() == VOTERCOUNT) {
+                //taskManager.registerTask(new finalAssignAnnouncerTask());
+            }
+
+        }
+    }
+
+    private void mergeIDAssign(Map<E_CryptoNodeID, Integer> recIDAssign) {
+        //     synchronized (LOCK) {
+        synchronized (IDAssignment) {
+            synchronized (smallestCluster) {
+                if (IDAssignment.isEmpty()) {
+                    IDAssignment = recIDAssign;
+                } else {
+                    Integer order;
+
+                    for (Map.Entry<E_CryptoNodeID, Integer> entry : recIDAssign.entrySet()) {
+                        order = IDAssignment.get(entry.getKey());
+                        if (order == null) {
+                            IDAssignment.put(entry.getKey(), entry.getValue());
+                            smallestCluster.add(entry.getKey());
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    private void aggrIDAssign(Map<E_CryptoNodeID, Integer> recIDAssign) {
+        //     synchronized (LOCK) {
+        synchronized (IDAssignment) {
+            if (IDAssignment.isEmpty()) {
+                IDAssignment = recIDAssign;
+            } else {
+                Integer order;
+
+                for (Map.Entry<E_CryptoNodeID, Integer> entry : recIDAssign.entrySet()) {
+                    order = IDAssignment.get(entry.getKey());
+                    if (order == null) {
+                        IDAssignment.put(entry.getKey(), entry.getValue());
+                        smallestCluster.add(entry.getKey());
+                    } else {
+                        IDAssignment.put(entry.getKey(), (entry.getValue() + order) % (int) Math.pow(VOTERCOUNT, 3));
+                    }
+                }
+
+
+            }
+            //       }
+
+        }
+    }
+
+    private class ClusterChoice {
+
+        List< Set<E_CryptoNodeID>> nodeToClusterList;
+        public int steps;
+
+        private void add(int chosenCluster, E_CryptoNodeID nodeID) {
+            nodeToClusterList.get(chosenCluster).add(nodeID);
+        }
+
+        private Set<E_CryptoNodeID> get(int cluster) {
+            return nodeToClusterList.get(cluster);
+        }
+
+        private int getSmallestCluster() {
+            int minSize = 0;
+            int min = 0;
+            int currentSize = 0;
+            for (int i = 0; i < numClusters; i++) {
+
+                currentSize = nodeToClusterList.get(i).size();
+                if (currentSize < minSize) {
+                    min = i;
+                    minSize = currentSize;
+                }
+            }
+            return min;
+
+        }
+
+        public ClusterChoice() {
+
+            nodeToClusterList = new LinkedList< Set< E_CryptoNodeID>>();
+
+            for (int i = 0; i < numClusters; i++) {
+                Set<E_CryptoNodeID> singleList = new HashSet<E_CryptoNodeID>();
+                nodeToClusterList.add(singleList);
+            }
+        }
+    }
+
+    private E_CryptoNodeID getRandomNodeID() {
+
+        Random generator = new Random();
+        int randomHost = generator.nextInt(VOTERCOUNT / nodesPerMachine) + 1;
+        String randomHostName = "node-" + randomHost;
+        int randomPort = generator.nextInt(nodesPerMachine) + nodeId.port;
+
+        E_CryptoNodeID randomNodeID = new E_CryptoNodeID(randomHostName, randomPort, -1);
+
+        return randomNodeID;
+    }
+
+    private class assignmentAnnouncerTask implements Task {
+
+        public void execute() {
+
+            E_CryptoNodeID randomNodeID = getRandomNodeID();
+
+            //  startDiffInfo();
+
+
+        }
+    }
+
     private class AnnouncerTask implements Task {
 
         public void execute() {
@@ -529,12 +834,12 @@ public class CryptoNode extends Node {
             //     synchronized (proxyView) {
 
 
-            if (!proxyView.isEmpty()) {
+            if (!peerView.isEmpty()) {
                 //Vote ballot = vote;
                 startInstant = (new Date()).getTime();
 
-                for (E_CryptoNodeID proxyId : proxyView) {
-                    dump("Send a '" + Emsg + "' ballot to " + proxyId);
+                for (E_CryptoNodeID peerId : peerView) {
+                    dump("Send a '" + Emsg + "' ballot to " + peerId);
                     try {
                         /*	if(isMalicious && ballot) {
                         dump("Corrupted vote to " + proxyId);
@@ -542,7 +847,7 @@ public class CryptoNode extends Node {
                         }
                         else {
                          */
-                        doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, proxyId, Emsg));
+                        doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg));
                         break;
                         //	}
                     } catch (Exception e) {
@@ -553,15 +858,40 @@ public class CryptoNode extends Node {
 
                 }
                 isVoteTaskOver = true;
-                taskManager.registerTask(new AttemptSelfDestruct());
+        //        taskManager.registerTask(new AttemptSelfDestruct());
+           //     taskManager.registerTask(new CloseVoteTask());
+                aggrLocalTally(Emsg);
             } else {
-                dump("Cannot vote: no proxy view");
+                dump("Cannot vote: no peer view");
             }
             //     }
             //  }
         }
     }
+   
+        public void aggrLocalTally(BigInteger ballot) {
+            synchronized (LOCK) {
 
+               localTally = encryptor.add(localTally, ballot);
+               numLocalTallies++;
+               if(numLocalTallies==peerView.size()+1)
+               {
+                   computedLocalTally=true;
+                   if (IAmSmallest)
+                   {
+                       partialTally=localTally;
+                       taskManager.registerTask(new GlobalCountingTask());
+                   }
+                   else if (receivedPartialTally)
+                       partialTally=encryptor.add(localTally,partialTally);
+                       taskManager.registerTask(new GlobalCountingTask());
+                   
+                   //else do nothing
+               }
+               
+
+        }
+    }
     private class AttemptSelfDestruct implements Task {
 
         public void execute() {
@@ -738,10 +1068,10 @@ public class CryptoNode extends Node {
 
     private class GlobalCountingTask implements Task {
 
-        private int localTallyGroupId;
+     //   private int localTallyGroupId;
 
-        public GlobalCountingTask(int groupId) {
-            this.localTallyGroupId = groupId;
+        public GlobalCountingTask() {
+          //  this.localTallyGroupId = groupId;
         }
 
         public void execute() {
@@ -750,22 +1080,22 @@ public class CryptoNode extends Node {
 
             synchronized (LOCK) {
                 //       synchronized (proxyView) {
-                if (!isGlobalCountingOver) {
+           //     if (!isGlobalCountingOver) {
 
                     dump("GlobalCountingTask");
-                    nbSentLocalTallies++;
-                    if (localTallyGroupId != nodeId.groupId) { //we don't send this value to the next group since it is the originator
+       //             nbSentLocalTallies++;
+      //              if (localTallyGroupId != nodeId.groupId) { //we don't send this value to the next group since it is the originator
 
                         for (E_CryptoNodeID proxyId : proxyView) {
-                            dump("Send local tally (" + localTallies[localTallyGroupId] + ") to " + proxyId);
+                            dump("Send local tally (" + partialTally + ") to " + proxyId);
                             try {
-                                doSendUDP(new CRYPTO_LOCAL_TALLY_MSG(nodeId, proxyId, localTallies[localTallyGroupId], localTallyGroupId));
+                                doSendUDP(new CRYPTO_LOCAL_TALLY_MSG(nodeId, proxyId, partialTally));
                             } catch (Exception e) {
                                 dump("UDP: cannot broadcast local tally");
                             }
                             break; //only send to one proxy.
                         }
-                    }
+        //            }
                     //check if the node has all the groups' tallies
                     //      boolean done = true;
 //                        for (BigInteger mytally : localTallies) {
@@ -775,15 +1105,18 @@ public class CryptoNode extends Node {
 //                                break;
 //                            }
 //                        }
-                    dump("nbSentLocalTallies: " + nbSentLocalTallies);
-                    if (nbSentLocalTallies == nodeId.NB_GROUPS) {
-                        taskManager.registerTask(new CloseGlobalCountingTask());
-                        isGlobalCountingOver = true;
-                        taskManager.registerTask(new AttemptSelfDestruct());
-                    } else {
-                        dump("still not done");
-                    }
-                }
+//                    dump("nbSentLocalTallies: " + nbSentLocalTallies);
+//                    if (nbSentLocalTallies == nodeId.NB_GROUPS) {
+//                        taskManager.registerTask(new CloseGlobalCountingTask());
+//                        isGlobalCountingOver = true;
+//                        taskManager.registerTask(new AttemptSelfDestruct());
+//                    } else {
+//                        dump("still not done");
+//                    }
+           //     }
+                          isGlobalCountingOver = true;
+                          taskManager.registerTask(new CloseGlobalCountingTask());
+//                        taskManager.registerTask(new AttemptSelfDestruct());
             }
             //      }
             dump("GlobalCountingTask at end");
