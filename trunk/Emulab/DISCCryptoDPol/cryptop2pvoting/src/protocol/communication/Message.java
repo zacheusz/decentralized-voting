@@ -14,11 +14,14 @@ public abstract class Message implements Serializable, Cloneable {
 	public static final byte LOCAL_TALLY_MSG = 5;
 	public static final byte INDIVIDUAL_TALLY_MSG = 6;
         public static final byte CRYPTO_BALLOT = 7; // A crypto ballot
-	public static final byte CRYPTO_LOCAL_TALLY_MSG = 8;
+	public static final byte CRYPTO_PARTIAL_TALLY_MSG = 8;
 	public static final byte CRYPTO_INDIVIDUAL_TALLY_MSG = 9;
 	public static final byte CRYPTO_DECRYPTION_SHARE_MSG = 10;
         public static final byte DEAD = 11;
         public static final byte CLUSTER_ASSIGN_MSG = 12;
+        public static final byte CRYPTO_FINAL_RESULT_MSG=13;
+        public static final byte FINAL_CLUSTER_ASSIGN_MSG = 14;
+
 //	public static final byte HITC = 11;
 
 	protected byte header;
