@@ -44,6 +44,10 @@ public abstract class CryptoSetup {
                 if(arguments.get("-nodesPerMachine") != null) {
                                     CryptoNode.nodesPerMachine = Integer.parseInt(arguments.get("-nodesPerMachine"));
                 } 
+                if(arguments.get("-stepsConstant") != null) {
+                                    CryptoNode.stepsConstant = Integer.parseInt(arguments.get("-stepsConstant"));
+                }    
+                
         }
 	
 }
