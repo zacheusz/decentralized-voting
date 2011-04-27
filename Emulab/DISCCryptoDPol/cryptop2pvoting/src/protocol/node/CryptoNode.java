@@ -215,6 +215,7 @@ public class CryptoNode extends Node {
 
         numClusters = (int) ((Math.log(VOTERCOUNT) / 2) / (kvalue * Math.log(VOTERCOUNT / 2)));
         nodesPerCluster = VOTERCOUNT / numClusters;
+        MINTALLIES = nodesPerCluster / 2 + 1;
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
@@ -307,31 +308,18 @@ public class CryptoNode extends Node {
 
             if (!isDecryptionSharingOver) {
                 dump("Received a decryption share (" + msg.getShare() + ") from " + msg.getSrc());
-                //          dump("Inputs to check share:"+msg.getShare()+" "+finalEncryptedResult);
-                //              if (res.CheckShare(msg.getShare(), finalEncryptedResult)) {
-//                dump("Received Share is legal."+ "from " + msg.getSrc());
-                //   resultShares.put(msg.getSrc(), msg.getShare());
-                //          if (resultSharesList[msg.getShareOrder()]!=null)
-                //		dump("existing order");
 
                 resultSharesList.add(msg.getShare());
 
                 currentDecodingIndex++;
                 dump("sharesize: " + currentDecodingIndex);
-                //    dump("sharesize: "+resultShares.size());
                 if (isFinalResultCalculated && currentDecodingIndex == MINTALLIES) {
-                    taskManager.registerTask(new CloseTallyDecryptionSharing());
+                    dump("CloseTallyDecryptionSharing");
+                    //actually close the Tally Decryption Sharing session
+                    isDecryptionSharingOver = true;
                     taskManager.registerTask(new TallyDecryption());
 
                 }
-
-
-                //            }
-                //      else{
-
-                //             dump("Discarded a decryption share message (cause: not legal)"+" from " + msg.getSrc());
-//
-                //          }
 
             } else {
                 dump("Discarded a decryption share message (cause: sent too late)" + " from " + msg.getSrc());
@@ -342,41 +330,27 @@ public class CryptoNode extends Node {
 
     private void receivePartialTally(CRYPTO_PARTIAL_TALLY_MSG msg) {
 
-        //   int groupId = msg.getGroupId();
-
-//        if (groupId == getPreviousGroupId()) {
-//            return;
-//        }
 
         synchronized (LOCK) {
-            //      if (!IAmSmallest) {
 
-            //             synchronized (localTallySets[groupId]) {
-            synchronized (partialTallies) {
+            dump("Received a partial tally (" + msg.getTally() + ") from " + msg.getSrc());
+            numPartialTallies++;
 
-                dump("Received a partial tally (" + msg.getTally() + ") from " + msg.getSrc());
-                numPartialTallies++;
+            partialTallies.add(msg.getTally());
 
-                partialTallies.add(msg.getTally());
+            if (numPartialTallies == clientView.size()) {
+                partialTally = mostPresent(partialTallies);
+                computedPartialTally = true;
 
-                if (numPartialTallies == clientView.size()) {
-                    partialTally = mostPresent(partialTallies);
-                    computedPartialTally = true;
+                if (IAmThreshold) {
 
-                    if (IAmThreshold) {
-
-                        finalEncryptedResult = partialTally;
-                        taskManager.registerTask(new TallyDecryptionSharing());
-                    } else if (computedLocalTally) {
-                        partialTally = encryptor.add(localTally, partialTally);
-                        taskManager.registerTask(new GlobalCountingTask());
-                    }
+                    finalEncryptedResult = partialTally;
+                    taskManager.registerTask(new TallyDecryptionSharing());
+                } else if (computedLocalTally) {
+                    partialTally = encryptor.add(localTally, partialTally);
+                    taskManager.registerTask(new GlobalCountingTask());
                 }
-
-                //        taskManager.registerTask(new GlobalCountingTask(groupId));
-
             }
-
 
         }
     }
@@ -384,7 +358,7 @@ public class CryptoNode extends Node {
     private BigInteger mostPresent(List<BigInteger> values) {
 
         int c, max = 0;
-        BigInteger argmax = BigInteger.ZERO;
+        BigInteger argmax = BigInteger.ONE;
 
         for (BigInteger i : values) {
             c = 0;
@@ -564,7 +538,27 @@ public class CryptoNode extends Node {
         }
     }
 
+    private class PreemptGlobalCountingTask implements Task {
 
+        public void execute() {
+            synchronized (LOCK) {
+                if (!isGlobalCountingOver) {//actually close the local counting session
+
+                    partialTally = mostPresent(partialTallies);
+                    computedPartialTally = true;
+
+                    if (IAmThreshold) {
+                        finalEncryptedResult = partialTally;
+                        taskManager.registerTask(new TallyDecryptionSharing());
+                    } else if (computedLocalTally) {
+                        partialTally = encryptor.add(localTally, partialTally);
+                        taskManager.registerTask(new GlobalCountingTask());
+                    }
+                }
+
+            }
+        }
+    }
 
     private class CloseTallyDecryptionSharing implements Task {
 
@@ -588,7 +582,7 @@ public class CryptoNode extends Node {
 
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
-                    taskManager.registerTask(new CloseTallyDecryptionSharing());
+                    taskManager.registerTask(new TallyDecryption());
                 }
             }
         }
@@ -612,31 +606,30 @@ public class CryptoNode extends Node {
     private class GlobalCountingTask implements Task {
 
         //   private int localTallyGroupId;
-
         public void execute() {
             // broadcast
             dump("GlobalCountingTask at begin");
-            if (!isGlobalCountingOver){
-            synchronized (LOCK) {
+            if (!isGlobalCountingOver) {
+                synchronized (LOCK) {
 
-                dump("GlobalCountingTask");
+                    dump("GlobalCountingTask");
 
-                for (E_CryptoNodeID proxyId : proxyView) {
-                    dump("Send local tally (" + partialTally + ") to " + proxyId);
-                    try {
-                        doSendUDP(new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally));
-                    } catch (Exception e) {
-                        dump("UDP: cannot broadcast local tally");
+                    for (E_CryptoNodeID proxyId : proxyView) {
+                        dump("Send local tally (" + partialTally + ") to " + proxyId);
+                        try {
+                            doSendUDP(new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally));
+                        } catch (Exception e) {
+                            dump("UDP: cannot broadcast local tally");
+                        }
+                        break;
                     }
-                    break; 
+
+                    isGlobalCountingOver = true;
+                    // taskManager.registerTask(new CloseGlobalCountingTask());
+
                 }
-
-                isGlobalCountingOver = true;
-               // taskManager.registerTask(new CloseGlobalCountingTask());
-
+                dump("GlobalCountingTask at end");
             }
-            dump("GlobalCountingTask at end");
-        }
         }
     }
 
@@ -647,20 +640,10 @@ public class CryptoNode extends Node {
 
                 if (!isDecryptionSharingOver) {
                     dump("TallyDecryptionSharing");
-//                    finalEncryptedResult = BigInteger.ONE;
-//
-//                    for (BigInteger mytally : localTallies) {
-//
-//                        //       dump("input1: " + finalEncryptedResult + "\ninput2: " + mytally);
-//                        finalEncryptedResult = encryptor.add(finalEncryptedResult, mytally);
-//                        //     dump("output: " + finalEncryptedResult);
-//                    }
 
                     dump("final encrypted:" + finalEncryptedResult.toString());
                     nodeResultShare = secKey.decrypt(finalEncryptedResult);
-                    //    resultShares.put(nodeId, nodeResultShare);
-                    //	  if (resultSharesList[shareOrder]!=null)
-                    //      	dump("existing order");
+
 
                     resultSharesList.add(nodeResultShare);
                     currentDecodingIndex++;
@@ -668,12 +651,6 @@ public class CryptoNode extends Node {
                     dump("sharesize: " + currentDecodingIndex);
 
 
-
-
-
-
-
-//                        synchronized (peerView) {
                     if (!peerView.isEmpty()) {
                         for (E_CryptoNodeID peerId : peerView) {
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
@@ -690,10 +667,10 @@ public class CryptoNode extends Node {
 
                     //}
                     if (currentDecodingIndex == MINTALLIES) {
-                        taskManager.registerTask(new CloseTallyDecryptionSharing());
+                        dump("CloseTallyDecryptionSharing");
+                        //actually close the Tally Decryption Sharing session
                         isDecryptionSharingOver = true;
                         taskManager.registerTask(new TallyDecryption());
-
                     }
 
                 }
@@ -708,21 +685,6 @@ public class CryptoNode extends Node {
                 if (!isTallyDecryptionOver) {
                     dump("TallyDecryption");
 
-
-                    //         DecodingShare[] shares = (DecodingShare[]) resultShares.values().toArray(new DecodingShare[resultShares.size()]);
-                    //    dump("size: "+currentDecodingIndex);
-                 /*   for ( PartialDecryption sh : resultSharesList) {
-                    if (sh.verify(finalEncryptedResult)) {
-                    dump("share ok");
-                    } else {
-                    dump("bad share");
-                    }
-                    }*/
-                    //dump("final input: "+finalEncryptedResult.toString());
-
-
-                    //finalResult = secKey.combineShares((DecryptionZKP[]) resultSharesList.toArray());
-
                     PartialDecryption[] decArray = new PartialDecryption[resultSharesList.size()];
                     for (int i = 0; i < resultSharesList.size(); i++) {
                         decArray[i] = resultSharesList.get(i);
@@ -731,11 +693,7 @@ public class CryptoNode extends Node {
                     finalResult = secKey.combineShares(decArray);
                     computedFinalResult = true;
                     dump("Determined final result:" + finalResult);
-                    //              try {
-                    //                Thread.currentThread().sleep(10000);
-                    //          } catch (InterruptedException ex) {
-                    //            Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                    //      }
+
                     isTallyDecryptionOver = true;
 
                     taskManager.registerTask(new ResultDiffusionTask());
@@ -749,46 +707,39 @@ public class CryptoNode extends Node {
 
     private class ResultDiffusionTask implements Task {
 
-        //   private int localTallyGroupId;
-        public ResultDiffusionTask() {
-            //  this.localTallyGroupId = groupId;
-        }
-
         public void execute() {
             // broadcast
-            dump("ResultDiffusionTask at begin");
 
-            synchronized (LOCK) {
+            if (!isResultDiffusionOver) {
+                dump("ResultDiffusionTask at begin");
 
-                for (E_CryptoNodeID proxyId : proxyView) {
-                    dump("Send local tally (" + finalResult + ") to " + proxyId);
-                    try {
-                        doSendUDP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
-                    } catch (Exception e) {
-                        dump("UDP: cannot broadcast local tally");
+                synchronized (LOCK) {
+
+                    for (E_CryptoNodeID proxyId : proxyView) {
+                        dump("Send local tally (" + finalResult + ") to " + proxyId);
+                        try {
+                            doSendUDP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
+                        } catch (Exception e) {
+                            dump("UDP: cannot broadcast local tally");
+                        }
+                        break;
                     }
-                    break; //only send to one proxy.
-                }
 
+                }
+                //      }
+                dump("ResultDiffusionTask at end");
             }
-            //      }
-            dump("ResultDiffusionTask at end");
         }
     }
 
     private void receiveFinalResult(CRYPTO_FINAL_RESULT_MSG msg) {
 
-        //   int groupId = msg.getGroupId();
-
-//        if (groupId == getPreviousGroupId()) {
-//            return;
-//        }
 
         synchronized (LOCK) {
             if (!computedFinalResult) {
 
                 //             synchronized (localTallySets[groupId]) {
-                synchronized (finalResults) {
+            //    synchronized (finalResults) {
 
                     dump("Received a final result (" + msg.getResult() + ") from " + msg.getSrc());
                     numFinalResults++;
@@ -800,8 +751,6 @@ public class CryptoNode extends Node {
                         computedFinalResult = true;
 
                         if (IAmThreshold) {
-
-                            taskManager.registerTask(new ResultOutput());
                             taskManager.registerTask(new AttemptSelfDestruct());
                         } else {
 
@@ -809,12 +758,9 @@ public class CryptoNode extends Node {
                         }
                     }
 
-                    //        taskManager.registerTask(new GlobalCountingTask(groupId));
-
                 }
 
-
-            }
+   //         }
         }
     }
 
@@ -843,18 +789,6 @@ public class CryptoNode extends Node {
     // **************************************************************************
     //
 //
-    //    private class PreemptCloseGlobalCountingTask implements Task {
-//
-//        public void execute() {
-//            synchronized (LOCK) {
-//                if (!isGlobalCountingOver) {//actually close the local counting session
-//                    isGlobalCountingOver = true;
-//
-//                    taskManager.registerTask(new CloseGlobalCountingTask());
-//                }
-//
-//            }
-//        }
 //    }
 //    private class CloseGlobalCountingTask implements Task {
 //
