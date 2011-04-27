@@ -30,10 +30,10 @@ public abstract class CryptoSetup {
 
                 }
 
-                if(arguments.get("-mintallies") != null) {
-                                    CryptoNode.MINTALLIES = Integer.parseInt(arguments.get("-mintallies"));
-
-                }                
+//                if(arguments.get("-mintallies") != null) {
+//                                    CryptoNode.MINTALLIES = Integer.parseInt(arguments.get("-mintallies"));
+//
+//                }                
                 if(arguments.get("-nbVoters") != null) {
                                     CryptoNode.VOTERCOUNT = Integer.parseInt(arguments.get("-nbVoters"));
                 }
