@@ -46,7 +46,10 @@ public abstract class CryptoSetup {
                 } 
                 if(arguments.get("-stepsConstant") != null) {
                                     CryptoNode.stepsConstant = Integer.parseInt(arguments.get("-stepsConstant"));
-                }    
+                }                    
+                if(arguments.get("-basicPort") != null) {
+                                    CryptoNode.basicPort = Integer.parseInt(arguments.get("-basicPort"));
+                }                    
                 
         }
 	

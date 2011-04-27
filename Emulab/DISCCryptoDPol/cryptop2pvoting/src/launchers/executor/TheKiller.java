@@ -30,8 +30,8 @@ public class TheKiller {
 		String message = arguments.get("-message");
 		
 		message = (message==null)?"no message":message;
-		E_CryptoNodeID srcId = new E_CryptoNodeID("God",0,-1);
-		E_CryptoNodeID destId = new E_CryptoNodeID(name,port,-1);
+		E_CryptoNodeID srcId = new E_CryptoNodeID("God",0);
+		E_CryptoNodeID destId = new E_CryptoNodeID(name,port);
 		
 		try {
 				(new E_NetworkSend()).sendUDP(new STOP_MSG(srcId,destId,message));

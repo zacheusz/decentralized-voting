@@ -47,10 +47,10 @@ public class CryptoGossipLauncher {
                 String secKeyFile = arguments.get("-secretKeyFile");
           //      String pubKeyFile = arguments.get("-publicKeyFile");
 
-                int groupId = Integer.parseInt(arguments.get("-groupId"));
+            //    int groupId = Integer.parseInt(arguments.get("-groupId"));
 		
 		E_NodeIDReader nodeIDReader = new E_NodeIDReader();
-		E_CryptoNodeID id = new E_CryptoNodeID(name, port,groupId);
+		E_CryptoNodeID id = new E_CryptoNodeID(name, port);
 
 		TaskManager taskManager = new E_CryptoThreadPerTaskTaskManager();
 		NetworkSend networkSend = new E_NetworkSend();
