@@ -4,6 +4,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import protocol.node.CryptoNode;
 
 
 public class E_CryptoNodeID implements Externalizable {
@@ -16,13 +17,19 @@ public class E_CryptoNodeID implements Externalizable {
 	public E_CryptoNodeID() {
 	}
 
-	public E_CryptoNodeID(String name, int port , int groupId) {
+	public E_CryptoNodeID(String name, int port ) {
                 this.name = name;
 		this.port = port;
-                this.groupId=groupId;
+              
 	}
 
 
+        public int getOrder(){
+            
+               int hash =hashCode();
+                hash = (hash<0)?-hash:hash;
+                return hash % CryptoNode.VOTERCOUNT;
+        }
 	public String getName() {
 		return name;
 	}

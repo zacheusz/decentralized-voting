@@ -25,7 +25,7 @@ public class CryptoBootstrapLauncher {
 		String name = arguments.get("-name");
 		int port = Integer.parseInt(arguments.get("-port"));
 
-		E_CryptoNodeID id = new E_CryptoNodeID(name, port,-1);
+		E_CryptoNodeID id = new E_CryptoNodeID(name, port);
 
 		TaskManager t = new E_CryptoThreadPerTaskTaskManager();
 		NetworkSend networkSend = new E_NetworkSend();
