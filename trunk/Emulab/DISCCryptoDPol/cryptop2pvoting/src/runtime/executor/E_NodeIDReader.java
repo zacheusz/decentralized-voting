@@ -11,12 +11,12 @@ public class E_NodeIDReader implements NodeIDReader {
 					.println("error! E_CryptoNodeID \"" + str + "\" has a bad format");
 			System.exit(1);
 		}
-		E_CryptoNodeID id = new E_CryptoNodeID(data[0], Integer.parseInt(data[1]),-1);
+		E_CryptoNodeID id = new E_CryptoNodeID(data[0], Integer.parseInt(data[1]));
 		return id;
 	}
 
 	public E_CryptoNodeID readNodeID(String str, int port) {
-		E_CryptoNodeID id = new E_CryptoNodeID(str, port,-1);
+		E_CryptoNodeID id = new E_CryptoNodeID(str, port);
 		return id;
 	}
 
