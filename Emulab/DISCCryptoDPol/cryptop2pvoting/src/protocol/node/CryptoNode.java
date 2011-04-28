@@ -224,6 +224,7 @@ public class CryptoNode extends Node {
             numClusters++;
         nodesPerCluster=(int) test;
         MINTALLIES = nodesPerCluster / 2 + 1;
+        System.out.println("min:"+MINTALLIES);
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
@@ -642,7 +643,7 @@ public class CryptoNode extends Node {
                     dump("final encrypted:" + finalEncryptedResult.toString());
                     nodeResultShare = secKey.decrypt(finalEncryptedResult);
 
-
+                    
                     resultSharesList.add(nodeResultShare);
                     currentDecodingIndex++;
                     isFinalResultCalculated = true;
