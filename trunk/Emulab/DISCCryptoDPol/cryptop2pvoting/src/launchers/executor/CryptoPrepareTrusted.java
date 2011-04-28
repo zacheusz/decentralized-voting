@@ -48,8 +48,9 @@ public class CryptoPrepareTrusted {
                 trusted.MakeSelectionElection ("Gore for president?", vote_names);//generates the public key specific for this setup
                 pub = trusted.GetPublicKey ();//gets the public key shared between the voters
 */
-                System.out.println(" Create new keypairs .");
+                System.out.println(" Create new keypairs ."+"npc: "+CryptoNode.nodesPerCluster+ "mint: "+ CryptoNode.MINTALLIES);
                 Random rnd = new Random();
+                
                 PaillierPrivateThresholdKey[] keys =KeyGen.PaillierThresholdKey(bits, CryptoNode.nodesPerCluster, CryptoNode.MINTALLIES, rnd.nextLong());
 
 
