@@ -219,7 +219,10 @@ public class CryptoNode extends Node {
 //        }
 
         numClusters = (int) (Math.ceil(VOTERCOUNT/ (kvalue * Math.log(VOTERCOUNT))));
-        nodesPerCluster = (int)(Math.floor(VOTERCOUNT/numClusters));
+        double test= Math.floor(VOTERCOUNT/numClusters);
+        if(test<(1.0*VOTERCOUNT/numClusters))
+            numClusters++;
+        nodesPerCluster=(int) test;
         MINTALLIES = nodesPerCluster / 2 + 1;
         try {
 //            taskManager.registerTask(new AnnouncerTask());
@@ -437,11 +440,11 @@ public class CryptoNode extends Node {
                     secKey=(PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile+nodeToCluster.keyNum);
                 }
 
-                System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
+        //        System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
                 proxyView = nodeToCluster.get((nodeId.groupId + 1) % numClusters);
-                   for (int i=0;i<proxyView.size();i++)
-                    System.out.println(proxyView.toArray()[i].toString()+" ,");
-             
+//                   for (int i=0;i<proxyView.size();i++)
+//                    System.out.println(proxyView.toArray()[i].toString()+" ,");
+//             
                 peerView = nodeToCluster.get((nodeId.groupId));
                 peerView.remove(nodeId);
                 clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
