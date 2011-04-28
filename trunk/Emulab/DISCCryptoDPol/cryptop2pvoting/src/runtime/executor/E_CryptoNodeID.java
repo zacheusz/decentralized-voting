@@ -41,7 +41,7 @@ public class E_CryptoNodeID implements Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		E_CryptoNodeID id = (E_CryptoNodeID) obj;
-		return (name.equals(id.name) && port == id.port && groupId==id.groupId);
+		return (name.equals(id.name) && port == id.port );
 	}
 
 	@Override
