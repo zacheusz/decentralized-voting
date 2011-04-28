@@ -619,6 +619,7 @@ public class CryptoNode extends Node {
                         dump("Send partial tally (" + partialTally + ") to " + proxyId);
                         try {
                             doSendTCP(new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally));
+                            wait(10);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
@@ -657,6 +658,7 @@ public class CryptoNode extends Node {
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                             try {
                                 doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare));
+                                wait(10);
                             } catch (Exception e) {
                                 dump("TCP: cannot send decryption share");
                             }
@@ -721,6 +723,7 @@ public class CryptoNode extends Node {
                         dump("Send final result (" + finalResult + ") to " + proxyId);
                         try {
                             doSendTCP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
+                            wait(10);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
