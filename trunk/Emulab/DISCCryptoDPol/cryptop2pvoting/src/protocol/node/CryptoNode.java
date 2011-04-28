@@ -219,13 +219,14 @@ public class CryptoNode extends Node {
 //        }
 
         numClusters = (int) (Math.ceil(VOTERCOUNT / (kvalue * Math.log(VOTERCOUNT))));
-        double test = Math.floor(VOTERCOUNT / numClusters);
-        if (test < (1.0 * VOTERCOUNT / numClusters)) {
-            numClusters++;
-        }
-        nodesPerCluster = (int) test;
+//        double test = Math.floor(VOTERCOUNT / numClusters);
+//        if (test < (1.0 * VOTERCOUNT / numClusters)) {
+//            numClusters++;
+//        }
+//        nodesPerCluster = (int) test;
+        nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT/numClusters));
         MINTALLIES = nodesPerCluster / 2 + 1;
-        System.out.println("min:" + MINTALLIES);
+      //  System.out.println("min:" + MINTALLIES);
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
