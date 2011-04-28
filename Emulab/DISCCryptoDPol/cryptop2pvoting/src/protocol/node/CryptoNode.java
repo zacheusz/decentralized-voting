@@ -457,7 +457,6 @@ public class CryptoNode extends Node {
                         try {
 
                             doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg));
-                            break;
                         } catch (Exception e) {
                             dump("TCP: cannot vote");
                         }
@@ -611,7 +610,7 @@ public class CryptoNode extends Node {
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
-                        break;
+                        
                     }
 
                     isGlobalCountingOver = true;
@@ -711,7 +710,7 @@ public class CryptoNode extends Node {
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
-                        break;
+                       
                     }
                 isResultDiffusionOver=true;
                     taskManager.registerTask(new AttemptSelfDestruct());
