@@ -326,7 +326,7 @@ public class CryptoNode extends Node {
 
                 currentDecodingIndex++;
                 dump("sharesize: " + currentDecodingIndex);
-                if (isFinalResultCalculated && currentDecodingIndex == MINTALLIES) {
+                if (isFinalResultCalculated && currentDecodingIndex == nodesPerCluster) {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
@@ -665,7 +665,7 @@ public class CryptoNode extends Node {
                     }
 
                     //}
-                    if (currentDecodingIndex == MINTALLIES) {
+                    if (currentDecodingIndex == nodesPerCluster) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         isDecryptionSharingOver = true;
