@@ -85,7 +85,7 @@ public class CryptoNode extends Node {
     public int numFinalResults = 0;
     protected List<BigInteger> finalResults = new LinkedList<BigInteger>();
     public boolean computedFinalResult = false;
-    public static int stepsConstant;
+  //  public static int stepsConstant;
     public static int basicPort;
     public static int nodesPerCluster;
     // Fields
