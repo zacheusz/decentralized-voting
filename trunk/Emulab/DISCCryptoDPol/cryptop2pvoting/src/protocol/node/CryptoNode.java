@@ -224,7 +224,7 @@ public class CryptoNode extends Node {
 //            numClusters++;
 //        }
 //        nodesPerCluster = (int) test;
-        nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT/numClusters));
+        nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT*1.0/numClusters));
         MINTALLIES = nodesPerCluster / 2 + 1;
       //  System.out.println("min:" + MINTALLIES);
         try {
