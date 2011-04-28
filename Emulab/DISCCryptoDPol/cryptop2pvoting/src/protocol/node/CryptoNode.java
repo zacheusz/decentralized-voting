@@ -224,9 +224,9 @@ public class CryptoNode extends Node {
 //            numClusters++;
 //        }
 //        nodesPerCluster = (int) test;
-        nodesPerCluster = (int) (Math.ceil(VOTERCOUNT * 1.0 / numClusters));
+        nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT*1.0/numClusters));
         MINTALLIES = nodesPerCluster / 2 + 1;
-        //  System.out.println("min:" + MINTALLIES);
+      //  System.out.println("min:" + MINTALLIES);
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
@@ -428,7 +428,7 @@ public class CryptoNode extends Node {
                     }
                 }
                 sortedIDs = sortByValue(IDAssignment);
-                //      System.out.println(nodeId.toString() + ":");
+          //      System.out.println(nodeId.toString() + ":");
 //                for (int i=0;i<sortedIDs.size();i++)
 //                    System.out.println(sortedIDs.get(i).toString()+" ,");
 //                
@@ -442,7 +442,7 @@ public class CryptoNode extends Node {
                     IAmThreshold = true;
 
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
-                    //  System.out.println("keynum:" + nodeToCluster.keyNum);
+                  //  System.out.println("keynum:" + nodeToCluster.keyNum);
                 }
 
                 //        System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
@@ -470,15 +470,8 @@ public class CryptoNode extends Node {
                         try {
 
                             doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg));
-
                         } catch (Exception e) {
                             dump("TCP: cannot vote");
-                        }
-                        
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
 
@@ -628,11 +621,6 @@ public class CryptoNode extends Node {
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                        }
 
                     }
 
@@ -668,14 +656,8 @@ public class CryptoNode extends Node {
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                             try {
                                 doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare));
-
                             } catch (Exception e) {
                                 dump("TCP: cannot send decryption share");
-                            }
-                            try {
-                                Thread.sleep(10);
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
 
@@ -707,7 +689,7 @@ public class CryptoNode extends Node {
                     System.out.println("shares: ");
                     for (int i = 0; i < resultSharesList.size(); i++) {
                         decArray[i] = resultSharesList.get(i);
-                        System.out.println(" " + decArray[i].getDecryptedValue());
+                        System.out.println(" "+decArray[i].getDecryptedValue());
                     }
                     //System.out.println("decaraysize: " + resultSharesList.size());
                     finalResult = secKey.combineShares(decArray);
@@ -738,14 +720,8 @@ public class CryptoNode extends Node {
                         dump("Send final result (" + finalResult + ") to " + proxyId);
                         try {
                             doSendTCP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
-
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
-                        }
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
                     }
