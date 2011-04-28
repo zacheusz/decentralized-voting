@@ -67,7 +67,7 @@ public class CryptoNode extends Node {
     public static int kvalue;
     public static int MINTALLIES;
     public static int nodesPerMachine;
-    public static ClusterChoice nodeToCluster;
+    public static ClusterChoice nodeToCluster=null;
     public static int chosenCluster;
     public static int numClusters;
     public static Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
@@ -421,7 +421,7 @@ public class CryptoNode extends Node {
                     }
                 }
                 sortedIDs = sortByValue(IDAssignment);
-
+                System.out.println(sortedIDs.size());
                 nodeToCluster = new ClusterChoice(sortedIDs, nodeId);
                 nodeId.groupId = nodeToCluster.myGroupID;
 
