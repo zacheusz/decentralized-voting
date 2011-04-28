@@ -29,8 +29,7 @@ public class CryptoPrepareTrusted {
                 CryptoNode.numClusters = (int) ((Math.log(CryptoNode.VOTERCOUNT) / 2) / (CryptoNode.kvalue * Math.log(CryptoNode.VOTERCOUNT / 2)));
                 CryptoNode.nodesPerCluster = CryptoNode.VOTERCOUNT / CryptoNode.numClusters;
                 CryptoNode.MINTALLIES = CryptoNode.nodesPerCluster / 2 + 1;
-                CryptoNode.MINTALLIES = Integer.parseInt(arguments.get("-mintallies"));
-            //    int CERTAINTY = Integer.parseInt(arguments.get("-certainty"));
+                //    int CERTAINTY = Integer.parseInt(arguments.get("-certainty"));
                 int bits = Integer.parseInt(arguments.get("-bits"));
              /*   int power = 2;
                
