@@ -73,9 +73,9 @@ public class CryptoNode extends Node {
     public static Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
     public static Map<E_CryptoNodeID, Integer> finalIDAssignment = new HashMap<E_CryptoNodeID, Integer>();
     Set<E_CryptoNodeID> smallestCluster;
-    public int numRecvClusterAssign = 0;
-    public int numRecvFinalClusterAssign = 0;
-    public ClusterAssignment clusterAssign;
+//    public int numRecvClusterAssign = 0;
+//    public int numRecvFinalClusterAssign = 0;
+//    public ClusterAssignment clusterAssign;
     public boolean IAmThreshold = false;
     public int numPartialTallies = 0;
     public boolean computedLocalTally = false;
