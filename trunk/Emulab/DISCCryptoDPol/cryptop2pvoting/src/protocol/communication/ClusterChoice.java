@@ -93,8 +93,8 @@ public class ClusterChoice implements Serializable {
             for (int j = 0; j < CryptoNode.nodesPerCluster; j++) {
                 tempId=initNodeToClusterList.get(i * CryptoNode.nodesPerCluster + j);               
                 singleList.add(tempId);
-                System.out.println(tempId.toString());
-                System.out.println(myNodeID.toString());
+            //    System.out.println(tempId.toString());
+          //      System.out.println(myNodeID.toString());
                 if (myNodeID.equals(tempId))
                 {
                     myGroupID=i;
