@@ -56,7 +56,7 @@ public class CryptoNode extends Node {
     private static int CLOSE_COUNTING_DELAY = 40 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_GLOBAL_COUNTING_DELAY =CLOSE_COUNTING_DELAY+ 40 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_DecryptionSharing_DELAY =  40 * 1000;
-    private static int CLOSE_ResultDiffusion_DELAY=40* 1000;
+    private static int CLOSE_ResultDiffusion_DELAY=60* 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
     private static int SELF_DESTRUCT_DELAY = 500 * 1000;
    // private static int COUNTING_PERIOD = 20 * 1000;		
@@ -689,7 +689,7 @@ public class CryptoNode extends Node {
                     for (int i = 0; i < resultSharesList.size(); i++) {
                         decArray[i] = resultSharesList.get(i);
                     }
-
+                    System.out.println("decaraysize: "+resultSharesList.size());
                     finalResult = secKey.combineShares(decArray);
                     computedFinalResult = true;
                     dump("Determined final result:" + finalResult);
@@ -768,6 +768,7 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
+                dump("PreemptResultDiffusionTask");
                 if (!computedFinalResult) {//actually close the local counting session
 
                     finalResult = mostPresent(finalResults);
