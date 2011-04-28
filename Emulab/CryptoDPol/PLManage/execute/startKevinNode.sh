@@ -15,7 +15,15 @@ beta=$BETA
 
 function launch () {
 #    rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1  $LOGIN_NAME@$node:$PROJECT_HOME/keys/
-    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $4 -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_HOME/keys/secKey$1 -publicKeyFile $PROJECT_HOME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -nbBallots $NB_BALLOTS"
+if [ $4 -eq 0 ]
+then
+    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "pkill java; $JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $4 -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_HOME/keys/secKey$1 -publicKeyFile $PROJECT_HOME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -nbBallots $NB_BALLOTS"
+# -nbVoters $VOTERCOUNT -kvalue $kvalue -nodesPerMachine $nodesPerMachine"
+else
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $4 -alpha $alpha -beta 1 -decision 0.3 -nbGroups $NB_GROUPS -secretKeyFile $PROJECT_HOME/keys/secKey$1 -publicKeyFile $PROJECT_HOME/keys/pubKey -groupId $2 -votecount $VOTECOUNT -mintallies $MINTALLIES -nbBallots $NB_BALLOTS"
+
+fi
+
 }
 
 if [ $# -ne 4 ]
@@ -57,8 +65,8 @@ do
    node_local_name=`expr match "$node" '\(node-*.[0-9]\)'`
  #  if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
   # then
-      launch $j $gid $i $(( $GOSSIP_PORT + $k  ))&
-	sleep 1
+      launch $j $gid $i $(( $GOSSIP_PORT + $k  )) $k&
+#	sleep 0.2 
    #else
    #   launch2 &
    #fi
