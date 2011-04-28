@@ -271,6 +271,7 @@ public class CryptoNode extends Node {
                     break;
                 case Message.CRYPTO_FINAL_RESULT_MSG:
                     receiveFinalResult((CRYPTO_FINAL_RESULT_MSG) msg);
+                    break;
 //                case Message.CLUSTER_ASSIGN_MSG:
 //                    receiveClusterAssign((CLUSTER_ASSIGN_MSG) msg);
 //                    break;
@@ -461,14 +462,15 @@ public class CryptoNode extends Node {
                             dump("TCP: cannot vote");
                         }
                     }
-                    isVoteTaskOver = true;
-                    taskManager.registerTask(new AttemptSelfDestruct());
-                    //     taskManager.registerTask(new CloseVoteTask());
-                    aggrLocalTally(Emsg);
+                    
                 } else {
                     dump("Cannot vote: no peer view");
 
                 }
+                isVoteTaskOver = true;
+                taskManager.registerTask(new AttemptSelfDestruct());
+                //     taskManager.registerTask(new CloseVoteTask());
+                aggrLocalTally(Emsg);
                 taskManager.registerTask(new PreemptGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
             }
         }
