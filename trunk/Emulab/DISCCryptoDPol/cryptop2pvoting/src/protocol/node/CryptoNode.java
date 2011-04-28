@@ -416,7 +416,7 @@ public class CryptoNode extends Node {
 
                 for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
                     for (int j = 0; j < nodesPerMachine; j++) {
-                        tempID = new E_CryptoNodeID("node" + i, basicPort + j);
+                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j);
                         IDAssignment.put(tempID, tempID.getOrder());
                     }
                 }
