@@ -437,6 +437,7 @@ public class CryptoNode extends Node {
                     secKey=(PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile+nodeToCluster.keyNum);
                 }
 
+                System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
                 proxyView = nodeToCluster.get((nodeId.groupId + 1) % numClusters);
                    for (int i=0;i<proxyView.size();i++)
                     System.out.println(proxyView.toArray()[i].toString()+" ,");
