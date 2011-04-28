@@ -474,8 +474,9 @@ public class CryptoNode extends Node {
                         } catch (Exception e) {
                             dump("TCP: cannot vote");
                         }
+                        
                         try {
-                            wait(10);
+                            Thread.sleep(10);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -628,7 +629,7 @@ public class CryptoNode extends Node {
                             dump("TCP: cannot broadcast local tally");
                         }
                         try {
-                            wait(10);
+                            Thread.sleep(10);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -672,7 +673,7 @@ public class CryptoNode extends Node {
                                 dump("TCP: cannot send decryption share");
                             }
                             try {
-                                wait(10);
+                                Thread.sleep(10);
                             } catch (InterruptedException ex) {
                                 Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -742,7 +743,7 @@ public class CryptoNode extends Node {
                             dump("TCP: cannot broadcast local tally");
                         }
                         try {
-                            wait(10);
+                            Thread.sleep(10);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                         }
