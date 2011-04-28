@@ -219,7 +219,7 @@ public class CryptoNode extends Node {
 //        }
 
         numClusters = (int) (Math.ceil(VOTERCOUNT/ (kvalue * Math.log(VOTERCOUNT))));
-        nodesPerCluster = VOTERCOUNT / numClusters;
+        nodesPerCluster = (int)(Math.ceil(kvalue * Math.log(VOTERCOUNT)));
         MINTALLIES = nodesPerCluster / 2 + 1;
         try {
 //            taskManager.registerTask(new AnnouncerTask());

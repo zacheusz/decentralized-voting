@@ -89,7 +89,7 @@ public class ClusterChoice implements Serializable {
         E_CryptoNodeID tempId;
         for (int i = 0; i < CryptoNode.numClusters; i++) {
             singleList = new HashSet<E_CryptoNodeID>();
-
+            
             for (int j = 0; j < CryptoNode.nodesPerCluster; j++) {
                 tempId=initNodeToClusterList.get(i * CryptoNode.nodesPerCluster + j);               
                 singleList.add(tempId);
