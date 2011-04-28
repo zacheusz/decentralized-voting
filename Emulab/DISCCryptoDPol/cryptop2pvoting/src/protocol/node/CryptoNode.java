@@ -423,9 +423,9 @@ public class CryptoNode extends Node {
                 }
                 sortedIDs = sortByValue(IDAssignment);
                 System.out.println(nodeId.toString()+":");
-                for (int i=0;i<sortedIDs.size();i++)
-                    System.out.println(sortedIDs.get(i).toString()+" ,");
-                
+//                for (int i=0;i<sortedIDs.size();i++)
+//                    System.out.println(sortedIDs.get(i).toString()+" ,");
+//                
                // System.out.println(sortedIDs.size());
                 nodeToCluster = new ClusterChoice(sortedIDs, nodeId);
                 nodeId.groupId = nodeToCluster.myGroupID;
@@ -438,6 +438,9 @@ public class CryptoNode extends Node {
                 }
 
                 proxyView = nodeToCluster.get((nodeId.groupId + 1) % numClusters);
+                   for (int i=0;i<proxyView.size();i++)
+                    System.out.println(proxyView.toArray()[i].toString()+" ,");
+             
                 peerView = nodeToCluster.get((nodeId.groupId));
                 peerView.remove(nodeId);
                 clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
