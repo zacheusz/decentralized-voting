@@ -218,7 +218,7 @@ public class CryptoNode extends Node {
 //
 //        }
 
-        numClusters = (int) (Math.log(VOTERCOUNT)/ (kvalue * Math.log(VOTERCOUNT)));
+        numClusters = (int) (VOTERCOUNT/ (kvalue * Math.log(VOTERCOUNT)));
         nodesPerCluster = VOTERCOUNT / numClusters;
         MINTALLIES = nodesPerCluster / 2 + 1;
         try {
