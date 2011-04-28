@@ -52,9 +52,9 @@ public class CryptoNode extends Node {
     //  private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 40000;				// Duration of the joining phase: 19 seconds to get peers
     //  private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 40000;
     //                                1  second  to get proxies
-    private static int VOTE_DELAY = 120 * 1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = 240 * 1000;// Delay before voting: 50 seconds
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
-    private static int CLOSE_COUNTING_DELAY = 120 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_COUNTING_DELAY = 240 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_DecryptionSharing_DELAY = 120 * 1000;
     private static int CLOSE_ResultDiffusion_DELAY = 120 * 1000;
@@ -428,21 +428,21 @@ public class CryptoNode extends Node {
                     }
                 }
                 sortedIDs = sortByValue(IDAssignment);
-                System.out.println(nodeId.toString() + ":");
+          //      System.out.println(nodeId.toString() + ":");
 //                for (int i=0;i<sortedIDs.size();i++)
 //                    System.out.println(sortedIDs.get(i).toString()+" ,");
 //                
                 // System.out.println(sortedIDs.size());
                 nodeToCluster = new ClusterChoice(sortedIDs, nodeId);
                 nodeId.groupId = nodeToCluster.myGroupID;
-                if (nodeId.groupId == -1) {
-                    System.out.println(nodeId.toString());
-                }
+//                if (nodeId.groupId == -1) {
+//                    System.out.println(nodeId.toString());
+//                }
                 if (nodeId.groupId == 0) {
                     IAmThreshold = true;
 
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
-                    System.out.println("keynum:" + nodeToCluster.keyNum);
+                  //  System.out.println("keynum:" + nodeToCluster.keyNum);
                 }
 
                 //        System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
