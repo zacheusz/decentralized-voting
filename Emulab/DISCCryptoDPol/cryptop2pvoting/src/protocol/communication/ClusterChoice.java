@@ -83,6 +83,7 @@ public class ClusterChoice implements Serializable {
 
     public ClusterChoice(List<E_CryptoNodeID> initNodeToClusterList,E_CryptoNodeID myNodeID) {
 
+        nodeToClusterList = new LinkedList< Set< E_CryptoNodeID>>();
 
         Set<E_CryptoNodeID> singleList;
         E_CryptoNodeID tempId;
