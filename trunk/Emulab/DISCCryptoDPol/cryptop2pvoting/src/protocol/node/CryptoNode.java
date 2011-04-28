@@ -39,7 +39,7 @@ import paillierp.key.PaillierKey;
 import runtime.executor.E_CryptoNodeID;
 import paillierp.testingPaillier.Testing;
 import zkp.DecryptionZKP;
-
+import protocol.communication.*;
 public class CryptoNode extends Node {
 
     // Timeout that are used in the protocol
