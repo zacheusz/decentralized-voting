@@ -685,10 +685,12 @@ public class CryptoNode extends Node {
                     dump("TallyDecryption");
 
                     PartialDecryption[] decArray = new PartialDecryption[resultSharesList.size()];
+                    System.out.println("shares: ");
                     for (int i = 0; i < resultSharesList.size(); i++) {
                         decArray[i] = resultSharesList.get(i);
+                        System.out.println(" "+decArray[i].getDecryptedValue());
                     }
-                    System.out.println("decaraysize: " + resultSharesList.size());
+                    //System.out.println("decaraysize: " + resultSharesList.size());
                     finalResult = secKey.combineShares(decArray);
                     computedFinalResult = true;
                     dump("Determined final result:" + finalResult);
