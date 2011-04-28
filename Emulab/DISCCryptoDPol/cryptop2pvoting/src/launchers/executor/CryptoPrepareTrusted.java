@@ -32,7 +32,7 @@ public class CryptoPrepareTrusted {
 //                double test= Math.floor(CryptoNode.VOTERCOUNT/CryptoNode.numClusters);
 //                if(test<(1.0*CryptoNode.VOTERCOUNT/CryptoNode.numClusters))
 //                    CryptoNode.numClusters++;
-                CryptoNode.nodesPerCluster =  (int)(Math.ceil(CryptoNode.VOTERCOUNT/CryptoNode.numClusters));
+                CryptoNode.nodesPerCluster =  (int)(Math.ceil(CryptoNode.VOTERCOUNT*1.0/CryptoNode.numClusters));
                 //CryptoNode.nodesPerCluster=(int) test;        
 
                 
