@@ -486,6 +486,8 @@ public class CryptoNode extends Node {
                 taskManager.registerTask(new GlobalCountingTask());
             }
             isLocalCountingOver = true;
+            taskManager.registerTask(new AttemptSelfDestruct());
+
             //else do nothing
         }
 
@@ -501,7 +503,7 @@ public class CryptoNode extends Node {
             //  System.out.println("isIndivSendingOver:"+isIndivSendingOver);
             //System.out.println("isResultOutputed:"+isResultOutputed);
             synchronized (LOCK) {
-                if (isGlobalCountingOver && isVoteTaskOver && isLocalCountingOver) {
+                if (isGlobalCountingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult&& isResultDiffusionOver) {
                     
                     /*		       try {
                     doSendTCP(new DEAD_MSG(nodeId, bootstrap));
@@ -679,9 +681,9 @@ public class CryptoNode extends Node {
                     dump("Determined final result:" + finalResult);
 
                     isTallyDecryptionOver = true;
-
+                        
                     taskManager.registerTask(new ResultDiffusionTask());
-
+                    taskManager.registerTask(new AttemptSelfDestruct());
 
 
                 }
@@ -707,6 +709,8 @@ public class CryptoNode extends Node {
                         }
                         break;
                     }
+                isResultDiffusionOver=true;
+                taskManager.registerTask(new AttemptSelfDestruct());
 
                 }
                 //      }
@@ -750,11 +754,11 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                if (!isResultDiffusionOver) {//actually close the local counting session
+                if (!computedFinalResult) {//actually close the local counting session
 
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
-
+                    
                     if (IAmThreshold) {
                         taskManager.registerTask(new AttemptSelfDestruct());
                     } else {
