@@ -421,6 +421,10 @@ public class CryptoNode extends Node {
                     }
                 }
                 sortedIDs = sortByValue(IDAssignment);
+                System.out.println(nodeId.toString()+":");
+                for (int i=0;i<sortedIDs.size();i++)
+                    System.out.println(sortedIDs.get(i).toString()+" ,");
+                
                // System.out.println(sortedIDs.size());
                 nodeToCluster = new ClusterChoice(sortedIDs, nodeId);
                 nodeId.groupId = nodeToCluster.myGroupID;
@@ -601,7 +605,7 @@ public class CryptoNode extends Node {
                     dump("GlobalCountingTask");
 
                     for (E_CryptoNodeID proxyId : proxyView) {
-                        dump("Send local tally (" + partialTally + ") to " + proxyId);
+                        dump("Send partial tally (" + partialTally + ") to " + proxyId);
                         try {
                             doSendTCP(new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally));
                         } catch (Exception e) {
@@ -701,7 +705,7 @@ public class CryptoNode extends Node {
                 
                 synchronized (LOCK) {                                        
                     for (E_CryptoNodeID proxyId : proxyView) {
-                        dump("Send local tally (" + finalResult + ") to " + proxyId);
+                        dump("Send final result (" + finalResult + ") to " + proxyId);
                         try {
                             doSendTCP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
                         } catch (Exception e) {
@@ -710,7 +714,7 @@ public class CryptoNode extends Node {
                         break;
                     }
                 isResultDiffusionOver=true;
-                taskManager.registerTask(new AttemptSelfDestruct());
+                    taskManager.registerTask(new AttemptSelfDestruct());
 
                 }
                 //      }
