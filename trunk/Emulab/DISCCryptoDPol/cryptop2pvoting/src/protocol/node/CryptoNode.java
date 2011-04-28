@@ -470,6 +470,7 @@ public class CryptoNode extends Node {
                         try {
 
                             doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg));
+                            wait(10);
                         } catch (Exception e) {
                             dump("TCP: cannot vote");
                         }
