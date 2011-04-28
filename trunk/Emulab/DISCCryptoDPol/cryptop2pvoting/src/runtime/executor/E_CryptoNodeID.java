@@ -12,7 +12,7 @@ public class E_CryptoNodeID implements Externalizable {
         public String name;
 	public int port;
 	public int groupId;
-        public static int NB_GROUPS;
+      //  public static int NB_GROUPS;
 
 	public E_CryptoNodeID() {
 	}

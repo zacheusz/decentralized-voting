@@ -46,26 +46,26 @@ public abstract class Node implements Receiver {
 		return hash % E_CryptoNodeID.NB_GROUPS;*/
                return id.groupId;
 	}
-	
-	public static int getNextGroupId(E_CryptoNodeID id) {
-		return (getGroupId(id) + 1) % E_CryptoNodeID.NB_GROUPS;
-	}
-	
-	public static int getPreviousGroupId(E_CryptoNodeID id) {
-		return (getGroupId(id) + E_CryptoNodeID.NB_GROUPS - 1) % E_CryptoNodeID.NB_GROUPS;
-	}
+//	
+//	public static int getNextGroupId(E_CryptoNodeID id) {
+//		return (getGroupId(id) + 1) % E_CryptoNodeID.NB_GROUPS;
+//	}
+//	
+//	public static int getPreviousGroupId(E_CryptoNodeID id) {
+//		return (getGroupId(id) + E_CryptoNodeID.NB_GROUPS - 1) % E_CryptoNodeID.NB_GROUPS;
+//	}
 	
 	public int getGroupId() {
 		return getGroupId(nodeId);
 	}
 	
-	public int getNextGroupId() {
-		return getNextGroupId(nodeId);
-	}
+//	public int getNextGroupId() {
+//		return getNextGroupId(nodeId);
+//	}
 	
-	public int getPreviousGroupId() {
-		return getPreviousGroupId(nodeId);
-	}
+//	public int getPreviousGroupId() {
+//		return getPreviousGroupId(nodeId);
+//	}
 	
 	protected  void printView(Set<E_CryptoNodeID> subView) {
 		for(E_CryptoNodeID id: subView) {
