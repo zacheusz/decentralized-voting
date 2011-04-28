@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
+import launchers.executor.CryptoGossipLauncher;
 import paillierp.Paillier;
 import paillierp.PaillierThreshold;
 import paillierp.PartialDecryption;
@@ -46,19 +47,20 @@ public class CryptoNode extends Node {
     public static long DECISION_DELAY = 10000;									// Delay before making a decision for localTally
     public static double VOTE_RATIO = 0.5;
     public static double MALICIOUS_RATIO = 0.1;
-    private final static int BOOTSTRAP_CONTACT_TIMEOUT = 40000;
+  //  private final static int BOOTSTRAP_CONTACT_TIMEOUT = 40000;
     //  private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 40000;				// Duration of the joining phase: 19 seconds to get peers
     //  private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 40000;
     //                                1  second  to get proxies
     //  private static int VOTE_DELAY = GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY + 40000;// Delay before voting: 50 seconds
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
-    private static int CLOSE_COUNTING_DELAY = 20 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 20 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_DecryptionSharing_DELAY = CLOSE_GLOBAL_COUNTING_DELAY + 20 * 1000;
-    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
-    private static int SELF_DESTRUCT_DELAY = CLOSE_TallyDecryption_DELAY + 20 * 1000;
-    private static int COUNTING_PERIOD = 20 * 1000;		
-    private static int CLOSE_ResultDiffusion_DELAY=1000;
+    private static int CLOSE_COUNTING_DELAY = 40 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_GLOBAL_COUNTING_DELAY = 40 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_DecryptionSharing_DELAY =  40 * 1000;
+    private static int CLOSE_ResultDiffusion_DELAY=40* 1000;
+//    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
+    private static int SELF_DESTRUCT_DELAY = 500 * 1000;
+   // private static int COUNTING_PERIOD = 20 * 1000;		
+    
             // Duration of epidemic dissemination: 20 seconds
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
@@ -89,7 +91,7 @@ public class CryptoNode extends Node {
     public static int basicPort;
     public static int nodesPerCluster;
     // Fields
-    protected final E_CryptoNodeID bootstrap;
+   // protected final E_CryptoNodeID bootstrap;
     //Keys
 //    PublicKey pub;
 //    SecretKey sec;
@@ -110,6 +112,7 @@ public class CryptoNode extends Node {
     protected PaillierThreshold secKey;
     protected BigInteger Emsg;
     BigInteger[] votes;
+    public static String secKeyFile;
     //protected boolean vote;
 //    protected Tally tally;
 //    protected Vote vote;
@@ -152,7 +155,7 @@ public class CryptoNode extends Node {
     // **************************************************************************
     // Constructors
     // **************************************************************************
-    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, E_CryptoNodeID bootstrap, PaillierThreshold sec) throws Exception {
+    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, PaillierThreshold sec) throws Exception {
 
         super(nodeId, networkSend);
         this.isMalicious = (Math.random() < MALICIOUS_RATIO);
@@ -190,7 +193,7 @@ public class CryptoNode extends Node {
         this.vote = voter.Vote(0);
          */
         this.taskManager = taskManager;
-        this.bootstrap = bootstrap;
+     //   this.bootstrap = bootstrap;
         this.stopper = stopper;
         //
     /*    this.pub = pub;
@@ -230,7 +233,7 @@ public class CryptoNode extends Node {
 //            taskManager.registerTask(new PreemptCloseGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
 //            taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
 //            taskManager.registerTask(new PreemptTallyDecryption(), CLOSE_TallyDecryption_DELAY);
-//            taskManager.registerTask(new SelfDestructTask(), SELF_DESTRUCT_DELAY);
+            taskManager.registerTask(new SelfDestructTask(), SELF_DESTRUCT_DELAY);
         } catch (Error e) {
             dump(nodeId + ": " + e.getMessage());
             e.printStackTrace();
@@ -424,6 +427,8 @@ public class CryptoNode extends Node {
 
                 if (nodeId.groupId == 0) {
                     IAmThreshold = true;
+                    
+                    secKey=(PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile+nodeToCluster.keyNum);
                 }
 
                 proxyView = nodeToCluster.get((nodeId.groupId + 1) % numClusters);
@@ -510,7 +515,7 @@ public class CryptoNode extends Node {
                     //     dump("Running Time: "+runningTime);
                     taskManager.registerTask(new ResultOutput());
                     
-                    taskManager.registerTask(new SelfDestructTask());
+                    
                 }
             }
 
@@ -769,6 +774,7 @@ public class CryptoNode extends Node {
 
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
+                taskManager.registerTask(new SelfDestructTask());
       //      }
 
 
