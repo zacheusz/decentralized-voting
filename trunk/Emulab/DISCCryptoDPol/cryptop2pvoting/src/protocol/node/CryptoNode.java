@@ -55,8 +55,8 @@ public class CryptoNode extends Node {
     private static int VOTE_DELAY = 120 * 1000;// Delay before voting: 50 seconds
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 120 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_GLOBAL_COUNTING_DELAY = CLOSE_COUNTING_DELAY + 60 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_DecryptionSharing_DELAY = 120 * 1000;
+    private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 120 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_DecryptionSharing_DELAY = 220 * 1000;
     private static int CLOSE_ResultDiffusion_DELAY = 120 * 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
     private static int SELF_DESTRUCT_DELAY = 1500 * 1000;
@@ -99,7 +99,7 @@ public class CryptoNode extends Node {
     protected boolean hasToken = true;
     protected boolean isLocalVoteOver = false;
     protected boolean isLocalCountingOver = false;
-    protected boolean isGlobalCountingOver = false;
+    protected boolean IsPartialTallyingOver = false;
     protected boolean isDecryptionSharingOver = false;
     protected boolean isFinalResultCalculated = false;
     protected boolean isTallyDecryptionOver = false;
@@ -480,10 +480,12 @@ public class CryptoNode extends Node {
 
                 }
                 isVoteTaskOver = true;
+                taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
+                
                 taskManager.registerTask(new AttemptSelfDestruct());
                 //     taskManager.registerTask(new CloseVoteTask());
                 aggrLocalTally(Emsg);
-                taskManager.registerTask(new PreemptGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
+                
             }
         }
     }
@@ -520,7 +522,7 @@ public class CryptoNode extends Node {
             //  System.out.println("isIndivSendingOver:"+isIndivSendingOver);
             //System.out.println("isResultOutputed:"+isResultOutputed);
             synchronized (LOCK) {
-                if (isGlobalCountingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult && isResultDiffusionOver) {
+                if (IsPartialTallyingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult && isResultDiffusionOver) {
 
                     /*		       try {
                     doSendTCP(new DEAD_MSG(nodeId, bootstrap));
@@ -564,11 +566,11 @@ public class CryptoNode extends Node {
         }
     }
 
-    private class PreemptGlobalCountingTask implements Task {
+    private class PreemptPartialTallyingTask implements Task {
 
         public void execute() {
             synchronized (LOCK) {
-                if (!isGlobalCountingOver) {//actually close the local counting session
+                if (!IsPartialTallyingOver) {//actually close the local counting session
 
                     partialTally = mostPresent(partialTallies);
                     computedPartialTally = true;
@@ -608,9 +610,8 @@ public class CryptoNode extends Node {
 
             // broadcast
             dump("GlobalCountingTask at begin");
-            if (!isGlobalCountingOver) {
+            if (!IsPartialTallyingOver) {
                 synchronized (LOCK) {
-
                     taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
                     dump("GlobalCountingTask");
 
@@ -624,7 +625,7 @@ public class CryptoNode extends Node {
 
                     }
 
-                    isGlobalCountingOver = true;
+                    IsPartialTallyingOver = true;
                     // taskManager.registerTask(new CloseGlobalCountingTask());
 
                 }
