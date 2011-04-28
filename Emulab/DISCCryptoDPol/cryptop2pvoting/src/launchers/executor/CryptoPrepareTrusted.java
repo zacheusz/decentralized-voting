@@ -29,10 +29,11 @@ public class CryptoPrepareTrusted {
                 //int TALLYCOUNT = Integer.parseInt(arguments.get("-tallycount"));
                 CryptoNode.numClusters = (int)Math.ceil( (CryptoNode.VOTERCOUNT / (CryptoNode.kvalue * Math.log(CryptoNode.VOTERCOUNT))));
          //       CryptoNode.nodesPerCluster =  (int)(Math.floor(CryptoNode.VOTERCOUNT/CryptoNode.numClusters));
-                double test= Math.floor(CryptoNode.VOTERCOUNT/CryptoNode.numClusters);
-                if(test<(1.0*CryptoNode.VOTERCOUNT/CryptoNode.numClusters))
-                    CryptoNode.numClusters++;
-                CryptoNode.nodesPerCluster=(int) test;        
+//                double test= Math.floor(CryptoNode.VOTERCOUNT/CryptoNode.numClusters);
+//                if(test<(1.0*CryptoNode.VOTERCOUNT/CryptoNode.numClusters))
+//                    CryptoNode.numClusters++;
+                CryptoNode.nodesPerCluster =  (int)(Math.ceil(CryptoNode.VOTERCOUNT/CryptoNode.numClusters));
+                //CryptoNode.nodesPerCluster=(int) test;        
 
                 
                 CryptoNode.MINTALLIES = CryptoNode.nodesPerCluster / 2 + 1;
