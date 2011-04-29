@@ -53,8 +53,11 @@ public abstract class CryptoSetup {
         if (arguments.get("-basicPort") != null) {
             CryptoNode.basicPort = Integer.parseInt(arguments.get("-basicPort"));
         }
-        if (arguments.get("-isMalicious") != null) {
-            CryptoNode.isMalicious = Boolean.parseBoolean(arguments.get("-isMalicious"));
+        if (arguments.get("-epsilon") != null) {
+            CryptoNode.epsilon = Double.parseDouble(arguments.get("-epsilon"));
+        }
+        if (arguments.get("-order") != null) {
+            CryptoNode.order = Integer.parseInt(arguments.get("-order"));
         }
 
     }
