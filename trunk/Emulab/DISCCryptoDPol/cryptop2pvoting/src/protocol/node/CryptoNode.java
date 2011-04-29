@@ -91,7 +91,7 @@ public class CryptoNode extends Node {
     //  public static int stepsConstant;
     public static int basicPort;
     public static int nodesPerCluster;
-    public static boolean isMalicious;
+   // public static boolean isMalicious;
     public static int order;
     public static double threshold = 1;
     // Fields
@@ -167,9 +167,7 @@ public class CryptoNode extends Node {
         //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
 
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
-        threshOrder = (0.5 - epsilon) * VOTERCOUNT;
-        //    System.out.println(threshOrder+" "+order);
-        this.isMalicious = (order < threshOrder);
+  
 
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
         int bits;
@@ -262,7 +260,7 @@ public class CryptoNode extends Node {
             dump(nodeId + ": " + e.getMessage());
             e.printStackTrace();
         }
-        dump("Node " + nodeId.getName() + " is born: " + isMalicious);
+        dump("Node " + nodeId.getName() + " is born: ");
         //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
         startTime = System.currentTimeMillis();
@@ -438,11 +436,22 @@ public class CryptoNode extends Node {
                 E_CryptoNodeID tempID;
                 Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
                 List<E_CryptoNodeID> sortedIDs;
-
+                
+                int mycount=1;
+                threshOrder = (0.5 - epsilon) * VOTERCOUNT;
+                boolean isMal;
                 for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
-                    for (int j = 0; j < nodesPerMachine; j++) {
-                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j);
+                    for (int j = 0; j < nodesPerMachine; j++) {                                           
+                        isMal=(mycount < threshOrder);
+                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j,isMal);
+                        
+                        if (tempID.equals(nodeId))
+                        {
+                            nodeId.isMalicious=isMal;
+                            System.out.println("I am "+isMal);
+                        }
                         IDAssignment.put(tempID, tempID.getOrder());
+                        mycount++;
                     }
                 }
                 sortedIDs = sortByValue(IDAssignment);
