@@ -219,12 +219,16 @@ public class CryptoNode extends Node {
 //        }
 
         numClusters = (int) (Math.ceil(VOTERCOUNT / (kvalue * Math.log(VOTERCOUNT))));
+        nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT*1.0/numClusters));
+        while(nodesPerCluster*numClusters>VOTERCOUNT)
+            numClusters--;
+        numClusters++;
 //        double test = Math.floor(VOTERCOUNT / numClusters);
 //        if (test < (1.0 * VOTERCOUNT / numClusters)) {
 //            numClusters++;
 //        }
 //        nodesPerCluster = (int) test;
-        nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT*1.0/numClusters));
+        
         MINTALLIES = nodesPerCluster / 2 + 1;
       //  System.out.println("min:" + MINTALLIES);
         try {
