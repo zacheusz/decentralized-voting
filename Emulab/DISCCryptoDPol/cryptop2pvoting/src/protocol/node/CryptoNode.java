@@ -53,18 +53,19 @@ public class CryptoNode extends Node {
     //  private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 40000;				// Duration of the joining phase: 19 seconds to get peers
     //  private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 40000;
     //                                1  second  to get proxies
-    private static int VOTE_DELAY = 320 * 1000;// Delay before voting: 50 seconds
+    public static int VOTECOUNT;
+    public static int VOTERCOUNT;
+    
+    private static int VOTE_DELAY = 40 +30*Voterount/100;// Delay before voting: 50 seconds
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
-    private static int CLOSE_COUNTING_DELAY = 120 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 120 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_DecryptionSharing_DELAY = 220 * 1000;
-    private static int CLOSE_ResultDiffusion_DELAY = 120 * 1000;
+    private static int CLOSE_COUNTING_DELAY = 320 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 320 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_DecryptionSharing_DELAY = 320 * 1000;
+    private static int CLOSE_ResultDiffusion_DELAY = 320 * 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
     private static int SELF_DESTRUCT_DELAY = 1500 * 1000;
     // private static int COUNTING_PERIOD = 20 * 1000;		
     // Duration of epidemic dissemination: 20 seconds
-    public static int VOTECOUNT;
-    public static int VOTERCOUNT;
     public static int kvalue;
     public static int MINTALLIES;
     public static int nodesPerMachine;
@@ -255,7 +256,7 @@ public class CryptoNode extends Node {
             dump(nodeId + ": " + e.getMessage());
             e.printStackTrace();
         }
-        dump("Node " + nodeId.getName() + " is born");
+        dump("Node " + nodeId.getName() + " is born: "+isMalicious);
         //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
         startTime = System.currentTimeMillis();
