@@ -479,7 +479,7 @@ public class CryptoNode extends Node {
 //                    System.out.println(proxyView.toArray()[i].toString()+" ,");
 //             
                 peerView = nodeToCluster.get((nodeId.groupId));
-                peerView.remove(nodeId);
+            //    peerView.remove(nodeId);
                 clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
                 taskManager.registerTask(new VoteTask(), VOTE_DELAY);
             }
@@ -492,9 +492,11 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
                 if (!isVoteTaskOver){
                 taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-                if (!peerView.isEmpty()) {
-
+                if (!(peerView.size()<=1)) {
+                    
                     for (E_CryptoNodeID peerId : peerView) {
+                        if (peerId.equals(nodeId))
+                            continue;
                         dump("Send a '" + Emsg + "' ballot to " + peerId);
                         try {
 
@@ -525,11 +527,11 @@ public class CryptoNode extends Node {
 
         localTally = encryptor.add(localTally, ballot);
         numBallots++;
-        int i=peerView.size();
-        i++;
-        System.out.println("ballots"+numBallots + " " +i );
+        
+        
+        System.out.println("ballots"+numBallots + " " +peerView.size() );
 
-        if (numBallots == (peerView.size() + 1)) {
+        if (numBallots == peerView.size()) {
             computedLocalTally = true;
             if (IAmThreshold) {
                 partialTally = localTally;
@@ -690,8 +692,10 @@ public class CryptoNode extends Node {
                     dump("sharesize: " + currentDecodingIndex);
 
 
-                    if (!peerView.isEmpty()) {
+                    if (!(peerView.size()<=1)) {
                         for (E_CryptoNodeID peerId : peerView) {
+                            if (peerId.equals(nodeId))
+                            continue;
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                             try {
                                 doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare));
