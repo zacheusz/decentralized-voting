@@ -368,6 +368,7 @@ public class CryptoNode extends Node {
                 numPartialTallies++;
 
                 partialTallies.add(msg.getTally());
+                System.out.println(numPartialTallies + " " + clientView.size());
 
                 if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     partialTally = mostPresent(partialTallies);
@@ -522,6 +523,8 @@ public class CryptoNode extends Node {
 
         localTally = encryptor.add(localTally, ballot);
         numBallots++;
+        System.out.println(numBallots + " " + clientView.size());
+
         if (numBallots == (peerView.size() + 1)) {
             computedLocalTally = true;
             if (IAmThreshold) {
@@ -787,7 +790,7 @@ public class CryptoNode extends Node {
                 numFinalResults++;
 
                 finalResults.add(msg.getResult());
-                System.out.println(numPartialTallies + " " + clientView.size());
+                System.out.println(numFinalResults + " " + clientView.size());
                 if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
