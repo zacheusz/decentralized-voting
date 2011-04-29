@@ -54,7 +54,7 @@ public abstract class CryptoSetup {
             CryptoNode.basicPort = Integer.parseInt(arguments.get("-basicPort"));
         }
         if (arguments.get("-epsilon") != null) {
-            CryptoNode.basicPort = Integer.parseInt(arguments.get("-epsilon"));
+            CryptoNode.epsilon = Integer.parseInt(arguments.get("-epsilon"));
         }
 
     }
