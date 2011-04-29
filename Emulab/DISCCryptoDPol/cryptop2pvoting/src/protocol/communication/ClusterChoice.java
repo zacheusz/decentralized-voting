@@ -33,6 +33,8 @@ public class ClusterChoice implements Serializable {
     public Set<E_CryptoNodeID> get(int cluster) {
         return nodeToClusterList.get(cluster);
     }
+    
+    public double [] dishonestFractions;
 //
 //        public int getSmallestCluster() {
 //            int minSize = 0;
@@ -110,6 +112,28 @@ public class ClusterChoice implements Serializable {
             }
             
             nodeToClusterList.add(singleList);
+        }
+        
+        
+        if (myGroupID==0 && keyNum==0)
+        {
+            dishonestFractions=new double [CryptoNode.numClusters];
+            
+            for (int i = 0; i < CryptoNode.numClusters; i++) {
+                
+                for (E_CryptoNodeID curID:nodeToClusterList.get(i))
+                {
+                    if (curID.isMalicious)
+                        dishonestFractions[i]++;
+                        
+                }
+                dishonestFractions[i]=dishonestFractions[i]/nodeToClusterList.get(i).size();
+                System.out.println("Group "+i+": "+dishonestFractions[i]);
+                
+                                
+            }
+            
+        
         }
     }
 }

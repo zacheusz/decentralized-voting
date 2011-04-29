@@ -50,7 +50,7 @@ public class CryptoGossipLauncher {
             //    int groupId = Integer.parseInt(arguments.get("-groupId"));
 		
 		E_NodeIDReader nodeIDReader = new E_NodeIDReader();
-		E_CryptoNodeID id = new E_CryptoNodeID(name, port);
+		E_CryptoNodeID id = new E_CryptoNodeID(name, port,false);
 
 		TaskManager taskManager = new E_CryptoThreadPerTaskTaskManager();
 		NetworkSend networkSend = new E_NetworkSend();
