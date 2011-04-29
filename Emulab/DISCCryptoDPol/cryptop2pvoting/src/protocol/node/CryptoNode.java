@@ -223,7 +223,7 @@ public class CryptoNode extends Node {
 
         numClusters = (int) (Math.ceil(VOTERCOUNT / (kvalue * Math.log(VOTERCOUNT))));
         nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT*1.0/numClusters));
-        while(nodesPerCluster*numClusters=>VOTERCOUNT)
+        while(nodesPerCluster*numClusters>=VOTERCOUNT)
             numClusters--;
         numClusters++;
 //        double test = Math.floor(VOTERCOUNT / numClusters);
