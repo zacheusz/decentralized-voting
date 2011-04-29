@@ -106,7 +106,10 @@ public class ClusterChoice implements Serializable {
                 {
                     myGroupID=i;
                     if (i==0)
+                    {
                         keyNum=j;
+                        System.out.println("Keynum: "+keyNum);
+                    }
                 }
             }
             
