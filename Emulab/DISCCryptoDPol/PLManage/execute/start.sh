@@ -38,7 +38,10 @@ echo "time for trusted 3rd party $DIFF1"
 
 rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey*  $LOGIN_NAME@$home_node:$PROJECT_HOME/keys/
 
+sleep $delay
+
 for ((i=0;i<nb;i++)) do
+
 #  sdate="`date +\"%y%m%d%H%M%S\"`"
 #  shuf $nodesFile > tmp$sdate
 #  mv tmp$sdate $nodesFile
