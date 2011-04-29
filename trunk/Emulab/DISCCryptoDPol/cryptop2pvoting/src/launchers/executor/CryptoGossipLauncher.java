@@ -24,7 +24,6 @@ import runtime.executor.E_CryptoNodeID;
 import runtime.executor.E_CryptoThreadPerTaskTaskManager;
 import runtime.executor.E_NetworkSend;
 
-import runtime.executor.E_NodeIDReader;
 import runtime.executor.E_Stopper;
 
 
@@ -49,7 +48,6 @@ public class CryptoGossipLauncher {
 
             //    int groupId = Integer.parseInt(arguments.get("-groupId"));
 		
-		E_NodeIDReader nodeIDReader = new E_NodeIDReader();
 		E_CryptoNodeID id = new E_CryptoNodeID(name, port,false);
 
 		TaskManager taskManager = new E_CryptoThreadPerTaskTaskManager();
