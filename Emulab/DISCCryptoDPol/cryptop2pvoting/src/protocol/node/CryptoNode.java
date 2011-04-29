@@ -167,7 +167,7 @@ public class CryptoNode extends Node {
     //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
         
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
-        threshOrder=(0.5*-epsilon)*VOTERCOUNT;
+        threshOrder=(0.5-epsilon)*VOTERCOUNT;
         System.out.println(threshOrder+" "+order);
         this.isMalicious=(order<threshOrder);
         
