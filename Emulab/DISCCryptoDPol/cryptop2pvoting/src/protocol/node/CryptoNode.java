@@ -162,7 +162,7 @@ public class CryptoNode extends Node {
 
         super(nodeId, networkSend);
         MALICIOUS_RATIO = 0.5 - epsilon;
-        this.isMalicious = (nodeId. < MALICIOUS_RATIO);
+        this.isMalicious = (Math.random() < MALICIOUS_RATIO);
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
 
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
