@@ -47,12 +47,13 @@ public class CryptoNode extends Node {
     public static double DECISION_THRESHOLD = 0.1;								// Required ratio of answers for making a decision
     public static long DECISION_DELAY = 10000;									// Delay before making a decision for localTally
     public static double VOTE_RATIO = 0.5;
-    public static double MALICIOUS_RATIO = 0.1;
+    public static double epsilon;
+    public static double MALICIOUS_RATIO;
     //  private final static int BOOTSTRAP_CONTACT_TIMEOUT = 40000;
     //  private static int GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY = 40000;				// Duration of the joining phase: 19 seconds to get peers
     //  private static int GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY = GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY + 40000;
     //                                1  second  to get proxies
-    private static int VOTE_DELAY = 120 * 1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = 180 * 1000;// Delay before voting: 50 seconds
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 120 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 120 * 1000;		// Duration of the local counting phase: 1 minute
@@ -90,6 +91,7 @@ public class CryptoNode extends Node {
     //  public static int stepsConstant;
     public static int basicPort;
     public static int nodesPerCluster;
+    public static boolean isMalicious;
     // Fields
     // protected final E_CryptoNodeID bootstrap;
     //Keys
@@ -158,6 +160,7 @@ public class CryptoNode extends Node {
     public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, PaillierThreshold sec) throws Exception {
 
         super(nodeId, networkSend);
+        MALICIOUS_RATIO=0.5-epsilon;
         this.isMalicious = (Math.random() < MALICIOUS_RATIO);
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
 
@@ -220,7 +223,7 @@ public class CryptoNode extends Node {
 
         numClusters = (int) (Math.ceil(VOTERCOUNT / (kvalue * Math.log(VOTERCOUNT))));
         nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT*1.0/numClusters));
-        while(nodesPerCluster*numClusters>VOTERCOUNT)
+        while(nodesPerCluster*numClusters=>VOTERCOUNT)
             numClusters--;
         numClusters++;
 //        double test = Math.floor(VOTERCOUNT / numClusters);
