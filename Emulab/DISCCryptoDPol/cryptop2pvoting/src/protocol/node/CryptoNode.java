@@ -93,6 +93,7 @@ public class CryptoNode extends Node {
     public static int basicPort;
     public static int nodesPerCluster;
     public static boolean isMalicious;
+    public static int order;
     public static double threshold = 0.9;
     // Fields
     // protected final E_CryptoNodeID bootstrap;
@@ -154,6 +155,7 @@ public class CryptoNode extends Node {
     // Stats
     public final long startTime;
     public boolean stopped = false;
+    public double threshOrder;
 
     // **************************************************************************
     // Constructors
@@ -165,7 +167,9 @@ public class CryptoNode extends Node {
     //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
         
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
-
+        threshOrder=(0.5*-epsilon)*VOTERCOUNT;
+        this.isMalicious=(order<threshOrder);
+        
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
         int bits;
         BigInteger base, temp;
