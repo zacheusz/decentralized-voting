@@ -163,7 +163,8 @@ public class CryptoNode extends Node {
         super(nodeId, networkSend);
         MALICIOUS_RATIO = 0.5 - epsilon;
         int thresholdValue=(int)(Math.floor(MALICIOUS_RATIO*VOTERCOUNT));
-        if (Integer.getInteger(nodeId.getName().substring(5)).compareTo(thresholdValue)<=0)
+        Integer tempInt=Integer.getInteger(nodeId.getName().substring(5));
+        if (tempInt.compareTo(thresholdValue)<=0)
             this.isMalicious = true;
         else
             this.isMalicious=false;
