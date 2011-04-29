@@ -39,7 +39,7 @@ import paillierp.key.PaillierKey;
 import runtime.executor.E_CryptoNodeID;
 import paillierp.testingPaillier.Testing;
 import zkp.DecryptionZKP;
-import protocol.communication.*;
+import protocol.communication.ClusterChoice;
 
 public class CryptoNode extends Node {
 
