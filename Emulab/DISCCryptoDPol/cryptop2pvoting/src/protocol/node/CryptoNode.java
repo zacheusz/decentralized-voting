@@ -118,7 +118,7 @@ public class CryptoNode extends Node {
     //protected boolean vote;
 //    protected Tally tally;
 //    protected Vote vote;
-    protected boolean isMalicious;
+
     protected boolean knownModulation = true;
     protected BigInteger individualTally;
     protected BigInteger localTally;
