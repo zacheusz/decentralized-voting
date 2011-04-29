@@ -168,7 +168,7 @@ public class CryptoNode extends Node {
         
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
         threshOrder=(0.5-epsilon)*VOTERCOUNT;
-        System.out.println(threshOrder+" "+order);
+   //    System.out.println(threshOrder+" "+order);
         this.isMalicious=(order<threshOrder);
         
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
@@ -192,11 +192,11 @@ public class CryptoNode extends Node {
 
 
 
-        if (isMalicious) {
+    //    if (isMalicious) {
             Emsg = encryptor.encrypt(votes[0]);
-        } else {
-            Emsg = encryptor.encrypt(votes[1]);
-        }
+    //    } else {
+    //        Emsg = encryptor.encrypt(votes[1]);
+    //    }
 
         /*  Voter voter; //entity voting
         voter = new Voter(pub);
@@ -633,9 +633,9 @@ public class CryptoNode extends Node {
                     taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
                     dump("GlobalCountingTask");
 
-                    if (isMalicious) {
-                        partialTally = encryptor.encrypt(votes[0].multiply(BigInteger.valueOf(nodeId.groupId + 1)));
-                    }
+//                    if (isMalicious) {
+//                        partialTally = encryptor.encrypt(votes[0].multiply(BigInteger.valueOf(nodeId.groupId + 1)));
+//                    }
 
                     for (E_CryptoNodeID proxyId : proxyView) {
                         dump("Send partial tally (" + partialTally + ") to " + proxyId);
@@ -741,9 +741,9 @@ public class CryptoNode extends Node {
                 synchronized (LOCK) {
                     for (E_CryptoNodeID proxyId : proxyView) {
                         
-                        if (isMalicious) {
-                            finalResult = votes[0].multiply(BigInteger.valueOf(VOTERCOUNT));
-                        }
+//                        if (isMalicious) {
+//                            finalResult = votes[0].multiply(BigInteger.valueOf(VOTERCOUNT));
+//                        }
                         dump("Send final result (" + finalResult + ") to " + proxyId);
                         try {
                             doSendTCP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
