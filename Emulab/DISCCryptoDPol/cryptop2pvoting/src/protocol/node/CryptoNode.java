@@ -168,6 +168,7 @@ public class CryptoNode extends Node {
         
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
         threshOrder=(0.5*-epsilon)*VOTERCOUNT;
+        System.out.println(threshOrder+" "+order);
         this.isMalicious=(order<threshOrder);
         
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
