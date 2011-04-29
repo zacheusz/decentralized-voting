@@ -627,7 +627,7 @@ public class CryptoNode extends Node {
                     dump("GlobalCountingTask");
 
                     if (isMalicious) {
-                        partialTally = encryptor.encrypt(votes[0].multiply((nodeId.groupId + 1)));
+                        partialTally = encryptor.encrypt(votes[0].multiply(nodeId.groupId + 1));
                     }
 
                     for (E_CryptoNodeID proxyId : proxyView) {
@@ -682,7 +682,7 @@ public class CryptoNode extends Node {
                     }
 
                     //}
-                    if (currentDecodingIndex == (int) (Math.floor((nodesPerCluster * threshold)))  {
+                    if (currentDecodingIndex == (int) (Math.floor(nodesPerCluster * threshold)))  {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         isDecryptionSharingOver = true;
