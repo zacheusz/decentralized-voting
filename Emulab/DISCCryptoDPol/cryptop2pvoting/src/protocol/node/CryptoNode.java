@@ -94,7 +94,7 @@ public class CryptoNode extends Node {
     public static int nodesPerCluster;
     public static boolean isMalicious;
     public static int order;
-    public static double threshold = 0.9;
+    public static double threshold = 1;
     // Fields
     // protected final E_CryptoNodeID bootstrap;
     //Keys
