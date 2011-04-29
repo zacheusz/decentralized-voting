@@ -105,6 +105,7 @@ public class CryptoNode extends Node {
     protected boolean isLocalVoteOver = false;
     protected boolean isLocalCountingOver = false;
     protected boolean IsPartialTallyingOver = false;
+    protected boolean isShareSendingOver = false;
     protected boolean isDecryptionSharingOver = false;
     protected boolean isFinalResultCalculated = false;
     protected boolean isTallyDecryptionOver = false;
@@ -193,7 +194,7 @@ public class CryptoNode extends Node {
 
 
     //    if (isMalicious) {
-            Emsg = encryptor.encrypt(votes[0]);
+            Emsg = encryptor.encrypt(votes[1]);
     //    } else {
     //        Emsg = encryptor.encrypt(votes[1]);
     //    }
@@ -661,7 +662,7 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
-                if (!isDecryptionSharingOver) {
+                if (!isShareSendingOver) {
                     dump("TallyDecryptionSharing");
 
                     dump("final encrypted:" + finalEncryptedResult.toString());
@@ -687,12 +688,11 @@ public class CryptoNode extends Node {
                     } else {
                         receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
                     }
-
+                    isShareSendingOver=true;                        
                     //}
                     if (currentDecodingIndex == (int) (Math.floor(nodesPerCluster * threshold)))  {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
-                        isDecryptionSharingOver = true;
                         taskManager.registerTask(new TallyDecryption());
                     }
 
@@ -734,11 +734,11 @@ public class CryptoNode extends Node {
 
         public void execute() {
             // broadcast
-
-            if (!isResultDiffusionOver) {
+    synchronized (LOCK) {
+            if ((!isResultDiffusionOver)&& !(numClusters==nodeId.groupId+1)) {
                 dump("ResultDiffusionTask at begin");
 
-                synchronized (LOCK) {
+                
                     for (E_CryptoNodeID proxyId : proxyView) {
                         
 //                        if (isMalicious) {
@@ -748,17 +748,19 @@ public class CryptoNode extends Node {
                         try {
                             doSendTCP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
                         } catch (Exception e) {
-                            dump("TCP: cannot broadcast local tally");
+                            dump("TCP: cannot broadcast final result");
                         }
 
                     }
                     isResultDiffusionOver = true;
-                    taskManager.registerTask(new AttemptSelfDestruct());
 
-                }
+                }            
                 //      }
                 dump("ResultDiffusionTask at end");
+                taskManager.registerTask(new AttemptSelfDestruct());
+
             }
+    
         }
     }
 
