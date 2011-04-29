@@ -92,6 +92,7 @@ public class CryptoNode extends Node {
     public static int basicPort;
     public static int nodesPerCluster;
     public static boolean isMalicious;
+    public static double threshold = 0.9;
     // Fields
     // protected final E_CryptoNodeID bootstrap;
     //Keys
@@ -118,7 +119,6 @@ public class CryptoNode extends Node {
     //protected boolean vote;
 //    protected Tally tally;
 //    protected Vote vote;
-
     protected boolean knownModulation = true;
     protected BigInteger individualTally;
     protected BigInteger localTally;
@@ -160,7 +160,7 @@ public class CryptoNode extends Node {
     public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, PaillierThreshold sec) throws Exception {
 
         super(nodeId, networkSend);
-        MALICIOUS_RATIO=0.5-epsilon;
+        MALICIOUS_RATIO = 0.5 - epsilon;
         this.isMalicious = (Math.random() < MALICIOUS_RATIO);
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
 
@@ -184,9 +184,12 @@ public class CryptoNode extends Node {
         }
 
 
-        BigInteger msg = BigInteger.valueOf(1);
-        Emsg = encryptor.encrypt(votes[1]);
 
+        if (isMalicious) {
+            Emsg = encryptor.encrypt(votes[0]);
+        } else {
+            Emsg = encryptor.encrypt(votes[1]);
+        }
 
         /*  Voter voter; //entity voting
         voter = new Voter(pub);
@@ -222,18 +225,19 @@ public class CryptoNode extends Node {
 //        }
 
         numClusters = (int) (Math.ceil(VOTERCOUNT / (kvalue * Math.log(VOTERCOUNT))));
-        nodesPerCluster =  (int)(Math.ceil(VOTERCOUNT*1.0/numClusters));
-        while(nodesPerCluster*numClusters>=VOTERCOUNT)
+        nodesPerCluster = (int) (Math.ceil(VOTERCOUNT * 1.0 / numClusters));
+        while (nodesPerCluster * numClusters >= VOTERCOUNT) {
             numClusters--;
+        }
         numClusters++;
 //        double test = Math.floor(VOTERCOUNT / numClusters);
 //        if (test < (1.0 * VOTERCOUNT / numClusters)) {
 //            numClusters++;
 //        }
 //        nodesPerCluster = (int) test;
-        
+
         MINTALLIES = nodesPerCluster / 2 + 1;
-      //  System.out.println("min:" + MINTALLIES);
+        //  System.out.println("min:" + MINTALLIES);
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
@@ -252,7 +256,7 @@ public class CryptoNode extends Node {
             e.printStackTrace();
         }
         dump("Node " + nodeId.getName() + " is born");
-        dump("Parameters: Vote Ratio=" + VOTE_RATIO);
+        //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
         startTime = System.currentTimeMillis();
     }
@@ -335,7 +339,7 @@ public class CryptoNode extends Node {
 
                 currentDecodingIndex++;
                 dump("sharesize: " + currentDecodingIndex);
-                if (isFinalResultCalculated && currentDecodingIndex == nodesPerCluster) {
+                if (isFinalResultCalculated && currentDecodingIndex == (int) (Math.floor(nodesPerCluster * threshold))) {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
@@ -360,7 +364,7 @@ public class CryptoNode extends Node {
 
                 partialTallies.add(msg.getTally());
 
-                if (numPartialTallies == clientView.size()) {
+                if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     partialTally = mostPresent(partialTallies);
                     computedPartialTally = true;
 
@@ -435,7 +439,7 @@ public class CryptoNode extends Node {
                     }
                 }
                 sortedIDs = sortByValue(IDAssignment);
-          //      System.out.println(nodeId.toString() + ":");
+                //      System.out.println(nodeId.toString() + ":");
 //                for (int i=0;i<sortedIDs.size();i++)
 //                    System.out.println(sortedIDs.get(i).toString()+" ,");
 //                
@@ -449,7 +453,7 @@ public class CryptoNode extends Node {
                     IAmThreshold = true;
 
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
-                  //  System.out.println("keynum:" + nodeToCluster.keyNum);
+                    //  System.out.println("keynum:" + nodeToCluster.keyNum);
                 }
 
                 //        System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
@@ -488,11 +492,11 @@ public class CryptoNode extends Node {
                 }
                 isVoteTaskOver = true;
                 taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
-                
+
                 taskManager.registerTask(new AttemptSelfDestruct());
                 //     taskManager.registerTask(new CloseVoteTask());
                 aggrLocalTally(Emsg);
-                
+
             }
         }
     }
@@ -502,7 +506,7 @@ public class CryptoNode extends Node {
 
         localTally = encryptor.add(localTally, ballot);
         numBallots++;
-        if (numBallots == peerView.size() + 1) {
+        if (numBallots == (int) (Math.floor((peerView.size() + 1) * threshold))) {
             computedLocalTally = true;
             if (IAmThreshold) {
                 partialTally = localTally;
@@ -622,6 +626,10 @@ public class CryptoNode extends Node {
                     taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
                     dump("GlobalCountingTask");
 
+                    if (isMalicious) {
+                        partialTally = encryptor.encrypt(votes[0].multiply((nodeId.groupId + 1)));
+                    }
+
                     for (E_CryptoNodeID proxyId : proxyView) {
                         dump("Send partial tally (" + partialTally + ") to " + proxyId);
                         try {
@@ -674,7 +682,7 @@ public class CryptoNode extends Node {
                     }
 
                     //}
-                    if (currentDecodingIndex == nodesPerCluster) {
+                    if (currentDecodingIndex == (int) (Math.floor((nodesPerCluster * threshold)))  {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         isDecryptionSharingOver = true;
@@ -697,7 +705,7 @@ public class CryptoNode extends Node {
                     System.out.println("shares: ");
                     for (int i = 0; i < resultSharesList.size(); i++) {
                         decArray[i] = resultSharesList.get(i);
-                        System.out.println(" "+decArray[i].getDecryptedValue());
+                        System.out.println(" " + decArray[i].getDecryptedValue());
                     }
                     //System.out.println("decaraysize: " + resultSharesList.size());
                     finalResult = secKey.combineShares(decArray);
@@ -725,6 +733,10 @@ public class CryptoNode extends Node {
 
                 synchronized (LOCK) {
                     for (E_CryptoNodeID proxyId : proxyView) {
+                        
+                        if (isMalicious) {
+                            finalResult = votes[0].multiply(VOTERCOUNT);
+                        }
                         dump("Send final result (" + finalResult + ") to " + proxyId);
                         try {
                             doSendTCP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
@@ -756,8 +768,8 @@ public class CryptoNode extends Node {
                 numFinalResults++;
 
                 finalResults.add(msg.getResult());
-                System.out.println(numPartialTallies+" "+clientView.size());
-                if (numPartialTallies == clientView.size()) {
+                System.out.println(numPartialTallies + " " + clientView.size());
+                if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
 
