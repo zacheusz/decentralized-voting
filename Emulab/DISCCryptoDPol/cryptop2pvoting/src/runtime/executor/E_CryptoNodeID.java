@@ -4,6 +4,11 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import protocol.node.CryptoNode;
 
 
@@ -48,7 +53,19 @@ public class E_CryptoNodeID implements Externalizable {
 
 	@Override
 	public int hashCode() {
-		return name.hashCode() ^ port;
+            byte[] thedigest = null;
+        try {
+            byte[] bytesOfMessage = (name+port).getBytes("UTF-8");
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            thedigest= md.digest(bytesOfMessage);
+                
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(E_CryptoNodeID.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(E_CryptoNodeID.class.getName()).log(Level.SEVERE, null, ex);
+        }
+           return thedigest.hashCode();
+
 	}
 
 	@Override
