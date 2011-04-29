@@ -203,6 +203,7 @@ public class CryptoNode extends Node {
         //this.vote = voter.Vote(randomGenerator.nextInt(VOTECOUNT + 1));//vote for arbitrary candidate
         this.vote = voter.Vote(0);
          */
+         
         this.taskManager = taskManager;
         //   this.bootstrap = bootstrap;
         this.stopper = stopper;
@@ -368,7 +369,7 @@ public class CryptoNode extends Node {
                 numPartialTallies++;
 
                 partialTallies.add(msg.getTally());
-                System.out.println("partial:"+numPartialTallies + " " + clientView.size());
+                dump("partial:"+numPartialTallies + " " + clientView.size());
 
                 if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     partialTally = mostPresent(partialTallies);
@@ -529,7 +530,7 @@ public class CryptoNode extends Node {
         numBallots++;
         
         
-        System.out.println("ballots"+numBallots + " " +peerView.size() );
+        dump("ballots "+numBallots + " " +peerView.size() );
 
         if (numBallots == peerView.size()) {
             computedLocalTally = true;
@@ -798,7 +799,7 @@ public class CryptoNode extends Node {
                 numFinalResults++;
 
                 finalResults.add(msg.getResult());
-                System.out.println("finals:"+numFinalResults + " " + clientView.size());
+                dump("finals:"+numFinalResults + " " + clientView.size());
                 if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
