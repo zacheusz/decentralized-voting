@@ -131,6 +131,7 @@ public class ClusterChoice implements Serializable {
                         
                 }
                 dishonestFractions[i]=dishonestFractions[i]/nodeToClusterList.get(i).size();
+                System.out.println(myNodeID.toString());
                 System.out.println("Group "+i+": "+dishonestFractions[i]);
                 
                                 
