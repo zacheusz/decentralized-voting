@@ -64,7 +64,7 @@ public class E_CryptoNodeID implements Externalizable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(E_CryptoNodeID.class.getName()).log(Level.SEVERE, null, ex);
         }
-           return thedigest.hashCode();
+           return (new String(thedigest)).hashCode();
 
 	}
 
