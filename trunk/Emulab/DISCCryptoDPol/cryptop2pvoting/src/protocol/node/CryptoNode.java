@@ -56,7 +56,7 @@ public class CryptoNode extends Node {
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
     
-    private static int VOTE_DELAY = (40 +40*VOTERCOUNT/100)*1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = (40 +40.0*VOTERCOUNT/100)*1000;// Delay before voting: 50 seconds
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 320 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 320 * 1000;		// Duration of the local counting phase: 1 minute
