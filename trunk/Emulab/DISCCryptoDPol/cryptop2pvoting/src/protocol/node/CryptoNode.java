@@ -523,7 +523,7 @@ public class CryptoNode extends Node {
 
         localTally = encryptor.add(localTally, ballot);
         numBallots++;
-        System.out.println(numBallots + " " + clientView.size());
+        System.out.println(numBallots + " " + peerView.size()+1);
 
         if (numBallots == (peerView.size() + 1)) {
             computedLocalTally = true;
