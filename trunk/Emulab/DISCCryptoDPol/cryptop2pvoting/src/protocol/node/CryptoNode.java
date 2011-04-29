@@ -161,8 +161,9 @@ public class CryptoNode extends Node {
     public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, PaillierThreshold sec) throws Exception {
 
         super(nodeId, networkSend);
-        MALICIOUS_RATIO = 0.5 - epsilon;
-        this.isMalicious = (Math.random() < MALICIOUS_RATIO);
+        //MALICIOUS_RATIO = 0.5 - epsilon;
+    //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
+        
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
 
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
