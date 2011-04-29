@@ -119,6 +119,9 @@ public class ClusterChoice implements Serializable {
         {
             dishonestFractions=new double [CryptoNode.numClusters];
             
+            for (int i=0;i<CryptoNode.numClusters;i++)
+                dishonestFractions[i]=0;
+            
             for (int i = 0; i < CryptoNode.numClusters; i++) {
                 
                 for (E_CryptoNodeID curID:nodeToClusterList.get(i))
