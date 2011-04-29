@@ -55,8 +55,7 @@ public class CryptoNode extends Node {
     //                                1  second  to get proxies
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
-    
-    private static int VOTE_DELAY = 180*1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = 180 * 1000;// Delay before voting: 50 seconds
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 320 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 320 * 1000;		// Duration of the local counting phase: 1 minute
@@ -165,13 +164,13 @@ public class CryptoNode extends Node {
 
         super(nodeId, networkSend);
         //MALICIOUS_RATIO = 0.5 - epsilon;
-    //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
-        
+        //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
+
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
-        threshOrder=(0.5-epsilon)*VOTERCOUNT;
-   //    System.out.println(threshOrder+" "+order);
-        this.isMalicious=(order<threshOrder);
-        
+        threshOrder = (0.5 - epsilon) * VOTERCOUNT;
+        //    System.out.println(threshOrder+" "+order);
+        this.isMalicious = (order < threshOrder);
+
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
         int bits;
         BigInteger base, temp;
@@ -193,11 +192,11 @@ public class CryptoNode extends Node {
 
 
 
-    //    if (isMalicious) {
-            Emsg = encryptor.encrypt(votes[1]);
-    //    } else {
-    //        Emsg = encryptor.encrypt(votes[1]);
-    //    }
+        //    if (isMalicious) {
+        Emsg = encryptor.encrypt(votes[1]);
+        //    } else {
+        //        Emsg = encryptor.encrypt(votes[1]);
+        //    }
 
         /*  Voter voter; //entity voting
         voter = new Voter(pub);
@@ -263,7 +262,7 @@ public class CryptoNode extends Node {
             dump(nodeId + ": " + e.getMessage());
             e.printStackTrace();
         }
-        dump("Node " + nodeId.getName() + " is born: "+isMalicious);
+        dump("Node " + nodeId.getName() + " is born: " + isMalicious);
         //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
         startTime = System.currentTimeMillis();
@@ -688,9 +687,9 @@ public class CryptoNode extends Node {
                     } else {
                         receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
                     }
-                    isShareSendingOver=true;                        
+                    isShareSendingOver = true;
                     //}
-                    if (currentDecodingIndex == (int) (Math.floor(nodesPerCluster * threshold)))  {
+                    if (currentDecodingIndex == (int) (Math.floor(nodesPerCluster * threshold))) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
@@ -734,13 +733,13 @@ public class CryptoNode extends Node {
 
         public void execute() {
             // broadcast
-    synchronized (LOCK) {
-            if ((!isResultDiffusionOver)&& !(numClusters==nodeId.groupId+1)) {
-                dump("ResultDiffusionTask at begin");
+            synchronized (LOCK) {
+                if ((!isResultDiffusionOver) && !(numClusters == nodeId.groupId + 1)) {
+                    dump("ResultDiffusionTask at begin");
 
-                
+
                     for (E_CryptoNodeID proxyId : proxyView) {
-                        
+
 //                        if (isMalicious) {
 //                            finalResult = votes[0].multiply(BigInteger.valueOf(VOTERCOUNT));
 //                        }
@@ -754,13 +753,15 @@ public class CryptoNode extends Node {
                     }
                     isResultDiffusionOver = true;
 
-                }            
-                //      }
+                } else if (numClusters == nodeId.groupId + 1) {
+                    isResultDiffusionOver = true;
+                }
+
                 dump("ResultDiffusionTask at end");
                 taskManager.registerTask(new AttemptSelfDestruct());
 
             }
-    
+
         }
     }
 
