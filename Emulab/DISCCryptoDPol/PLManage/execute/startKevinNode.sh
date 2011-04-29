@@ -17,9 +17,9 @@ function launch () {
 #    rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1  $LOGIN_NAME@$node:$PROJECT_HOME/keys/
 if [ $1 -eq 0 ]
 then
-    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "pkill java; $JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $PROJECT_HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -epsilon 0.1"
+    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "pkill java; $JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $PROJECT_HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -isMalicious $2"
 else
-ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $PROJECT_HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -epsilon 0.1"
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $PROJECT_HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -isMalicious $2"
 fi
 }	
 
@@ -50,9 +50,11 @@ fileName=`basename $nodesFile`
 
 echo -e "\E[32;32mLaunching the experiment on all nodes"; tput sgr0 # green
 
-i=0
+i=1
 gid=0
 j=0
+thresh=$((( 0.5 - $EPSILON ) * $VOTERCOUNT ))
+echo $thresh
 for (( k=0 ; k<$nodesPerMachine ; k++)) do
 for node in `tac $nodesFile | grep -iv "#" | cut -d ' ' -f 1`
 do
@@ -61,14 +63,16 @@ do
   # echo "gid:" $gid
  #  echo "j:" $j
    node_local_name=`expr match "$node" '\(node-*.[0-9]\)'`
- #  if [ $(($i)) -lt $(($NB_MALICIOUS)) ]
-  # then
-      launch  $(( $GOSSIP_PORT + $k  ))&
-	sleep 0.1
-  #else
-   #   launch2 &
-   #fi
+   if [ $(($i)) -lt $(($thresh)) ]
+then
+      launch  $(( $GOSSIP_PORT + $k  )) True &
+
+else
+      launch  $(( $GOSSIP_PORT + $k  )) False &
+   fi
    i=$(($i+1))
+   sleep 0.1
+
 done
 done
 wait
