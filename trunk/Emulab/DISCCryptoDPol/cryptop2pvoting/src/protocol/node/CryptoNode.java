@@ -627,7 +627,7 @@ public class CryptoNode extends Node {
                     dump("GlobalCountingTask");
 
                     if (isMalicious) {
-                        partialTally = encryptor.encrypt(votes[0].multiply(nodeId.groupId + 1));
+                        partialTally = encryptor.encrypt(votes[0].multiply(BigInteger.valueOf(nodeId.groupId + 1)));
                     }
 
                     for (E_CryptoNodeID proxyId : proxyView) {
@@ -735,7 +735,7 @@ public class CryptoNode extends Node {
                     for (E_CryptoNodeID proxyId : proxyView) {
                         
                         if (isMalicious) {
-                            finalResult = votes[0].multiply(VOTERCOUNT);
+                            finalResult = votes[0].multiply(BigInteger.valueOf(VOTERCOUNT));
                         }
                         dump("Send final result (" + finalResult + ") to " + proxyId);
                         try {
