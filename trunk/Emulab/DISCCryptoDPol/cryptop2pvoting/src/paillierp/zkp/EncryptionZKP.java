@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import paillierp.AbstractPaillier;
 import paillierp.ByteUtils;
 import paillierp.key.*;
-import paillierp.testingPaillier.testUtils;
 
 /**
  * A non-interactive Zero Knowledge Proof that the ciphertext is of a
@@ -200,22 +199,19 @@ public class EncryptionZKP extends ZKP {
 		// we need to find an u in $Z^*_{N^2}$
 		u = key.getRandomModNSPlusOneStar();
 
-		//b=((nPlusOne.modPow(x,nSquare)).multiply(u.modPow(n,nSquare))).mod(nSquare);
-		b=testUtils.modMult((nPlusOne.modPow(x,nSquare)),u.modPow(n,nSquare),nSquare);
-                
+		b=((nPlusOne.modPow(x,nSquare)).multiply(u.modPow(n,nSquare))).mod(nSquare);
+		
 		// Calculate the Hash function to create random choice e
 		e = hash(c.toByteArray(), b.toByteArray());
 		
 		//w=x+e*alpha mod N
 		dummy=x.add(e.multiply(alpha));
-		//w=dummy.mod(n);
-                w=testUtils.modAdd(x, testUtils.modMult(e, alpha, n), n);
+		w=dummy.mod(n);
 		t=dummy.divide(n);
 
 		//$z=u.s^e.(1+n)^t$
-		//z=((u.multiply(s.modPow(e,nSquare))).multiply(nPlusOne.modPow(t,nSquare))).mod(nSquare);
-		z=testUtils.modMult(testUtils.modMult(u,s.modPow(e,nSquare),nSquare),nPlusOne.modPow(t,nSquare),nSquare);
-                
+		z=((u.multiply(s.modPow(e,nSquare))).multiply(nPlusOne.modPow(t,nSquare))).mod(nSquare);
+		
 		this.c=c;
 		this.b=b;
 		this.w=w;
@@ -251,11 +247,8 @@ public class EncryptionZKP extends ZKP {
 		BigInteger e = hash(c.toByteArray(), b.toByteArray());
 		
 		try {
-		//	return ((((nPlusOne.modPow(w,nSPlusOne)).multiply(z.modPow(n,nSPlusOne))).mod(nSPlusOne)).compareTo(
-		//	        (b.multiply(c.modPow(e,nSPlusOne))).mod(nSPlusOne)		
-		//	       )==0);
-                    return ((testUtils.modMult(nPlusOne.modPow(w,nSPlusOne),z.modPow(n,nSPlusOne),nSPlusOne)).compareTo(
-			        testUtils.modMult(b,c.modPow(e,nSPlusOne),nSPlusOne)		
+			return ((((nPlusOne.modPow(w,nSPlusOne)).multiply(z.modPow(n,nSPlusOne))).mod(nSPlusOne)).compareTo(
+			        (b.multiply(c.modPow(e,nSPlusOne))).mod(nSPlusOne)		
 			       )==0);
 		} catch (java.lang.ArithmeticException f) {
 			// The above may fail if the number was corrupted.
