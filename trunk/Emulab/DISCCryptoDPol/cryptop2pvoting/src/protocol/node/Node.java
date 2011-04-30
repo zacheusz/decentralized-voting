@@ -93,6 +93,7 @@ public abstract class Node implements Receiver {
 			}
 		} catch (SocketTimeoutException e) {
 			dump("TCP: " + nodeId + ":" + msg.getDest() + " might be dead!");
+                        networkSend.sendTCP(msg);
 		} catch (ConnectException e) {
 			dump("TCP: " + nodeId + ":" + msg.getDest() + " is dead!");
 		}
