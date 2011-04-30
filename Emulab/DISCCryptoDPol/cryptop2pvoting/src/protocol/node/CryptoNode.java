@@ -1009,7 +1009,7 @@ public class CryptoNode extends Node {
             specialDump(MSView+" "+MRView+" "+MSVote+" "+MRBallot+" "+MSPartial+" "+MRPartial+
                     " "+MSShare+" "+MRShare+" "+MSResult+" "+MRResult+" "+SMSView+" "+SMRView+" "+SMSVote+" "+SMRBallot+
                     " "+SMSPartial+" "+SMRPartial+" "+SMSShare+" "+SMRShare+" "+SMSResult+" "+SMRResult+" "+TallyAggTime+
-                    " "+VoteEncTime+" "+VoteDecTime);
+                    " "+VoteEncTime+" "+VoteDecTime+" "+runningTime);
             isResultOutputed = true;
             // taskManager.registerTask(new AttemptSelfDestruct());
             taskManager.registerTask(new SelfDestructTask());
