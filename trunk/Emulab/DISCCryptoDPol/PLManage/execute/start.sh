@@ -1,6 +1,6 @@
 #!/bin/bash
 source ../configure.sh
-delay=10
+delay=5
 nb=$1
 
 echo "Running $nb experiments"
@@ -16,6 +16,7 @@ cd -;
 
 ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "pkill java;mkdir -p $PROJECT_HOME; echo $bname $bport 0 > $PROJECT_HOME/bootstrapset.txt"
 cd ../../;
+sleep $delay
 rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete $PROJECT_NAME/bin/ $LOGIN_NAME@$home_node:$BINHOME
 cd -;
 
