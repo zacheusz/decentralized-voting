@@ -2,16 +2,16 @@ package protocol.node;
 
 //import Exception.NoLegalVotes;
 //import Exception.NotEnoughTallies;
-import protocol.communication.CLUSTER_ASSIGN_MSG;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.UnknownHostException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 import protocol.communication.*;
 import runtime.NetworkSend;
@@ -53,8 +53,8 @@ public class CryptoNode extends Node {
     //                                1  second  to get proxies
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
-    private static int VIEW_DIFF_DELAY  =180* 1000;// Delay before voting: 50 seconds
-    private static int VOTE_DELAY=VIEW_DIFF_DELAY+120 *1000;
+    private static int VIEW_DIFF_DELAY = 180 * 1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = VIEW_DIFF_DELAY + 120 * 1000;
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 320 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 320 * 1000;		// Duration of the local counting phase: 1 minute
@@ -96,6 +96,9 @@ public class CryptoNode extends Node {
     public static double threshold = 1;
     public static boolean receivedAllViews = false;
     public static boolean isViewDiffusionOver = false;
+    public static boolean isFirstView = true;
+    public static long startViewTime=0;
+    public static long viewDuration=0;
     // Fields
     // protected final E_CryptoNodeID bootstrap;
     //Keys
@@ -120,6 +123,29 @@ public class CryptoNode extends Node {
     protected BigInteger Emsg;
     BigInteger[] votes;
     public static String secKeyFile;
+    public int MSView = 0;
+    public int MRView = 0;
+    public int MSVote = 0;
+    public int MRBallot = 0;
+    public int MSPartial = 0;
+    public int MRPartial = 0;
+    public int MSShare = 0;
+    public int MRShare = 0;
+    public int MSResult = 0;
+    public int MRResult = 0;
+    public double SMSView = 0;
+    public double SMRView = 0;
+    public double SMSVote = 0;
+    public double SMRBallot = 0;
+    public double SMSPartial = 0;
+    public double SMRPartial = 0;
+    public double SMSShare = 0;
+    public double SMRShare = 0;
+    public double SMSResult = 0;
+    public double SMRResult = 0;
+    public long TallyAggTime = 0;
+    public long VoteEncTime = 0;
+    public long VoteDecTime = 0;
     //protected boolean vote;
 //    protected Tally tally;
 //    protected Vote vote;
@@ -193,7 +219,9 @@ public class CryptoNode extends Node {
 
 
         //    if (isMalicious) {
+        long startT = (new Date()).getTime();
         Emsg = encryptor.encrypt(votes[1]);
+        VoteEncTime+=(new Date()).getTime()-startT;
         //    } else {
         //        Emsg = encryptor.encrypt(votes[1]);
         //    }
@@ -333,6 +361,9 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
                 dump("Received a ballot (" + msg.getVote() + ") from " + msg.getSrc());
                 aggrLocalTally(msg.getVote());
+                    MRBallot++;
+                    SMRBallot+=getObjectSize(msg);
+
             }
 
         } else {
@@ -351,6 +382,9 @@ public class CryptoNode extends Node {
 
                 currentDecodingIndex++;
                 dump("sharesize: " + currentDecodingIndex);
+                
+                MRShare++;
+                SMRShare+=getObjectSize(msg);
                 if (isFinalResultCalculated && currentDecodingIndex == (int) (Math.floor(MINTALLIES * threshold))) {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
@@ -377,6 +411,9 @@ public class CryptoNode extends Node {
                 partialTallies.add(msg.getTally());
                 dump("partial:" + numPartialTallies + " " + clientView.size());
 
+                MRPartial++;
+                SMRPartial+=getObjectSize(msg);
+                
                 if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     partialTally = mostPresent(partialTallies);
                     computedPartialTally = true;
@@ -386,7 +423,10 @@ public class CryptoNode extends Node {
                         finalEncryptedResult = partialTally;
                         taskManager.registerTask(new TallyDecryptionSharing());
                     } else if (computedLocalTally) {
+                        long startT = (new Date()).getTime();                                                                            
                         partialTally = encryptor.add(localTally, partialTally);
+                        TallyAggTime+=(new Date()).getTime()-startT;
+                        
                         taskManager.registerTask(new GlobalCountingTask());
                     }
                 }
@@ -439,7 +479,7 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                startInstant = (new Date()).getTime();
+               
 
                 E_CryptoNodeID tempID;
                 Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
@@ -488,12 +528,31 @@ public class CryptoNode extends Node {
                 //    peerView.remove(nodeId);
                 clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
 
-                if (IAmThreshold)
+                if (IAmThreshold) {
                     taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
-                
+
+
+                }
                 taskManager.registerTask(new VoteTask(), VOTE_DELAY);
             }
         }
+    }
+
+    public static int getObjectSize(
+            Serializable obj) {
+        byte[] ba = null;
+
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(obj);
+            oos.close();
+            ba = baos.toByteArray();
+            baos.close();
+        } catch (IOException ioe) {
+            return 0;
+        }
+        return ba.length;
     }
 
     private class ViewDiffusion implements Task {
@@ -504,6 +563,7 @@ public class CryptoNode extends Node {
                     //       taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
                     //   if (!(peerView.size()<=1)) {
                     Set<E_CryptoNodeID> tempSet;
+                    CRYPTO_VIEW_MSG mes;
                     for (int i = 0; i < numClusters; i++) {
                         tempSet = nodeToCluster.get(i);
                         for (E_CryptoNodeID peerId : tempSet) {
@@ -511,9 +571,12 @@ public class CryptoNode extends Node {
                                 continue;
                             }
                             dump("Send a viewto " + peerId);
-                            try {
 
-                                doSendTCP(new CRYPTO_VIEW_MSG(nodeId, peerId, nodeToCluster.get((peerId.groupId)), nodeToCluster.get((peerId.groupId + 1) % numClusters), nodeToCluster.get((peerId.groupId + numClusters - 1) % numClusters)));
+                            try {
+                                mes = new CRYPTO_VIEW_MSG(nodeId, peerId, nodeToCluster.get((peerId.groupId)), nodeToCluster.get((peerId.groupId + 1) % numClusters), nodeToCluster.get((peerId.groupId + numClusters - 1) % numClusters));
+                                doSendTCP(mes);
+                                MSView++;
+                                SMSView += getObjectSize(mes);
                             } catch (Exception e) {
                                 dump("TCP: cannot vote");
                             }
@@ -537,9 +600,21 @@ public class CryptoNode extends Node {
 
         if (!receivedAllViews) {
             synchronized (LOCK) {
-
+              if (isFirstView)
+                {startViewTime = (new Date()).getTime();
+                    isFirstView=false;
+                }
+              
                 dump("Received a view message from " + msg.getSrc());
                 numReceivedViews++;
+                if (numReceivedViews==nodesPerCluster)
+                {
+                    receivedAllViews=true;
+                    viewDuration=(new Date()).getTime()-startViewTime;
+                }
+                    
+                MRView++;
+                SMRView += getObjectSize(msg);
 
             }
         }
@@ -550,6 +625,8 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isVoteTaskOver) {
+                    startInstant = (new Date ()).getTime ();
+                    CRYPTO_BALLOT_MSG mes = null;
                     taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
                     if (!(peerView.size() <= 1)) {
 
@@ -559,12 +636,16 @@ public class CryptoNode extends Node {
                             }
                             dump("Send a '" + Emsg + "' ballot to " + peerId);
                             try {
-
-                                doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg));
+                                
+                                mes=new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
+                                
+                                doSendTCP(mes);
                             } catch (Exception e) {
                                 dump("TCP: cannot vote");
                             }
                         }
+                        MSVote+=peerView.size()-1;
+                        SMSVote+=getObjectSize(mes)*(peerView.size()-1);
 
                     } else {
                         dump("Cannot vote: no peer view");
@@ -628,8 +709,8 @@ public class CryptoNode extends Node {
                     } 
                      */
 
-                    // endInstant = (new Date ()).getTime ();
-                    //   runningTime=endInstant-startInstant;
+                    endInstant = (new Date ()).getTime ();
+                    runningTime=endInstant-startInstant+viewDuration;
                     //     dump("Running Time: "+runningTime);
                     taskManager.registerTask(new ResultOutput());
 
@@ -708,6 +789,7 @@ public class CryptoNode extends Node {
             dump("GlobalCountingTask at begin");
             if (!IsPartialTallyingOver) {
                 synchronized (LOCK) {
+                    CRYPTO_PARTIAL_TALLY_MSG mes = null;
                     taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
                     dump("GlobalCountingTask");
 
@@ -718,7 +800,8 @@ public class CryptoNode extends Node {
                     for (E_CryptoNodeID proxyId : proxyView) {
                         dump("Send partial tally (" + partialTally + ") to " + proxyId);
                         try {
-                            doSendTCP(new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally));
+                            mes=new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally);
+                            doSendTCP(mes);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
@@ -726,6 +809,8 @@ public class CryptoNode extends Node {
                     }
 
                     IsPartialTallyingOver = true;
+                    MSPartial+=proxyView.size();
+                    SMSPartial+=getObjectSize(mes); 
                     // taskManager.registerTask(new CloseGlobalCountingTask());
 
                 }
@@ -750,7 +835,8 @@ public class CryptoNode extends Node {
                     currentDecodingIndex++;
                     isFinalResultCalculated = true;
                     dump("sharesize: " + currentDecodingIndex);
-
+                    
+                    CRYPTO_DECRYPTION_SHARE_MSG mes=null;
 
                     if (!(peerView.size() <= 1)) {
                         for (E_CryptoNodeID peerId : peerView) {
@@ -759,11 +845,15 @@ public class CryptoNode extends Node {
                             }
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                             try {
-                                doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare));
+                                mes=new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
+                                doSendTCP(mes);
                             } catch (Exception e) {
                                 dump("TCP: cannot send decryption share");
                             }
                         }
+                        
+                        MSShare+=peerView.size()-1;
+                        SMSShare+=getObjectSize(mes)*(peerView.size()-1);
 
                     } else {
                         receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
@@ -795,7 +885,11 @@ public class CryptoNode extends Node {
                         System.out.println(" " + decArray[i].getDecryptedValue());
                     }
                     //System.out.println("decaraysize: " + resultSharesList.size());
+                    
+                    long startT = (new Date()).getTime();                
                     finalResult = secKey.combineShares(decArray);
+                    VoteDecTime+=(new Date()).getTime()-startT;
+                    
                     computedFinalResult = true;
                     dump("Determined final result:" + finalResult);
 
@@ -818,7 +912,7 @@ public class CryptoNode extends Node {
                 if ((!isResultDiffusionOver) && !(numClusters == nodeId.groupId + 1)) {
                     dump("ResultDiffusionTask at begin");
 
-
+                    CRYPTO_FINAL_RESULT_MSG mes=null;
                     for (E_CryptoNodeID proxyId : proxyView) {
 
 //                        if (isMalicious) {
@@ -826,13 +920,16 @@ public class CryptoNode extends Node {
 //                        }
                         dump("Send final result (" + finalResult + ") to " + proxyId);
                         try {
-                            doSendTCP(new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult));
+                            mes=new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult);
+                            doSendTCP(mes);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast final result");
                         }
 
                     }
                     isResultDiffusionOver = true;
+                    MSResult+=proxyView.size();
+                    SMSResult+=getObjectSize(mes)*proxyView.size();
 
                 } else if (numClusters == nodeId.groupId + 1) {
                     isResultDiffusionOver = true;
@@ -859,6 +956,8 @@ public class CryptoNode extends Node {
                 numFinalResults++;
 
                 finalResults.add(msg.getResult());
+                MRResult++;
+                SMRResult+=getObjectSize(msg);
                 dump("finals:" + numFinalResults + " " + clientView.size());
                 if (numFinalResults == (int) (Math.floor(clientView.size() * threshold))) {
                     finalResult = mostPresent(finalResults);
@@ -905,7 +1004,12 @@ public class CryptoNode extends Node {
         public void execute() {
             //        synchronized (LOCK) {
             paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
+            
 
+            specialDump(MSView+" "+MRView+" "+MSVote+" "+MRBallot+" "+MSPartial+" "+MRPartial+
+                    " "+MSShare+" "+MRShare+" "+MSResult+" "+MRResult+" "+SMSView+" "+SMRView+" "+SMSVote+" "+SMRBallot+
+                    " "+SMSPartial+" "+SMRPartial+" "+SMSShare+" "+SMRShare+" "+SMSResult+" "+SMRResult+" "+TallyAggTime+
+                    " "+VoteEncTime+" "+VoteDecTime);
             isResultOutputed = true;
             // taskManager.registerTask(new AttemptSelfDestruct());
             taskManager.registerTask(new SelfDestructTask());
