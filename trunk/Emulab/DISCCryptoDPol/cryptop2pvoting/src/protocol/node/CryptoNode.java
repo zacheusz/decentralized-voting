@@ -219,9 +219,9 @@ public class CryptoNode extends Node {
 
 
         //    if (isMalicious) {
-        long startT = (new Date()).getTime();
+        long startT = System.nanoTime();
         Emsg = encryptor.encrypt(votes[1]);
-        VoteEncTime+=(new Date()).getTime()-startT;
+        VoteEncTime+=System.nanoTime()-startT;
         //    } else {
         //        Emsg = encryptor.encrypt(votes[1]);
         //    }
@@ -423,9 +423,9 @@ public class CryptoNode extends Node {
                         finalEncryptedResult = partialTally;
                         taskManager.registerTask(new TallyDecryptionSharing());
                     } else if (computedLocalTally) {
-                        long startT = (new Date()).getTime();                                                                            
+                        long startT = System.nanoTime();                                                                            
                         partialTally = encryptor.add(localTally, partialTally);
-                        TallyAggTime+=(new Date()).getTime()-startT;
+                        TallyAggTime+=System.nanoTime()-startT;
                         
                         taskManager.registerTask(new GlobalCountingTask());
                     }
@@ -601,7 +601,7 @@ public class CryptoNode extends Node {
         if (!receivedAllViews) {
             synchronized (LOCK) {
               if (isFirstView)
-                {startViewTime = (new Date()).getTime();
+                {startViewTime = System.nanoTime();
                     isFirstView=false;
                 }
               
@@ -610,7 +610,7 @@ public class CryptoNode extends Node {
                 if (numReceivedViews==nodesPerCluster)
                 {
                     receivedAllViews=true;
-                    viewDuration=(new Date()).getTime()-startViewTime;
+                    viewDuration=System.nanoTime()-startViewTime;
                 }
                     
                 MRView++;
@@ -625,7 +625,7 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isVoteTaskOver) {
-                    startInstant = (new Date ()).getTime ();
+                    startInstant = System.nanoTime();
                     CRYPTO_BALLOT_MSG mes = null;
                     taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
                     if (!(peerView.size() <= 1)) {
@@ -709,7 +709,7 @@ public class CryptoNode extends Node {
                     } 
                      */
 
-                    endInstant = (new Date ()).getTime ();
+                    endInstant = System.nanoTime();
                     runningTime=endInstant-startInstant+viewDuration;
                     //     dump("Running Time: "+runningTime);
                     taskManager.registerTask(new ResultOutput());
@@ -886,9 +886,9 @@ public class CryptoNode extends Node {
                     }
                     //System.out.println("decaraysize: " + resultSharesList.size());
                     
-                    long startT = (new Date()).getTime();                
+                    long startT = System.nanoTime();                
                     finalResult = secKey.combineShares(decArray);
-                    VoteDecTime+=(new Date()).getTime()-startT;
+                    VoteDecTime+=System.nanoTime()-startT;
                     
                     computedFinalResult = true;
                     dump("Determined final result:" + finalResult);
