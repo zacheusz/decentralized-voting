@@ -239,7 +239,7 @@ public class TestingRest {
 
         for (int i = 0; i < candidatesLength; i++) {
            // int strlen = candidatesLength;
-   //         System.out.print("vote " + i + ":");
+            System.out.print("vote " + i + ":");
 
             if (i < (candidatesLength - 1)) {
                 temp = result.mod(votes[i + 1]);
@@ -247,7 +247,7 @@ public class TestingRest {
                 temp = result;
             }
             temp = temp.divide(votes[i]);
-     //       System.out.println(" " + temp);
+            System.out.println(" " + temp);
         }
     }
 }
