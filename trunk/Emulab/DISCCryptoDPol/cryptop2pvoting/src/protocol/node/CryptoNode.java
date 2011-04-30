@@ -798,7 +798,7 @@ public class CryptoNode extends Node {
 
                 finalResults.add(msg.getResult());
                 dump("finals:"+numFinalResults + " " + clientView.size());
-                if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
+                if (numFinalResults == (int) (Math.floor(clientView.size() * threshold))) {
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
 
