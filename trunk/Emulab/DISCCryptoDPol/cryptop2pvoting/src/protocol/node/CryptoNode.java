@@ -54,6 +54,7 @@ public class CryptoNode extends Node {
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
     private static int VOTE_DELAY =180* 1000;// Delay before voting: 50 seconds
+    private static int VIEW_DIFF_DELAY=VOTE_DELAY+120 *1000;
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 320 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 320 * 1000;		// Duration of the local counting phase: 1 minute
@@ -89,9 +90,12 @@ public class CryptoNode extends Node {
     //  public static int stepsConstant;
     public static int basicPort;
     public static int nodesPerCluster;
-   // public static boolean isMalicious;
+    // public static boolean isMalicious;
     public static int order;
+    public static int numReceivedViews = 0;
     public static double threshold = 1;
+    public static boolean receivedAllViews = false;
+    public static boolean isViewDiffusionOver = false;
     // Fields
     // protected final E_CryptoNodeID bootstrap;
     //Keys
@@ -165,7 +169,7 @@ public class CryptoNode extends Node {
         //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
 
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
-  
+
 
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
         int bits;
@@ -201,7 +205,7 @@ public class CryptoNode extends Node {
         //this.vote = voter.Vote(randomGenerator.nextInt(VOTECOUNT + 1));//vote for arbitrary candidate
         this.vote = voter.Vote(0);
          */
-         
+
         this.taskManager = taskManager;
         //   this.bootstrap = bootstrap;
         this.stopper = stopper;
@@ -293,6 +297,10 @@ public class CryptoNode extends Node {
                 case Message.CRYPTO_FINAL_RESULT_MSG:
                     receiveFinalResult((CRYPTO_FINAL_RESULT_MSG) msg);
                     break;
+                case Message.CRYPTO_VIEW_MSG:
+                    receiveView((CRYPTO_VIEW_MSG) msg);
+                    break;
+
 //                case Message.CLUSTER_ASSIGN_MSG:
 //                    receiveClusterAssign((CLUSTER_ASSIGN_MSG) msg);
 //                    break;
@@ -367,7 +375,7 @@ public class CryptoNode extends Node {
                 numPartialTallies++;
 
                 partialTallies.add(msg.getTally());
-                dump("partial:"+numPartialTallies + " " + clientView.size());
+                dump("partial:" + numPartialTallies + " " + clientView.size());
 
                 if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     partialTally = mostPresent(partialTallies);
@@ -436,19 +444,18 @@ public class CryptoNode extends Node {
                 E_CryptoNodeID tempID;
                 Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
                 List<E_CryptoNodeID> sortedIDs;
-                
-                int mycount=1;
+
+                int mycount = 1;
                 threshOrder = (0.5 - epsilon) * VOTERCOUNT;
                 boolean isMal;
                 for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
-                    for (int j = 0; j < nodesPerMachine; j++) {                                           
-                        isMal=(mycount < threshOrder);
-                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j,isMal);
-                        
-                        if (tempID.equals(nodeId))
-                        {
-                            nodeId.isMalicious=isMal;
-                            System.out.println("I am "+isMal);
+                    for (int j = 0; j < nodesPerMachine; j++) {
+                        isMal = (mycount < threshOrder);
+                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j, isMal);
+
+                        if (tempID.equals(nodeId)) {
+                            nodeId.isMalicious = isMal;
+                            System.out.println("I am " + isMal);
                         }
                         IDAssignment.put(tempID, tempID.getOrder());
                         mycount++;
@@ -478,9 +485,61 @@ public class CryptoNode extends Node {
 //                    System.out.println(proxyView.toArray()[i].toString()+" ,");
 //             
                 peerView = nodeToCluster.get((nodeId.groupId));
-            //    peerView.remove(nodeId);
+                //    peerView.remove(nodeId);
                 clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
+
+                if (IAmThreshold)
+                    taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
+                
                 taskManager.registerTask(new VoteTask(), VOTE_DELAY);
+            }
+        }
+    }
+
+    private class ViewDiffusion implements Task {
+
+        public void execute() {
+            synchronized (LOCK) {
+                if (!isViewDiffusionOver) {
+                    //       taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
+                    //   if (!(peerView.size()<=1)) {
+                    Set<E_CryptoNodeID> tempSet = nodeToCluster.get(numClusters);
+                    for (int i = 0; i < CryptoNode.numClusters; i++) {
+                        for (E_CryptoNodeID peerId : tempSet) {
+                            if (peerId.equals(nodeId)) {
+                                continue;
+                            }
+                            dump("Send a viewto " + peerId);
+                            try {
+
+                                doSendTCP(new CRYPTO_VIEW_MSG(nodeId, peerId, nodeToCluster.get((peerId.groupId)), nodeToCluster.get((peerId.groupId + 1) % numClusters), nodeToCluster.get((peerId.groupId + numClusters - 1) % numClusters)));
+                            } catch (Exception e) {
+                                dump("TCP: cannot vote");
+                            }
+                        }
+                    }
+
+
+                    isViewDiffusionOver = true;
+                    //  taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
+                    //     aggrLocalTally(Emsg);
+                    taskManager.registerTask(new AttemptSelfDestruct());
+                    //     taskManager.registerTask(new CloseVoteTask());
+
+
+                }
+            }
+        }
+    }
+
+    private void receiveView(CRYPTO_VIEW_MSG msg) {
+
+        if (!receivedAllViews) {
+            synchronized (LOCK) {
+
+                dump("Received a view message from " + msg.getSrc());
+                numReceivedViews++;
+
             }
         }
     }
@@ -489,35 +548,36 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                if (!isVoteTaskOver){
-                taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-                if (!(peerView.size()<=1)) {
-                    
-                    for (E_CryptoNodeID peerId : peerView) {
-                        if (peerId.equals(nodeId))
-                            continue;
-                        dump("Send a '" + Emsg + "' ballot to " + peerId);
-                        try {
+                if (!isVoteTaskOver) {
+                    taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
+                    if (!(peerView.size() <= 1)) {
 
-                            doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg));
-                        } catch (Exception e) {
-                            dump("TCP: cannot vote");
+                        for (E_CryptoNodeID peerId : peerView) {
+                            if (peerId.equals(nodeId)) {
+                                continue;
+                            }
+                            dump("Send a '" + Emsg + "' ballot to " + peerId);
+                            try {
+
+                                doSendTCP(new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg));
+                            } catch (Exception e) {
+                                dump("TCP: cannot vote");
+                            }
                         }
+
+                    } else {
+                        dump("Cannot vote: no peer view");
+
                     }
+                    isVoteTaskOver = true;
+                    taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
+                    aggrLocalTally(Emsg);
+                    taskManager.registerTask(new AttemptSelfDestruct());
+                    //     taskManager.registerTask(new CloseVoteTask());
 
-                } else {
-                    dump("Cannot vote: no peer view");
 
                 }
-                isVoteTaskOver = true;
-                taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
-                aggrLocalTally(Emsg);
-                taskManager.registerTask(new AttemptSelfDestruct());
-                //     taskManager.registerTask(new CloseVoteTask());
-                
-
             }
-                }
         }
     }
 
@@ -526,9 +586,9 @@ public class CryptoNode extends Node {
 
         localTally = encryptor.add(localTally, ballot);
         numBallots++;
-        
-        
-        dump("ballots "+numBallots + " " +peerView.size() );
+
+
+        dump("ballots " + numBallots + " " + peerView.size());
 
         if (numBallots == peerView.size()) {
             computedLocalTally = true;
@@ -691,10 +751,11 @@ public class CryptoNode extends Node {
                     dump("sharesize: " + currentDecodingIndex);
 
 
-                    if (!(peerView.size()<=1)) {
+                    if (!(peerView.size() <= 1)) {
                         for (E_CryptoNodeID peerId : peerView) {
-                            if (peerId.equals(nodeId))
-                            continue;
+                            if (peerId.equals(nodeId)) {
+                                continue;
+                            }
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                             try {
                                 doSendTCP(new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare));
@@ -797,7 +858,7 @@ public class CryptoNode extends Node {
                 numFinalResults++;
 
                 finalResults.add(msg.getResult());
-                dump("finals:"+numFinalResults + " " + clientView.size());
+                dump("finals:" + numFinalResults + " " + clientView.size());
                 if (numFinalResults == (int) (Math.floor(clientView.size() * threshold))) {
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
