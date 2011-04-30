@@ -80,9 +80,9 @@ public abstract class Node implements Receiver {
 				networkSend.sendUDP(msg);
 			}
 		} catch (SocketTimeoutException e) {
-			dump("UDP: " + nodeId + ":" + msg.getDest() + " might be dead!");
+			System.out.println("UDP: " + nodeId + ":" + msg.getDest() + " might be dead!");
 		} catch (ConnectException e) {
-			dump("UDP: " + nodeId + ":" + msg.getDest() + " is dead!");
+			System.out.println("UDP: " + nodeId + ":" + msg.getDest() + " is dead!");
 		}
 	}
 
@@ -92,10 +92,10 @@ public abstract class Node implements Receiver {
 				networkSend.sendTCP(msg);
 			}
 		} catch (SocketTimeoutException e) {
-			dump("TCP: " + nodeId + ":" + msg.getDest() + " might be dead!");
+			System.out.println("TCP: " + nodeId + ":" + msg.getDest() + " might be dead!");
                         networkSend.sendTCP(msg);
 		} catch (ConnectException e) {
-			dump("TCP: " + nodeId + ":" + msg.getDest() + " is dead!");
+			System.out.println("TCP: " + nodeId + ":" + msg.getDest() + " is dead!");
 		}
 	}
 	
