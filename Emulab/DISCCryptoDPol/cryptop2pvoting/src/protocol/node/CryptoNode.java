@@ -351,7 +351,7 @@ public class CryptoNode extends Node {
 
                 currentDecodingIndex++;
                 dump("sharesize: " + currentDecodingIndex);
-                if (isFinalResultCalculated && currentDecodingIndex == (int) (Math.floor(nodesPerCluster * threshold))) {
+                if (isFinalResultCalculated && currentDecodingIndex == (int) (Math.floor(MINTALLIES * threshold))) {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
