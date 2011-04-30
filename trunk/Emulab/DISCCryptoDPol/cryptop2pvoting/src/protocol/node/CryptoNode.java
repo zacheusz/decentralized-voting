@@ -503,8 +503,9 @@ public class CryptoNode extends Node {
                 if (!isViewDiffusionOver) {
                     //       taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
                     //   if (!(peerView.size()<=1)) {
-                    Set<E_CryptoNodeID> tempSet = nodeToCluster.get(numClusters);
-                    for (int i = 0; i < CryptoNode.numClusters; i++) {
+                    Set<E_CryptoNodeID> tempSet;
+                    for (int i = 0; i < numClusters; i++) {
+                        tempSet = nodeToCluster.get(i);
                         for (E_CryptoNodeID peerId : tempSet) {
                             if (peerId.equals(nodeId)) {
                                 continue;
