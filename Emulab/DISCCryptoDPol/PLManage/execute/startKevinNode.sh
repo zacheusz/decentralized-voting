@@ -71,7 +71,7 @@ do
       launch  $(( $GOSSIP_PORT + $k  )) $i &
 #   fi
    i=$(($i+1))
-   sleep 0.1
+   sleep 0.15
 
 done
 done

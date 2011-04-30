@@ -19,20 +19,21 @@ export DEFAULT_NODEFILE="../deploy/nodesPLAllNew"
 #export DEFAULT_BOOTSTRAP="peeramidion.irisa.fr"
 #changed bootstrap to localhost
 export DEFAULT_BOOTSTRAP="localhost"
-export SSH_TIMEOUT=30
+export SSH_TIMEOUT=50
 export BETA=0.05
 #tried deploying on fewer nodes
+export EPSILON=0.2
 export NB_NODES=76
 export NB_MALICIOUS=0
 #export NB_GROUPS=10
-export K=4
+export K=8
 #export NB_BALLOTS=$((2*$K+1))
 export NB_BALLOTS=1
 export VOTECOUNT=3
 export nodesPerMachine=10
 export TALLYCOUNT=$(( $nodesPerMachine * $NB_NODES ))
 export VOTERCOUNT=$TALLYCOUNT
-export KVALUE=2
+export KVALUE=13
 #export MINTALLIES=$(((($VOTERCOUNT/$NB_GROUPS))))
 #export CERTAINTY=64
 export BITS=128
