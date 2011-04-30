@@ -108,7 +108,7 @@ public class ClusterChoice implements Serializable {
                     if (i==0)
                     {
                         keyNum=j;
-                        System.out.println("Keynum: "+keyNum);
+               //         System.out.println("Keynum: "+keyNum);
                     }
                 }
             }
@@ -133,8 +133,8 @@ public class ClusterChoice implements Serializable {
                         
                 }
                 dishonestFractions[i]=dishonestFractions[i]/nodeToClusterList.get(i).size();
-                System.out.println(myNodeID.toString());
-                System.out.println("Group "+i+": "+dishonestFractions[i]);
+              //  System.out.println(myNodeID.toString());
+               // System.out.println("Group "+i+": "+dishonestFractions[i]);
                 
                                 
             }

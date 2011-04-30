@@ -562,6 +562,7 @@ public class CryptoNode extends Node {
                 if (!isViewDiffusionOver) {
                     //       taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
                     //   if (!(peerView.size()<=1)) {
+                    specialDump("ViewDiffusion");
                     Set<E_CryptoNodeID> tempSet;
                     CRYPTO_VIEW_MSG mes;
                     for (int i = 0; i < numClusters; i++) {
