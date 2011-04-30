@@ -112,19 +112,18 @@ public abstract class Node implements Receiver {
 	}
 
 	public void dump(String message) {
-	//	if (!nodeId.name.contains("06"))
-//                 return;
-		
-		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
-		if(out != null) {
-			synchronized(out) {
-				out.println(msg);
-				out.flush();
-			}
-		}
-		synchronized(System.out) {
-			System.out.println(msg);
-		}
+
+		return;
+//		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
+//		if(out != null) {
+//			synchronized(out) {
+//				out.println(msg);
+//				out.flush();
+//			}
+//		}
+//		synchronized(System.out) {
+//			System.out.println(msg);
+//		}
 
 
 	}
