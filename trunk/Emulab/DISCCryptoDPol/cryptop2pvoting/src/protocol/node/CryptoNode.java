@@ -426,6 +426,7 @@ public class CryptoNode extends Node {
                         long startT = System.nanoTime();
                         partialTally = encryptor.add(localTally, partialTally);
                         TallyAggTime += System.nanoTime() - startT;
+                        isShareSendingOver=true;
 
                         taskManager.registerTask(new GlobalCountingTask());
                     }
@@ -777,6 +778,8 @@ public class CryptoNode extends Node {
 
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
+                                            isShareSendingOver=true;
+
                     taskManager.registerTask(new TallyDecryption());
                 }
             }
@@ -1014,7 +1017,7 @@ public class CryptoNode extends Node {
                 }
 
 
-                specialDump("\r" + MSView + " " + MSVote + " " + MSPartial + " " + MSShare + " " + MSResult + " " + MRView + " " + MRBallot + " " + MRPartial
+                specialDump("\r" + MSView + " " + Math.pow(MSVote,2) + " " + MSPartial + " " + MSShare + " " + MSResult + " " + MRView + " " + MRBallot + " " + MRPartial
                         + " " + MRShare + " " + MRResult + " " + SMSView + " " + SMSVote + " " + SMSPartial + " " + SMSShare + " " + SMSResult + " " + SMRView + " "
                         + SMRBallot + " " + SMRPartial + " " + SMRShare + " " + SMRResult + " " + TallyAggTime
                         + " " + VoteEncTime + " " + VoteDecTime + " " + runningTime + "\r");
