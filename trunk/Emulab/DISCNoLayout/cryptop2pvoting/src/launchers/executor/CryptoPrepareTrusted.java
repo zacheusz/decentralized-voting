@@ -38,7 +38,7 @@ public class CryptoPrepareTrusted {
                         CryptoNode.numClusters--;
                 CryptoNode.numClusters++;
                 
-                CryptoNode.MINTALLIES = CryptoNode.nodesPerCluster / 2 + 1;
+                CryptoNode.MINTALLIES = CryptoNode.VOTERCOUNT / 2 + 1;
                 //    int CERTAINTY = Integer.parseInt(arguments.get("-certainty"));
                 int bits = Integer.parseInt(arguments.get("-bits"));
              /*   int power = 2;
@@ -61,7 +61,7 @@ public class CryptoPrepareTrusted {
                 System.out.println(" Create new keypairs ."+"npc: "+CryptoNode.nodesPerCluster+ "mint: "+ CryptoNode.MINTALLIES+"voters: "+CryptoNode.VOTERCOUNT+"nc "+CryptoNode.numClusters);
                 Random rnd = new Random();
                 
-                PaillierPrivateThresholdKey[] keys =KeyGen.PaillierThresholdKey(bits, CryptoNode.nodesPerCluster, CryptoNode.MINTALLIES, rnd.nextLong());
+                PaillierPrivateThresholdKey[] keys =KeyGen.PaillierThresholdKey(bits, CryptoNode.VOTERCOUNT, CryptoNode.MINTALLIES, rnd.nextLong());
 
 
          //       writeToFile("keys/pubKey",pub);
