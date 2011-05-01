@@ -133,6 +133,8 @@ public class CryptoNode extends Node {
     public int MRShare = 0;
     public int MSResult = 0;
     public int MRResult = 0;
+    public int MRKeys=0;
+    public int SMRKeys=0;
     public double SMSView = 0;
     public double SMRView = 0;
     public double SMSVote = 0;
@@ -1030,8 +1032,10 @@ public class CryptoNode extends Node {
 
 
 
-                specialDump("\r" + MSView + " " + MSVote + " " + MSPartial + " " + MSShare + " " + MSResult + " " + MRView + " " + MRBallot + " " + MRPartial
-                        + " " + MRShare + " " + MRResult + " " + SMSView + " " + SMSVote + " " + SMSPartial + " " + SMSShare + " " + SMSResult + " " + SMRView + " "
+                specialDump("\r" + MSView + " " + MSVote + " " + MSPartial + " " + MSShare + " " + MSResult +
+                        " " + MRKeys+" "+MRView + " " + MRBallot + " " + MRPartial
+                        + " " + MRShare + " " + MRResult + " " + SMSView + " " + SMSVote + " " + SMSPartial + " " + SMSShare +
+                        " " + SMSResult + " " +SMRKeys+" "+ SMRView + " "
                         + SMRBallot + " " + SMRPartial + " " + SMRShare + " " + SMRResult + " " + TallyAggTime
                         + " " + VoteEncTime + " " + VoteDecTime + " " + runningTime + "\r");
                 isResultOutputed = true;
@@ -1324,5 +1328,5 @@ public class CryptoNode extends Node {
 //
 //            }
 //        }
-//    }
+//    }public int MRKeys=1;
 }

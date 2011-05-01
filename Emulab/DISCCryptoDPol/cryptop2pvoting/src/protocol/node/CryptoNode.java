@@ -1021,15 +1021,15 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                if (nodeToCluster.keyNum == 0) {
-                    paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
-                }
+//                if (nodeToCluster.keyNum == 0) {
+//                    paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
+//                }
 
                 
                 specialDump("\r" +" "+ MSView + " " + Math.pow(MSVote,2) + " " + MSPartial + " " + MSShare + " " + MSResult + " " +MRKeys+" "+
                         MRView + " " + MRBallot + " " + MRPartial
-                        + " " + MRShare + " " + MRResult + " " + SMSView + " " + SMSVote + " " + SMSPartial + " " + SMSShare + " " + SMRKeys+" "+
-                        SMSResult + " " + SMRView + " "
+                        + " " + MRShare + " " + MRResult + " " + SMSView + " " + SMSVote + " " + SMSPartial + " " + SMSShare + " " + 
+                        SMSResult + " " + SMRKeys+" "+SMRView + " "
                         + SMRBallot + " " + SMRPartial + " " + SMRShare + " " + SMRResult + " " + TallyAggTime
                         + " " + VoteEncTime + " " + VoteDecTime + " " + runningTime + "\r");
                 isResultOutputed = true;
