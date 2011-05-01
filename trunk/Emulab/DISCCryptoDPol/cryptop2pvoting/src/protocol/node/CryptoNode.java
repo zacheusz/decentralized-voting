@@ -385,7 +385,7 @@ public class CryptoNode extends Node {
                 
                 MRShare++;
                 SMRShare+=getObjectSize(msg);
-                if (isFinalResultCalculated && currentDecodingIndex == (int) (Math.floor(MINTALLIES * threshold))) {
+                if (isFinalResultCalculated && currentDecodingIndex == (int) (Math.floor(MINTALLIES))) {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
