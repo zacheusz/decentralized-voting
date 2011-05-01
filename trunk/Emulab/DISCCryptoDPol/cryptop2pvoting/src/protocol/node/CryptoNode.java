@@ -864,7 +864,7 @@ public class CryptoNode extends Node {
                     }
                     isShareSendingOver = true;
                     //}
-                    if (currentDecodingIndex == (int) (Math.floor(MINTALLIES * threshold))) {
+                    if (currentDecodingIndex == (int) (Math.floor(MINTALLIES))) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
