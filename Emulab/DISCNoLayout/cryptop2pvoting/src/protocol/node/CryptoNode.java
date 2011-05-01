@@ -133,8 +133,8 @@ public class CryptoNode extends Node {
     public int MRShare = 0;
     public int MSResult = 0;
     public int MRResult = 0;
-    public int MRKeys=0;
-    public int SMRKeys=0;
+    public int MRKeys = 0;
+    public int SMRKeys = 0;
     public double SMSView = 0;
     public double SMRView = 0;
     public double SMSVote = 0;
@@ -147,9 +147,8 @@ public class CryptoNode extends Node {
     public double SMRResult = 0;
     public long TallyAggTime = 0;
     public long VoteEncTime = 0;
-    public long ShareCompTime=0;
+    public long ShareCompTime = 0;
     public long VoteDecTime = 0;
-    
     //protected boolean vote;
 //    protected Tally tally;
 //    protected Vote vote;
@@ -193,14 +192,14 @@ public class CryptoNode extends Node {
     // Constructors
     // **************************************************************************
     public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, PaillierThreshold sec) throws Exception {
-
+        
         super(nodeId, networkSend);
         //MALICIOUS_RATIO = 0.5 - epsilon;
         //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
 
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
 
-
+        
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
         int bits;
         BigInteger base, temp;
@@ -209,12 +208,12 @@ public class CryptoNode extends Node {
         pubKey = sec.getPublicKey();
         encryptor = new Paillier();
         encryptor.setEncryption(pubKey);
-
+        
         bits = pubKey.getNS().bitLength() / VOTECOUNT;
         base = (new BigInteger("2")).pow(bits);
         temp = base;
         votes[0] = BigInteger.ONE;
-
+        
         for (i = 1; i < VOTECOUNT; i++) {
             votes[i] = temp;
             temp = temp.multiply(base);
@@ -237,7 +236,7 @@ public class CryptoNode extends Node {
         //this.vote = voter.Vote(randomGenerator.nextInt(VOTECOUNT + 1));//vote for arbitrary candidate
         this.vote = voter.Vote(0);
          */
-
+        
         this.taskManager = taskManager;
         //   this.bootstrap = bootstrap;
         this.stopper = stopper;
@@ -354,39 +353,39 @@ public class CryptoNode extends Node {
             e.printStackTrace();
         }
     }
-
+    
     public boolean isStopped() {
         return stopped;
     }
-
+    
     private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoSuchAlgorithmException {
-
+        
         if (!isLocalCountingOver) {
             synchronized (LOCK) {
                 dump("Received a ballot (" + msg.getVote() + ") from " + msg.getSrc());
                 aggrLocalTally(msg.getVote());
                 MRBallot++;
                 SMRBallot += getObjectSize(msg);
-
+                
             }
-
+            
         } else {
             dump("Discarded an ballot message (cause: sent too late)");
         }
     }
-
+    
     private void receiveDecryptionShare(CRYPTO_DECRYPTION_SHARE_MSG msg) throws NoSuchAlgorithmException {
         synchronized (LOCK) {
-
+            
             if (!isDecryptionSharingOver) {
-
+                
                 dump("Received a decryption share (" + msg.getShare() + ") from " + msg.getSrc());
-
+                
                 resultSharesList.add(msg.getShare());
-
+                
                 currentDecodingIndex++;
                 dump("sharesize: " + currentDecodingIndex);
-
+                
                 MRShare++;
                 SMRShare += getObjectSize(msg);
                 if (isFinalResultCalculated && currentDecodingIndex == MINTALLIES) {
@@ -394,55 +393,55 @@ public class CryptoNode extends Node {
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
                     taskManager.registerTask(new TallyDecryption());
-
+                    
                 }
-
+                
             } else {
                 dump("Discarded a decryption share message (cause: sent too late)" + " from " + msg.getSrc());
             }
-
+            
         }
     }
-
+    
     private void receivePartialTally(CRYPTO_PARTIAL_TALLY_MSG msg) {
-
+        
         if (!computedPartialTally) {
             synchronized (LOCK) {
-
+                
                 dump("Received a partial tally (" + msg.getTally() + ") from " + msg.getSrc());
                 numPartialTallies++;
-
+                
                 partialTallies.add(msg.getTally());
                 dump("partial:" + numPartialTallies + " " + clientView.size());
-
+                
                 MRPartial++;
                 SMRPartial += getObjectSize(msg);
-
+                
                 if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
                     partialTally = mostPresent(partialTallies);
                     computedPartialTally = true;
-
+                    
                     if (IAmThreshold) {
-
+                        
                         finalEncryptedResult = partialTally;
                         taskManager.registerTask(new TallyDecryptionSharing());
                     } else if (computedLocalTally) {
                         long startT = System.nanoTime();
                         partialTally = encryptor.add(localTally, partialTally);
                         TallyAggTime += System.nanoTime() - startT;
-
+                        
                         taskManager.registerTask(new GlobalCountingTask());
                     }
                 }
             }
         }
     }
-
+    
     private BigInteger mostPresent(List<BigInteger> values) {
-
+        
         int c, max = 0;
         BigInteger argmax = BigInteger.ONE;
-
+        
         for (BigInteger i : values) {
             c = 0;
             for (BigInteger j : values) {
@@ -450,7 +449,7 @@ public class CryptoNode extends Node {
                     c++;
                 }
             }
-
+            
             if (c > max) {
                 argmax = i;
                 max = c;
@@ -458,12 +457,12 @@ public class CryptoNode extends Node {
         }
         return argmax;
     }
-
+    
     public static List sortByValue(final Map m) {
         List keys = new ArrayList();
         keys.addAll(m.keySet());
         Collections.sort(keys, new Comparator() {
-
+            
             public int compare(Object o1, Object o2) {
                 Object v1 = m.get(o1);
                 Object v2 = m.get(o2);
@@ -478,17 +477,17 @@ public class CryptoNode extends Node {
         });
         return keys;
     }
-
+    
     private class getViews implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
-
-
+                
+                
                 E_CryptoNodeID tempID;
                 Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
                 List<E_CryptoNodeID> sortedIDs;
-
+                
                 int mycount = 1;
                 threshOrder = (0.5 - epsilon) * VOTERCOUNT;
                 boolean isMal;
@@ -496,7 +495,7 @@ public class CryptoNode extends Node {
                     for (int j = 0; j < nodesPerMachine; j++) {
                         isMal = (mycount < threshOrder);
                         tempID = new E_CryptoNodeID("node-" + i, basicPort + j, isMal);
-
+                        
                         if (tempID.equals(nodeId)) {
                             nodeId.isMalicious = isMal;
                             //     System.out.println("I am " + isMal);
@@ -518,7 +517,7 @@ public class CryptoNode extends Node {
 //                }
                 if (nodeId.groupId == 0) {
                     IAmThreshold = true;
-
+                    
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
                     //  System.out.println("keynum:" + nodeToCluster.keyNum);
                 }
@@ -531,21 +530,21 @@ public class CryptoNode extends Node {
                 peerView = nodeToCluster.get((nodeId.groupId));
                 //    peerView.remove(nodeId);
                 clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
-
+                
                 if (IAmThreshold) {
                     taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
-
-
+                    
+                    
                 }
                 taskManager.registerTask(new VoteTask(), VOTE_DELAY);
             }
         }
     }
-
+    
     public static int getObjectSize(
             Serializable obj) {
         byte[] ba = null;
-
+        
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -558,9 +557,9 @@ public class CryptoNode extends Node {
         }
         return ba.length;
     }
-
+    
     private class ViewDiffusion implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
                 if (!isViewDiffusionOver) {
@@ -576,7 +575,7 @@ public class CryptoNode extends Node {
                                 continue;
                             }
                             dump("Send a viewto " + peerId);
-
+                            
                             try {
                                 mes = new CRYPTO_VIEW_MSG(nodeId, peerId, nodeToCluster.get((peerId.groupId)), nodeToCluster.get((peerId.groupId + 1) % numClusters), nodeToCluster.get((peerId.groupId + numClusters - 1) % numClusters));
                                 doSendUDP(mes);
@@ -587,45 +586,45 @@ public class CryptoNode extends Node {
                             }
                         }
                     }
-
-
+                    
+                    
                     isViewDiffusionOver = true;
                     //  taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
                     //     aggrLocalTally(Emsg);
                     taskManager.registerTask(new AttemptSelfDestruct());
                     //     taskManager.registerTask(new CloseVoteTask());
 
-
+                    
                 }
             }
         }
     }
-
+    
     private void receiveView(CRYPTO_VIEW_MSG msg) {
-
+        
         if (!receivedAllViews) {
             synchronized (LOCK) {
                 if (isFirstView) {
                     startViewTime = System.nanoTime();
                     isFirstView = false;
                 }
-
+                
                 dump("Received a view message from " + msg.getSrc());
                 numReceivedViews++;
                 if (numReceivedViews == nodesPerCluster) {
                     receivedAllViews = true;
                     viewDuration = System.nanoTime() - startViewTime;
                 }
-
+                
                 MRView++;
                 SMRView += getObjectSize(msg);
-
+                
             }
         }
     }
-
+    
     private class VoteTask implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
                 if (!isVoteTaskOver) {
@@ -634,66 +633,67 @@ public class CryptoNode extends Node {
                     int mycount = 0;
                     for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
                         for (int j = 0; j < nodesPerMachine; j++) {
-
+                            
                             tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
                             peerView.add(tempID);
                             if (nodeId.equals(tempID)) {
                                 secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                             }
                             mycount++;
-
-
+                            
+                            
                         }
                     }
-                    startInstant = System.nanoTime();
-                    CRYPTO_BALLOT_MSG mes = null;
-                    taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-                    if (!(peerView.size() <= 1)) {
-
-                        for (E_CryptoNodeID peerId : peerView) {
-                            if (peerId.equals(nodeId)) {
-                                continue;
-                            }
-                            dump("Send a '" + Emsg + "' ballot to " + peerId);
-                            try {
-
-                                mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
-
-                                doSendUDP(mes);
-                            } catch (Exception e) {
-                                dump("TCP: cannot vote");
-                            }
-                        }
-                        MSVote += peerView.size() - 1;
-                        SMSVote += getObjectSize(mes) * (peerView.size() - 1);
-
-                    } else {
-                        dump("Cannot vote: no peer view");
-
-                    }
-                    isVoteTaskOver = true;
-                    //   taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
-                    aggrLocalTally(Emsg);
-                    taskManager.registerTask(new AttemptSelfDestruct());
-                    //     taskManager.registerTask(new CloseVoteTask());
-
-
                 }
+                startInstant = System.nanoTime();
+                CRYPTO_BALLOT_MSG mes = null;
+                taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
+                if (!(peerView.size() <= 1)) {
+                    
+                    for (E_CryptoNodeID peerId : peerView) {
+                        if (peerId.equals(nodeId)) {
+                            continue;
+                        }
+                        dump("Send a '" + Emsg + "' ballot to " + peerId);
+                        try {
+                            
+                            mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
+                            
+                            doSendUDP(mes);
+                        } catch (Exception e) {
+                            dump("TCP: cannot vote");
+                        }
+                    }
+                    MSVote += peerView.size() - 1;
+                    SMSVote += getObjectSize(mes) * (peerView.size() - 1);
+                    
+                } else {
+                    dump("Cannot vote: no peer view");
+                    
+                }
+                isVoteTaskOver = true;
+                //   taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
+                aggrLocalTally(Emsg);
+                taskManager.registerTask(new AttemptSelfDestruct());
+                //     taskManager.registerTask(new CloseVoteTask());
+
+                
+                
             }
         }
     }
-
+    
     public void aggrLocalTally(BigInteger ballot) {
-
-
-        localTally = encryptor.add(localTally, ballot);
-        numBallots++;
-
-
-        dump("ballots " + numBallots + " " + peerView.size());
-
-        if (numBallots == (int)Math.floor(VOTERCOUNT)) {
-            computedLocalTally = true;
+        
+        synchronized (LOCK) {
+            localTally = encryptor.add(localTally, ballot);
+            numBallots++;
+            
+            
+            dump("ballots " + numBallots + " " + peerView.size());
+            
+            if (numBallots == (int) Math.floor(VOTERCOUNT)) {
+                computedLocalTally = true;
 //            if (IAmThreshold) {
 //                partialTally = localTally;
 //                taskManager.registerTask(new GlobalCountingTask());
@@ -702,26 +702,26 @@ public class CryptoNode extends Node {
 //                taskManager.registerTask(new GlobalCountingTask());
 //            }
 
-            isLocalCountingOver = true;
-            taskManager.registerTask(new TallyDecryptionSharing());
-            finalEncryptedResult = localTally;
+                isLocalCountingOver = true;
+                taskManager.registerTask(new TallyDecryptionSharing());
+                finalEncryptedResult = localTally;
 
-            //else do nothing
+                //else do nothing
+            }
+            
         }
-
-
-
+        
     }
-
+    
     private class AttemptSelfDestruct implements Task {
-
+        
         public void execute() {
-                   System.out.println("isVoteTaskOver:"+isVoteTaskOver);
-                System.out.println("isLocalCountingOver:"+isLocalCountingOver);
-              System.out.println("isTallyDecryptionOver:"+isTallyDecryptionOver);
-            System.out.println("isShareSendingOver:"+isShareSendingOver);
+            System.out.println("isVoteTaskOver:" + isVoteTaskOver);
+            System.out.println("isLocalCountingOver:" + isLocalCountingOver);
+            System.out.println("isTallyDecryptionOver:" + isTallyDecryptionOver);
+            System.out.println("isShareSendingOver:" + isShareSendingOver);
             synchronized (LOCK) {
-                if (isVoteTaskOver && isLocalCountingOver && isTallyDecryptionOver &&isShareSendingOver) {
+                if (isVoteTaskOver && isLocalCountingOver && isTallyDecryptionOver && isShareSendingOver) {
 
                     /*		       try {
                     doSendUDP(new DEAD_MSG(nodeId, bootstrap));
@@ -730,47 +730,47 @@ public class CryptoNode extends Node {
                     dump("TCP: cannot send dead message to bootstrap");
                     } 
                      */
-
+                    
                     endInstant = System.nanoTime();
                     runningTime = endInstant - startInstant + viewDuration;
                     //     dump("Running Time: "+runningTime);
                     taskManager.registerTask(new ResultOutput());
-
-
+                    
+                    
                 }
             }
-
-
+            
+            
         }
     }
-
+    
     private class PreemptCloseLocalCountingTask implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
                 if (!isLocalCountingOver) {//actually close the local counting session
-                 //   specialDump("PreemptCloseLocalCountingTask");
+                    //   specialDump("PreemptCloseLocalCountingTask");
 
                     computedLocalTally = true;
                     isLocalCountingOver = true;
                     finalEncryptedResult = localTally;
                     taskManager.registerTask(new TallyDecryptionSharing());
-
+                    
                 }
-
+                
             }
         }
     }
-
+    
     private class PreemptPartialTallyingTask implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
                 if (!IsPartialTallyingOver) {//actually close the local counting session
 
                     partialTally = mostPresent(partialTallies);
                     computedPartialTally = true;
-
+                    
                     if (IAmThreshold) {
                         finalEncryptedResult = partialTally;
                         taskManager.registerTask(new TallyDecryptionSharing());
@@ -779,17 +779,17 @@ public class CryptoNode extends Node {
                         taskManager.registerTask(new GlobalCountingTask());
                     }
                 }
-
+                
             }
         }
     }
-
+    
     private class PreemptCloseTallyDecryptionSharing implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
                 if (!isDecryptionSharingOver) {
-                 //   specialDump("PreemptCloseTallyDecryptionSharing");
+                    //   specialDump("PreemptCloseTallyDecryptionSharing");
 
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
@@ -798,7 +798,7 @@ public class CryptoNode extends Node {
             }
         }
     }
-
+    
     private class GlobalCountingTask implements Task {
 
         //   private int localTallyGroupId;
@@ -825,9 +825,9 @@ public class CryptoNode extends Node {
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
-
+                        
                     }
-
+                    
                     IsPartialTallyingOver = true;
                     MSPartial += proxyView.size();
                     SMSPartial += getObjectSize(mes);
@@ -838,71 +838,75 @@ public class CryptoNode extends Node {
             }
         }
     }
-
+    
     private class TallyDecryptionSharing implements Task {
-
+        
         public void execute() {
-            synchronized (LOCK) {
-                taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
-                if (!isShareSendingOver) {
-                    //      specialDump("TallyDecryptionSharing");
-                    dump("TallyDecryptionSharing");
-
-                    dump("final encrypted:" + finalEncryptedResult.toString());
-                    
-                    long startT = System.nanoTime();                                        
-                    nodeResultShare = secKey.decrypt(finalEncryptedResult);
-                    ShareCompTime += System.nanoTime() - startT;
-
+            taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
+            if (!isShareSendingOver) {
+                //      specialDump("TallyDecryptionSharing");
+                dump("TallyDecryptionSharing");
+                
+                dump("final encrypted:" + finalEncryptedResult.toString());
+                
+                long startT = System.nanoTime();                
+                nodeResultShare = secKey.decrypt(finalEncryptedResult);
+                ShareCompTime += System.nanoTime() - startT;
+                synchronized (LOCK) {
                     resultSharesList.add(nodeResultShare);
+                    
                     currentDecodingIndex++;
-                    isFinalResultCalculated = true;
-                    dump("sharesize: " + currentDecodingIndex);
-
-                    CRYPTO_DECRYPTION_SHARE_MSG mes = null;
-
-                    if (!(peerView.size() <= 1)) {
-                        for (E_CryptoNodeID peerId : peerView) {
-                            if (peerId.equals(nodeId)) {
-                                continue;
-                            }
-                            dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
-                            try {
-                                mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                                doSendUDP(mes);
-                            } catch (Exception e) {
-                                dump("TCP: cannot send decryption share");
-                            }
+                }                
+                isFinalResultCalculated = true;
+                dump("sharesize: " + currentDecodingIndex);
+                
+                CRYPTO_DECRYPTION_SHARE_MSG mes = null;
+                
+                if (!(peerView.size() <= 1)) {
+                    for (E_CryptoNodeID peerId : peerView) {
+                        if (peerId.equals(nodeId)) {
+                            continue;
                         }
-
+                        dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
+                        try {
+                            mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
+                            doSendUDP(mes);
+                        } catch (Exception e) {
+                            dump("TCP: cannot send decryption share");
+                        }
+                    }
+                    synchronized (LOCK) {
+                        
                         MSShare += peerView.size() - 1;
                         SMSShare += getObjectSize(mes) * (peerView.size() - 1);
-
-                    } else {
-                        receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
                     }
-                    isShareSendingOver = true;
-                    //}
+                } else {
+                    receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
+                }
+                isShareSendingOver = true;
+                //}
+                synchronized (LOCK) {
+                    
                     if (currentDecodingIndex == MINTALLIES) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
                     }
-                    taskManager.registerTask(new AttemptSelfDestruct());
-
-
                 }
+                taskManager.registerTask(new AttemptSelfDestruct());
+                
+                
             }
         }
     }
-
+    
     private class TallyDecryption implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
                 if (!isTallyDecryptionOver) {
                     dump("TallyDecryption");
-                    isDecryptionSharingOver=true;
+                    isDecryptionSharingOver = true;
                     PartialDecryption[] decArray = new PartialDecryption[resultSharesList.size()];
                     //        System.out.println("shares: ");
                     for (int i = 0; i < resultSharesList.size(); i++) {
@@ -914,30 +918,30 @@ public class CryptoNode extends Node {
                     long startT = System.nanoTime();
                     finalResult = secKey.combineShares(decArray);
                     VoteDecTime += System.nanoTime() - startT;
-
+                    
                     computedFinalResult = true;
                     dump("Determined final result:" + finalResult);
-
+                    
                     isTallyDecryptionOver = true;
 
                     //         taskManager.registerTask(new ResultDiffusionTask());
                     taskManager.registerTask(new AttemptSelfDestruct());
-
-
+                    
+                    
                 }
             }
         }
     }
-
+    
     private class ResultDiffusionTask implements Task {
-
+        
         public void execute() {
             // broadcast
             synchronized (LOCK) {
                 if ((!isResultDiffusionOver) && !(numClusters == nodeId.groupId + 1)) {
                     //      specialDump("ResultDiffusionTask");
                     dump("ResultDiffusionTask at begin");
-
+                    
                     CRYPTO_FINAL_RESULT_MSG mes = null;
                     for (E_CryptoNodeID proxyId : proxyView) {
 
@@ -951,27 +955,27 @@ public class CryptoNode extends Node {
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast final result");
                         }
-
+                        
                     }
                     isResultDiffusionOver = true;
                     MSResult += proxyView.size();
                     SMSResult += getObjectSize(mes) * proxyView.size();
-
+                    
                 } else if (numClusters == nodeId.groupId + 1) {
                     isResultDiffusionOver = true;
                 }
-
+                
                 dump("ResultDiffusionTask at end");
                 taskManager.registerTask(new AttemptSelfDestruct());
-
+                
             }
-
+            
         }
     }
-
+    
     private void receiveFinalResult(CRYPTO_FINAL_RESULT_MSG msg) {
-
-
+        
+        
         synchronized (LOCK) {
             if (!computedFinalResult) {
 
@@ -980,7 +984,7 @@ public class CryptoNode extends Node {
 
                 dump("Received a final result (" + msg.getResult() + ") from " + msg.getSrc());
                 numFinalResults++;
-
+                
                 finalResults.add(msg.getResult());
                 MRResult++;
                 SMRResult += getObjectSize(msg);
@@ -988,66 +992,66 @@ public class CryptoNode extends Node {
                 if (numFinalResults == (int) (Math.floor(clientView.size() * threshold))) {
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
-
+                    
                     if (IAmThreshold) {
                         taskManager.registerTask(new AttemptSelfDestruct());
                     } else {
-
+                        
                         taskManager.registerTask(new ResultDiffusionTask());
                     }
                 }
-
+                
             }
 
             //         }
         }
     }
-
+    
     private class PreemptResultDiffusionTask implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
-
+                
                 if (!computedFinalResult) {//actually close the local counting session
-                 //   specialDump("PreemptResultDiffusionTask");
+                    //   specialDump("PreemptResultDiffusionTask");
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
-
+                    
                     if (IAmThreshold) {
                         taskManager.registerTask(new AttemptSelfDestruct());
                     } else {
-
+                        
                         taskManager.registerTask(new ResultDiffusionTask());
                     }
                 }
-
+                
             }
         }
     }
-
+    
     private class ResultOutput implements Task {
-
+        
         public void execute() {
             synchronized (LOCK) {
 //                if (nodeId.name.equals("node-1") && nodeId.port == basicPort) {
 //                    paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
 //                }
 
-
-
-
-                specialDump("\r" + MSView + " " + Math.pow(MSVote,2) + " " + MSPartial + " " + MSShare + " " + MSResult +
-                        " " + MRKeys+" "+MRView + " " + Math.pow(MRBallot,2) + " " + MRPartial
-                        + " " + MRShare + " " + MRResult + " " + SMSView + " " + Math.pow(SMSVote,2) + " " + SMSPartial + " " + SMSShare +
-                        " " + SMSResult + " " +SMRKeys+" "+ SMRView + " "
-                        + Math.pow(SMRBallot,2) + " " + SMRPartial + " " + SMRShare + " " + SMRResult + " " + TallyAggTime
-                        + " " + VoteEncTime + " " +ShareCompTime+" "+ VoteDecTime + " " + runningTime + "\r");
+                
+                
+                
+                specialDump("\r" + MSView + " " + Math.pow(MSVote, 2) + " " + MSPartial + " " + MSShare + " " + MSResult
+                        + " " + MRKeys + " " + MRView + " " + Math.pow(MRBallot, 2) + " " + MRPartial
+                        + " " + MRShare + " " + MRResult + " " + SMSView + " " + Math.pow(SMSVote, 2) + " " + SMSPartial + " " + SMSShare
+                        + " " + SMSResult + " " + SMRKeys + " " + SMRView + " "
+                        + Math.pow(SMRBallot, 2) + " " + SMRPartial + " " + SMRShare + " " + SMRResult + " " + TallyAggTime
+                        + " " + VoteEncTime + " " + ShareCompTime + " " + VoteDecTime + " " + runningTime + "\r");
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
                 taskManager.registerTask(new SelfDestructTask());
             }
-
-
+            
+            
         }
     }
     //    }
