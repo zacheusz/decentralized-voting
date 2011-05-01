@@ -702,13 +702,13 @@ public class CryptoNode extends Node {
     private class AttemptSelfDestruct implements Task {
 
         public void execute() {
-                   System.out.println("IsPartialTallyingOver:"+IsPartialTallyingOver);
-                System.out.println("isVoteTaskOver:"+isVoteTaskOver);
-              System.out.println("isLocalCountingOver:"+isLocalCountingOver);
-            System.out.println("computedFinalResult:"+computedFinalResult);
-            System.out.println("isResultDiffusionOver:"+isResultDiffusionOver);
-            System.out.println("isShareSendingOver:"+isShareSendingOver);
-            
+//                   System.out.println("IsPartialTallyingOver:"+IsPartialTallyingOver);
+//                System.out.println("isVoteTaskOver:"+isVoteTaskOver);
+//              System.out.println("isLocalCountingOver:"+isLocalCountingOver);
+//            System.out.println("computedFinalResult:"+computedFinalResult);
+//            System.out.println("isResultDiffusionOver:"+isResultDiffusionOver);
+//            System.out.println("isShareSendingOver:"+isShareSendingOver);
+//            
             synchronized (LOCK) {
                 if (IsPartialTallyingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult && isResultDiffusionOver && isShareSendingOver) {
 
