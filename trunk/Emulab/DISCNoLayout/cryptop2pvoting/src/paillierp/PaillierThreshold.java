@@ -72,293 +72,289 @@ import zkp.*;
  */
 public class PaillierThreshold extends AbstractPaillier {
 
-	/*
-	 * Fields
-	 */
+    /*
+     * Fields
+     */
+    /** Private Key allowing decryption; should be same as public key. */
+    protected PaillierPrivateThresholdKey deckey = null;
 
-	/** Private Key allowing decryption; should be same as public key. */
-	protected PaillierPrivateThresholdKey deckey = null;
+    /*
+     * 
+     * Constructors
+     * 
+     */
+    /**
+     * Default constructor. This constructor can be used if there is 
+     * no need to generate public/private key pair.
+     */
+    public PaillierThreshold() {
+    }
 
-	/*
-	 * 
-	 * Constructors
-	 * 
-	 */
+    /**
+     * Constructs a new encryption object which uses the specified
+     * key for encryption.
+     * 
+     * @param key  Public key used for encryption
+     */
+    public PaillierThreshold(PaillierThresholdKey key) {
+        this.key = key.getPublicKey();
 
-	/**
-	 * Default constructor. This constructor can be used if there is 
-	 * no need to generate public/private key pair.
-	 */
-	public PaillierThreshold(){ }
+        this.encryptMode = true;
+    }
 
-	/**
-	 * Constructs a new encryption object which uses the specified
-	 * key for encryption.
-	 * 
-	 * @param key  Public key used for encryption
-	 */
-	public PaillierThreshold(PaillierThresholdKey key) {
-		this.key = key.getPublicKey();
+    /**
+     * Constructs a new encryption/decryption object which uses the specified
+     * key for both encryption and decryption.
+     * 
+     * @param key  Private key used for decryption and encryption
+     */
+    public PaillierThreshold(PaillierPrivateThresholdKey key) {
+        this.key = key.getPublicKey();
+        this.deckey = key;
 
-		this.encryptMode = true;
-	}
+        this.encryptMode = true;
+        this.decryptMode = true;
+    }
 
-	/**
-	 * Constructs a new encryption/decryption object which uses the specified
-	 * key for both encryption and decryption.
-	 * 
-	 * @param key  Private key used for decryption and encryption
-	 */
-	public PaillierThreshold(PaillierPrivateThresholdKey key) {
-		this.key = key.getPublicKey();
-		this.deckey = key;
+    /**
+     * Constructs a new encryption object which uses the specified
+     * key for encryption.
+     * 
+     * @param key  Public key used for encryption
+     */
+    public PaillierThreshold(PaillierKey key) {
+        this.key = key;
 
-		this.encryptMode = true;
-		this.decryptMode = true;
-	}
-	
-	/**
-	 * Constructs a new encryption object which uses the specified
-	 * key for encryption.
-	 * 
-	 * @param key  Public key used for encryption
-	 */
-	public PaillierThreshold(PaillierKey key) {
-		this.key = key;
+        this.encryptMode = true;
+    }
 
-		this.encryptMode = true;
-	}
-	
-	/*
-	 * 
-	 * Methods
-	 * 
-	 */
+    /*
+     * 
+     * Methods
+     * 
+     */
+    /**
+     * Sets the mode for this object to encrypt and will use the provided
+     * key to encrypt messages.
+     *  
+     * @param key Public key which this class will use to encrypt
+     */
+    void setEncryption(PaillierKey key) {
+        if (this.decryptMode == false || this.deckey.getN() == key.getN()) {
+            this.key = key;
+        } else {
+            throw new IllegalArgumentException("Given public key does not correspond to stored private key");
+        }
 
-	/**
-	 * Sets the mode for this object to encrypt and will use the provided
-	 * key to encrypt messages.
-	 *  
-	 * @param key Public key which this class will use to encrypt
-	 */
-	void setEncryption(PaillierKey key)
-	{
-		if (this.decryptMode==false || this.deckey.getN() == key.getN()){
-			this.key = key;
-		}
-		else {
-			throw new IllegalArgumentException("Given public key does not correspond to stored private key");
-		}
+        // Enable the encryption mode now
+        this.encryptMode = true;
 
-		// Enable the encryption mode now
-		this.encryptMode=true;
+        return;
+    }
 
-		return;
-	}
+    /**
+     * Sets the mode for this object to encrypt and will use the provided
+     * key to encrypt messages.
+     *  
+     * @param key Public key which this class will use to encrypt
+     */
+    void setEncryption(PaillierThresholdKey key) {
+        if (this.decryptMode == false || this.deckey.getN() == key.getN()) {
+            this.key = key;
+        } else {
+            throw new IllegalArgumentException("Given public key does not correspond to stored private key");
+        }
 
-	/**
-	 * Sets the mode for this object to encrypt and will use the provided
-	 * key to encrypt messages.
-	 *  
-	 * @param key Public key which this class will use to encrypt
-	 */
-	void setEncryption(PaillierThresholdKey key)
-	{
-		if (this.decryptMode==false || this.deckey.getN() == key.getN()){
-			this.key = key;
-		}
-		else {
-			throw new IllegalArgumentException("Given public key does not correspond to stored private key");
-		}
+        // Enable the encryption mode now
+        this.encryptMode = true;
 
-		// Enable the encryption mode now
-		this.encryptMode=true;
+        return;
+    }
 
-		return;
-	}
+    /**
+     * Sets the mode for this object to decrypt and will use the provided key
+     * to decrypt only.  (Encryption will continue to be done using the key 
+     * provided in {@link #setEncryption(PaillierKey)}.)
+     * 
+     * @param key Private key which this class will use to decrypt
+     */
+    void setDecryption(PaillierPrivateThresholdKey key) {
+        this.key = key;
+        this.deckey = key;
 
-	/**
-	 * Sets the mode for this object to decrypt and will use the provided key
-	 * to decrypt only.  (Encryption will continue to be done using the key 
-	 * provided in {@link #setEncryption(PaillierKey)}.)
-	 * 
-	 * @param key Private key which this class will use to decrypt
-	 */
-	void setDecryption(PaillierPrivateThresholdKey key)
-	{
-		this.key = key;
-		this.deckey = key;
+        // enable the decryption mode now
+        this.decryptMode = true;
+        return;
+    }
 
-		// enable the decryption mode now
-		this.decryptMode=true;
-		return;
-	}
+    /**
+     * Sets the mode for this object to decrypt and encrypt using the provided
+     * key.
+     *  
+     * @param key   Private key which this class will use to encrypt and decrypt
+     */
+    public void setDecryptEncrypt(PaillierPrivateThresholdKey key) {
+        setDecryption(key);
+        setEncryption(key);
+        return;
+    }
 
-	/**
-	 * Sets the mode for this object to decrypt and encrypt using the provided
-	 * key.
-	 *  
-	 * @param key   Private key which this class will use to encrypt and decrypt
-	 */
-	public void setDecryptEncrypt(PaillierPrivateThresholdKey key)
-	{
-		setDecryption(key);
-		setEncryption(key);
-		return;
-	}
+    /**
+     * The public key of the Paillier threshold system, which includes
+     * the values <i>n</i> and the public values <i>v</i> and
+     * {<i>v<sub>i</sub></i>}.  This object must already be in decrypt mode
+     * to return these values.
+     * 
+     * @return     The public key <i>n</i> and public values
+     */
+    public PaillierThresholdKey getPublicThresholdKey() {
+        if (decryptMode) {
+            return deckey.getThresholdKey();
+        } else {
+            throw new IllegalStateException(this.notReadyForDecryption);
+        }
+    }
 
-	/**
-	 * The public key of the Paillier threshold system, which includes
-	 * the values <i>n</i> and the public values <i>v</i> and
-	 * {<i>v<sub>i</sub></i>}.  This object must already be in decrypt mode
-	 * to return these values.
-	 * 
-	 * @return     The public key <i>n</i> and public values
-	 */
-	public PaillierThresholdKey getPublicThresholdKey()
-	{
-		if(decryptMode)	return deckey.getThresholdKey();
-		else throw new IllegalStateException(this.notReadyForDecryption);
-	}
+    /** 
+     * The private key for the Paillier system with thresholding
+     * is the RSA modulo n and the secret share <i>s<sub>i</sub></i>
+     * 
+     * @return The private key; null if not in decrypt mode
+     */
+    public PaillierPrivateThresholdKey getPrivateKey() {
+        if (decryptMode) {
+            return deckey;
+        } else {
+            return null;
+        }
+    }
 
-	/** 
-	 * The private key for the Paillier system with thresholding
-	 * is the RSA modulo n and the secret share <i>s<sub>i</sub></i>
-	 * 
-	 * @return The private key; null if not in decrypt mode
-	 */
-	public PaillierPrivateThresholdKey getPrivateKey()
-	{  
-		if (decryptMode) {
-			return deckey;
-		} else {
-			return null;
-		}
-	}
+    /**
+     * Partially decrypts the given ciphertext {@code c} < <i>n</i><sup>2</sup>
+     * using the share of the private key.  Returns only the decrypted value
+     * with no ID attached.
+     * 
+     * @param c    ciphertext as BigInteger
+     * @return     the decrypted share <i>c<sub>i</sub></i>
+     */
+    public BigInteger decryptOnly(BigInteger c) {
+        //Check whether everything is set for doing decryption
+        if (decryptMode == false) {
+            throw new IllegalStateException(this.notReadyForDecryption);
+        }
 
-	/**
-	 * Partially decrypts the given ciphertext {@code c} < <i>n</i><sup>2</sup>
-	 * using the share of the private key.  Returns only the decrypted value
-	 * with no ID attached.
-	 * 
-	 * @param c    ciphertext as BigInteger
-	 * @return     the decrypted share <i>c<sub>i</sub></i>
-	 */
-	public BigInteger decryptOnly(BigInteger c)
-	{
-		//Check whether everything is set for doing decryption
-		if(decryptMode==false) throw new IllegalStateException(this.notReadyForDecryption);
-		
-		return (new PartialDecryption(deckey, c)).getDecryptedValue();
-		
-		//if(c.abs().compareTo(key.getNSquare()) >= 0) throw new IllegalArgumentException("c must be less than n^2");
+        return (new PartialDecryption(deckey, c)).getDecryptedValue();
 
-		//return c.modPow(deckey.getSi().multiply(BigInteger.valueOf(2).multiply(this.deckey.getDelta())), deckey.getNSquare());
-	}
-	
-	/**
-	 * Partially decrypts the given ciphertext {@code c} < <i>n</i><sup>2</sup>
-	 * using the share of the private key.
-	 * 
-	 * @param c    ciphertext as BigInteger
-	 * @return     the decrypted share <i>c<sub>i</sub></i>
-	 */
-	public PartialDecryption decrypt(BigInteger c)
-	{
-		//Check whether everything is set for doing decryption
-		if(decryptMode==false) throw new IllegalStateException(this.notReadyForDecryption);
-		
-		return new PartialDecryption(deckey, c);
-		
-		//if(c.abs().compareTo(key.getNSquare()) >= 0) throw new IllegalArgumentException("c must be less than n^2");
+        //if(c.abs().compareTo(key.getNSquare()) >= 0) throw new IllegalArgumentException("c must be less than n^2");
 
-		//return c.modPow(deckey.getSi().multiply(BigInteger.valueOf(2).multiply(this.deckey.getDelta())), deckey.getNSquare());
-	}
+        //return c.modPow(deckey.getSi().multiply(BigInteger.valueOf(2).multiply(this.deckey.getDelta())), deckey.getNSquare());
+    }
 
-	/**
-	 * Partially decrypts the given ciphertext {@code c} < <i>n</i><sup>2</sup>
-	 * using the share of the private key.  This then gives a non-interactive
-	 * Zero Knowledge Proof that the partial decryption is truly this share's
-	 * contribution to the decryption of {@code c}.
-	 * 
-	 * @param c    ciphertext as BigInteger
-	 * @return     the decrypted share <i>c<sub>i</sub></i>
-	 */
-	public DecryptionZKP decryptProof(BigInteger c) {
-		return new DecryptionZKP(this.deckey, c);
-	}
+    /**
+     * Partially decrypts the given ciphertext {@code c} < <i>n</i><sup>2</sup>
+     * using the share of the private key.
+     * 
+     * @param c    ciphertext as BigInteger
+     * @return     the decrypted share <i>c<sub>i</sub></i>
+     */
+    public PartialDecryption decrypt(BigInteger c) {
+        //Check whether everything is set for doing decryption
+        if (decryptMode == false) {
+            throw new IllegalStateException(this.notReadyForDecryption);
+        }
 
-	/**
-	 * This function combines the shares of the decryption
-	 * to get the final decryption, assumes that the shares are valid.
-	 * 
-	 * @param shares    a collection of at least <i>w</i> partial decryptions
-	 *                  of the same ciphertext
-	 * @return          the decrypted value combined using the shares.
-	 */
-	public BigInteger combineShares(PartialDecryption... shares)
-	{
-		if(this.decryptMode == false) throw new IllegalStateException(this.notReadyForDecryption);
-		if(shares.length < deckey.getW()) {
-			throw new IllegalArgumentException("You must call this method with at least w shares");
-		}
+        return new PartialDecryption(deckey, c);
 
-		// TODO check to make sure no share is duplicated.
-		
-		int w = deckey.getW();
-		BigInteger delta = deckey.getDelta();
-		BigInteger n = deckey.getN();
-		BigInteger nSquare = deckey.getNSPlusOne();
+        //if(c.abs().compareTo(key.getNSquare()) >= 0) throw new IllegalArgumentException("c must be less than n^2");
 
-		BigInteger cprime = BigInteger.ONE;
-		BigInteger L = null;
-		BigInteger res = null;
+        //return c.modPow(deckey.getSi().multiply(BigInteger.valueOf(2).multiply(this.deckey.getDelta())), deckey.getNSquare());
+    }
 
-		//System.out.print("c' = ");
-		for(int i = 0; i < w; i++) {
-			BigInteger lambda = delta;
-			for(int iprime = 0; iprime < w; iprime++) {
-				
-				if(iprime != i) {
-					if (shares[i].getID()-shares[iprime].getID() != 0)
-						lambda = lambda.multiply(BigInteger.valueOf(-shares[iprime].getID())).divide(BigInteger.valueOf(shares[i].getID()-shares[iprime].getID()));
-					else
-						throw new IllegalArgumentException("You cannot have repeated shares.");
-				}
-			}
-			cprime = cprime.multiply(shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare)).mod(nSquare);
+    /**
+     * Partially decrypts the given ciphertext {@code c} < <i>n</i><sup>2</sup>
+     * using the share of the private key.  This then gives a non-interactive
+     * Zero Knowledge Proof that the partial decryption is truly this share's
+     * contribution to the decryption of {@code c}.
+     * 
+     * @param c    ciphertext as BigInteger
+     * @return     the decrypted share <i>c<sub>i</sub></i>
+     */
+    public DecryptionZKP decryptProof(BigInteger c) {
+        return new DecryptionZKP(this.deckey, c);
+    }
 
-			
-			//System.out.print(shares[i]+"^(2*"+lambda+") + ");
-		}
+    /**
+     * This function combines the shares of the decryption
+     * to get the final decryption, assumes that the shares are valid.
+     * 
+     * @param shares    a collection of at least <i>w</i> partial decryptions
+     *                  of the same ciphertext
+     * @return          the decrypted value combined using the shares.
+     */
+    public BigInteger combineShares(PartialDecryption... shares) {
+        if (this.decryptMode == false) {
+            throw new IllegalStateException(this.notReadyForDecryption);
+        }
+        if (shares.length < deckey.getW()) {
+            throw new IllegalArgumentException("You must call this method with at least " + deckey.getW() + " shares, not " + shares.length);
+        }
 
-		L = cprime.subtract(BigInteger.ONE).divide(n);
-		res = L.multiply(deckey.getCombineSharesConstant()).mod(n);
+        // TODO check to make sure no share is duplicated.
 
-		return res;
-	}
+        int w = deckey.getW();
+        BigInteger delta = deckey.getDelta();
+        BigInteger n = deckey.getN();
+        BigInteger nSquare = deckey.getNSPlusOne();
 
-	/**
-	 * This function combines the shares of the decryption
-	 * to get the final decryption, all the while checking to make sure
-	 * that each ZKP proves a good partial decryption of the correct ciphertext.
-	 * 
-	 * @param shares    a collection of at least <i>w</i> partial decryptions
-	 *                  (with ZKP) of the same ciphertext
-	 * @return          the decrypted value combined using the shares.
-	 */
-	public BigInteger combineShares(DecryptionZKP... shares) {
-		PartialDecryption[] decryptions = new PartialDecryption[shares.length];
-		BigInteger c = shares[0].getC();
-		for (int i = 0; i < shares.length; i++) {
-			if (shares[i].verify(c)) {
-				decryptions[i] = shares[i].getPartialDecryption();
-			} else {
-				throw new IllegalArgumentException("Someone decrypted the wrong ciphertext");
-			}
-		}
+        BigInteger cprime = BigInteger.ONE;
+        BigInteger L = null;
+        BigInteger res = null;
 
-		return combineShares(decryptions);
-	}
+        //System.out.print("c' = ");
+        for (int i = 0; i < w; i++) {
+            BigInteger lambda = delta;
+            for (int iprime = 0; iprime < w; iprime++) {
 
+                if (iprime != i) {
+                    if (shares[i].getID() - shares[iprime].getID() != 0) {
+                        lambda = lambda.multiply(BigInteger.valueOf(-shares[iprime].getID())).divide(BigInteger.valueOf(shares[i].getID() - shares[iprime].getID()));
+                    } else {
+                        throw new IllegalArgumentException("You cannot have repeated shares.");
+                    }
+                }
+            }
+            cprime = cprime.multiply(shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare)).mod(nSquare);
+
+
+            //System.out.print(shares[i]+"^(2*"+lambda+") + ");
+        }
+
+        L = cprime.subtract(BigInteger.ONE).divide(n);
+        res = L.multiply(deckey.getCombineSharesConstant()).mod(n);
+
+        return res;
+    }
+
+    /**
+     * This function combines the shares of the decryption
+     * to get the final decryption, all the while checking to make sure
+     * that each ZKP proves a good partial decryption of the correct ciphertext.
+     * 
+     * @param shares    a collection of at least <i>w</i> partial decryptions
+     *                  (with ZKP) of the same ciphertext
+     * @return          the decrypted value combined using the shares.
+     */
+    public BigInteger combineShares(DecryptionZKP... shares) {
+        PartialDecryption[] decryptions = new PartialDecryption[shares.length];
+        BigInteger c = shares[0].getC();
+        for (int i = 0; i < shares.length; i++) {
+            if (shares[i].verify(c)) {
+                decryptions[i] = shares[i].getPartialDecryption();
+            } else {
+                throw new IllegalArgumentException("Someone decrypted the wrong ciphertext");
+            }
+        }
+
+        return combineShares(decryptions);
+    }
 }

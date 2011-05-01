@@ -300,7 +300,8 @@ public class PaillierThreshold extends AbstractPaillier {
 	{
 		if(this.decryptMode == false) throw new IllegalStateException(this.notReadyForDecryption);
 		if(shares.length < deckey.getW()) {
-			throw new IllegalArgumentException("You must call this method with at least w shares");
+			throw new IllegalArgumentException("You must call this method with at least " +deckey.getW()+" shares, not "+shares.length);
+                        
 		}
 
 		// TODO check to make sure no share is duplicated.
