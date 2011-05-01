@@ -1,6 +1,6 @@
 #!/bin/bash
 source ../configure.sh
-delay=5
+delay=10
 nb=$1
 
 echo "Running $nb experiments"
