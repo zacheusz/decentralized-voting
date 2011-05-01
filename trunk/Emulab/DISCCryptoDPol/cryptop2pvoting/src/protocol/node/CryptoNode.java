@@ -364,13 +364,13 @@ public class CryptoNode extends Node {
     private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoSuchAlgorithmException {
 
         if (!isLocalCountingOver) {
-            synchronized (LOCK) {
+        //    synchronized (LOCK) {
                 dump("Received a ballot (" + msg.getVote() + ") from " + msg.getSrc());
                 aggrLocalTally(msg.getVote());
                 MRBallot++;
                 SMRBallot += getObjectSize(msg);
 
-            }
+        //    }
 
         } else {
             dump("Discarded an ballot message (cause: sent too late)");
@@ -674,6 +674,7 @@ public class CryptoNode extends Node {
     }
 
     public void aggrLocalTally(BigInteger ballot) {
+            synchronized (LOCK) {
 
 
         localTally = encryptor.add(localTally, ballot);
@@ -696,7 +697,7 @@ public class CryptoNode extends Node {
 
             //else do nothing
         }
-
+            }
 
 
     }
@@ -806,7 +807,6 @@ public class CryptoNode extends Node {
             dump("GlobalCountingTask at begin");
             if (!IsPartialTallyingOver) {
                 //specialDump("GlobalCountingTask");
-                synchronized (LOCK) {
                     CRYPTO_PARTIAL_TALLY_MSG mes = null;
                     taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
                     dump("GlobalCountingTask");
@@ -834,7 +834,7 @@ public class CryptoNode extends Node {
                 }
                 dump("GlobalCountingTask at end");
             }
-        }
+        
     }
 
     private class TallyDecryptionSharing implements Task {
