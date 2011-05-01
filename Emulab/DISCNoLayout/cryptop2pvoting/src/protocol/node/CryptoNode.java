@@ -714,10 +714,10 @@ public class CryptoNode extends Node {
     private class AttemptSelfDestruct implements Task {
 
         public void execute() {
-            //       System.out.println("isGlobalCountingOver:"+isGlobalCountingOver);
-            //    System.out.println("isVoteTaskOver:"+isVoteTaskOver);
-            //  System.out.println("isIndivSendingOver:"+isIndivSendingOver);
-            //System.out.println("isResultOutputed:"+isResultOutputed);
+                   System.out.println("isGlobalCountingOver:"+isGlobalCountingOver);
+                System.out.println("isVoteTaskOver:"+isVoteTaskOver);
+              System.out.println("isIndivSendingOver:"+isIndivSendingOver);
+            System.out.println("isResultOutputed:"+isResultOutputed);
             synchronized (LOCK) {
                 if (isVoteTaskOver && isLocalCountingOver && isTallyDecryptionOver &&isShareSendingOver) {
 
