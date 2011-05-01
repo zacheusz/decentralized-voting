@@ -692,10 +692,13 @@ public class CryptoNode extends Node {
     private class AttemptSelfDestruct implements Task {
 
         public void execute() {
-            //       System.out.println("isGlobalCountingOver:"+isGlobalCountingOver);
-            //    System.out.println("isVoteTaskOver:"+isVoteTaskOver);
-            //  System.out.println("isIndivSendingOver:"+isIndivSendingOver);
-            //System.out.println("isResultOutputed:"+isResultOutputed);
+                   System.out.println("IsPartialTallyingOver:"+IsPartialTallyingOver);
+                System.out.println("isVoteTaskOver:"+isVoteTaskOver);
+              System.out.println("isLocalCountingOver:"+isLocalCountingOver);
+            System.out.println("computedFinalResult:"+computedFinalResult);
+            System.out.println("isResultDiffusionOver:"+isResultDiffusionOver);
+            System.out.println("isShareSendingOver:"+isShareSendingOver);
+            
             synchronized (LOCK) {
                 if (IsPartialTallyingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult && isResultDiffusionOver && isShareSendingOver) {
 
@@ -910,7 +913,8 @@ public class CryptoNode extends Node {
         public void execute() {
             // broadcast
             synchronized (LOCK) {
-                if ((!isResultDiffusionOver) && !(numClusters == nodeId.groupId + 1)) {
+                if (!isResultDiffusionOver) {
+                if (!(numClusters == nodeId.groupId + 1)) {
                     //specialDump("ResultDiffusionTask");
                     dump("ResultDiffusionTask at begin");
 
@@ -929,17 +933,16 @@ public class CryptoNode extends Node {
                         }
 
                     }
-                    isResultDiffusionOver = true;
                     MSResult += proxyView.size();
                     SMSResult += getObjectSize(mes) * proxyView.size();
 
-                } else if (numClusters == nodeId.groupId + 1) {
-                    isResultDiffusionOver = true;
-                }
+                } 
+                isResultDiffusionOver = true;
 
                 dump("ResultDiffusionTask at end");
                 taskManager.registerTask(new AttemptSelfDestruct());
 
+            }
             }
 
         }
