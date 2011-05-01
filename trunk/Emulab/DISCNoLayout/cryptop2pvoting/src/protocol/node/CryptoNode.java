@@ -745,7 +745,7 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isLocalCountingOver) {//actually close the local counting session
-                    specialDump("PreemptCloseLocalCountingTask");
+                 //   specialDump("PreemptCloseLocalCountingTask");
 
                     computedLocalTally = true;
                     isLocalCountingOver = true;
@@ -785,7 +785,7 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isDecryptionSharingOver) {
-                    specialDump("PreemptCloseTallyDecryptionSharing");
+                 //   specialDump("PreemptCloseTallyDecryptionSharing");
 
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
@@ -1003,7 +1003,7 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
 
                 if (!computedFinalResult) {//actually close the local counting session
-                    specialDump("PreemptResultDiffusionTask");
+                 //   specialDump("PreemptResultDiffusionTask");
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
 
@@ -1023,9 +1023,9 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                if (nodeId.name.equals("node-1") && nodeId.port == basicPort) {
-                    paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
-                }
+//                if (nodeId.name.equals("node-1") && nodeId.port == basicPort) {
+//                    paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
+//                }
 
 
 
