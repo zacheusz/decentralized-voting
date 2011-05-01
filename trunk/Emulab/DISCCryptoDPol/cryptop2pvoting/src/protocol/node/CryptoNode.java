@@ -820,6 +820,7 @@ public class CryptoNode extends Node {
                         try {
                             mes = new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally);
                             doSendUDP(mes);
+                            Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
@@ -933,13 +934,13 @@ public class CryptoNode extends Node {
 
         public void execute() {
             // broadcast
-            synchronized (LOCK) {
                 if (!isResultDiffusionOver) {
                 if (!(numClusters == nodeId.groupId + 1)) {
                     //specialDump("ResultDiffusionTask");
                     dump("ResultDiffusionTask at begin");
-
+            }
                     CRYPTO_FINAL_RESULT_MSG mes = null;
+                
                     for (E_CryptoNodeID proxyId : proxyView) {
 
 //                        if (isMalicious) {
@@ -949,6 +950,7 @@ public class CryptoNode extends Node {
                         try {
                             mes = new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult);
                             doSendUDP(mes);
+                            Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast final result");
                         }
@@ -957,13 +959,13 @@ public class CryptoNode extends Node {
                     MSResult += proxyView.size();
                     SMSResult += getObjectSize(mes) * proxyView.size();
 
-                } 
+                
                 isResultDiffusionOver = true;
 
                 dump("ResultDiffusionTask at end");
                 taskManager.registerTask(new AttemptSelfDestruct());
 
-            }
+            
             }
 
         }
@@ -982,6 +984,7 @@ public class CryptoNode extends Node {
                 numFinalResults++;
 
                 finalResults.add(msg.getResult());
+            }
                 MRResult++;
                 SMRResult += getObjectSize(msg);
                 dump("finals:" + numFinalResults + " " + clientView.size());
@@ -997,7 +1000,7 @@ public class CryptoNode extends Node {
                     }
                 }
 
-            }
+            
 
             //         }
         }
