@@ -632,7 +632,6 @@ public class CryptoNode extends Node {
     private class VoteTask implements Task {
 
         public void execute() {
-            synchronized (LOCK) {
                 if (!isVoteTaskOver) {
                     //specialDump("VoteTask");
                     startInstant = System.nanoTime();
@@ -663,13 +662,14 @@ public class CryptoNode extends Node {
                     }
                     isVoteTaskOver = true;
                     taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
+                    
                     aggrLocalTally(Emsg);
                     taskManager.registerTask(new AttemptSelfDestruct());
                     //     taskManager.registerTask(new CloseVoteTask());
 
 
                 }
-            }
+            
         }
     }
 
