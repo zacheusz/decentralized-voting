@@ -692,7 +692,7 @@ public class CryptoNode extends Node {
 
         dump("ballots " + numBallots + " " + peerView.size());
 
-        if (numBallots == (int)Math.floor(peerView.size())*threshold) {
+        if (numBallots == (int)Math.floor(VOTERCOUNT)) {
             computedLocalTally = true;
 //            if (IAmThreshold) {
 //                partialTally = localTally;
