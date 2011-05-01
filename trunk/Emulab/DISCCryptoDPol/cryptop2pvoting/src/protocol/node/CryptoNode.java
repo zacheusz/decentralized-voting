@@ -575,7 +575,7 @@ public class CryptoNode extends Node {
 
                             try {
                                 mes = new CRYPTO_VIEW_MSG(nodeId, peerId, nodeToCluster.get((peerId.groupId)), nodeToCluster.get((peerId.groupId + 1) % numClusters), nodeToCluster.get((peerId.groupId + numClusters - 1) % numClusters));
-                                doSendTCP(mes);
+                                doSendUDP(mes);
                                 MSView++;
                                 SMSView += getObjectSize(mes);
                             } catch (Exception e) {
@@ -641,7 +641,7 @@ public class CryptoNode extends Node {
                                 
                                 mes=new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
                                 
-                                doSendTCP(mes);
+                                doSendUDP(mes);
                             } catch (Exception e) {
                                 dump("TCP: cannot vote");
                             }
@@ -704,7 +704,7 @@ public class CryptoNode extends Node {
                 if (IsPartialTallyingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult && isResultDiffusionOver) {
 
                     /*		       try {
-                    doSendTCP(new DEAD_MSG(nodeId, bootstrap));
+                    doSendUDP(new DEAD_MSG(nodeId, bootstrap));
                     dump("sent a dead message");
                     }catch (Exception e) {
                     dump("TCP: cannot send dead message to bootstrap");
@@ -804,7 +804,7 @@ public class CryptoNode extends Node {
                         dump("Send partial tally (" + partialTally + ") to " + proxyId);
                         try {
                             mes=new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally);
-                            doSendTCP(mes);
+                            doSendUDP(mes);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
@@ -850,7 +850,7 @@ public class CryptoNode extends Node {
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                             try {
                                 mes=new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                                doSendTCP(mes);
+                                doSendUDP(mes);
                             } catch (Exception e) {
                                 dump("TCP: cannot send decryption share");
                             }
@@ -926,7 +926,7 @@ public class CryptoNode extends Node {
                         dump("Send final result (" + finalResult + ") to " + proxyId);
                         try {
                             mes=new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult);
-                            doSendTCP(mes);
+                            doSendUDP(mes);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast final result");
                         }
@@ -1101,7 +1101,7 @@ public class CryptoNode extends Node {
 //                       
 //                    E_CryptoNodeID randomNodeID = getRandomNodeID();
 //                    try {
-//                            doSendTCP(new POSITION_ASSIGN_MSG(nodeId, randomNodeID, nodeToCluster));
+//                            doSendUDP(new POSITION_ASSIGN_MSG(nodeId, randomNodeID, nodeToCluster));
 //                        } catch (Exception e) {
 //                            dump("TCP: cannot send cluster assignment");
 //                }
@@ -1163,7 +1163,7 @@ public class CryptoNode extends Node {
 //                    for (E_CryptoNodeID peerId : smallestCluster) {
 //                        dump("Send cluster assignment to " + peerId);
 //                        try {
-//                            doSendTCP(new CLUSTER_ASSIGN_MSG(nodeId, peerId, myIDAssignment));
+//                            doSendUDP(new CLUSTER_ASSIGN_MSG(nodeId, peerId, myIDAssignment));
 //                        } catch (Exception e) {
 //                            dump("TCP: cannot send cluster assignment");
 //                        }
