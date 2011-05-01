@@ -70,7 +70,7 @@ public class CryptoPrepareTrusted {
                 //int numGroups=VOTERCOUNT/CryptoNode.MINTALLIES;
        //         int index;
          //       for (int j=0;j<numGroups;j++){
-                 for (i =0;i<CryptoNode.nodesPerCluster;i++)
+                 for (i =0;i<CryptoNode.VOTERCOUNT;i++)
                  {
                      //sec=trusted.GetSecretDistributedKeyPart(i);
                      p=new PaillierThreshold(keys[i]);
