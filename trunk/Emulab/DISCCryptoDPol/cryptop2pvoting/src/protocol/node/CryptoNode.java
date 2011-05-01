@@ -93,7 +93,7 @@ public class CryptoNode extends Node {
     // public static boolean isMalicious;
     public static int order;
     public static int numReceivedViews = 0;
-    public static double threshold = 1;
+    public static double threshold = 0.95;
     public static boolean receivedAllViews = false;
     public static boolean isViewDiffusionOver = false;
     public static boolean isFirstView = true;
@@ -1011,9 +1011,9 @@ public class CryptoNode extends Node {
       //      paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
             
 
-            specialDump("\r"+MSView+" "+MRView+" "+MSVote+" "+MRBallot+" "+MSPartial+" "+MRPartial+
-                    " "+MSShare+" "+MRShare+" "+MSResult+" "+MRResult+" "+SMSView+" "+SMRView+" "+SMSVote+" "+SMRBallot+
-                    " "+SMSPartial+" "+SMRPartial+" "+SMSShare+" "+SMRShare+" "+SMSResult+" "+SMRResult+" "+TallyAggTime+
+            specialDump("\r"+MSView+" "+MSVote+" "+MSPartial+" "+MSShare+" "+MSResult+" "+MRView+" "+MRBallot+" "+MRPartial+
+                    " "+MRShare+" "+MRResult+" "+SMSView+" "+SMSVote+" "+SMSPartial+" "+SMSShare+" "+SMSResult+" "+SMRView+" "+
+                    SMRBallot+" "+SMRPartial+" "+SMRShare+" "+SMRResult+" "+TallyAggTime+
                     " "+VoteEncTime+" "+VoteDecTime+" "+runningTime+"\r");
             isResultOutputed = true;
             // taskManager.registerTask(new AttemptSelfDestruct());
