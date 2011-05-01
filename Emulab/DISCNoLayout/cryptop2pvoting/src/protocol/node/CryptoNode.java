@@ -385,7 +385,7 @@ public class CryptoNode extends Node {
 
                 MRShare++;
                 SMRShare += getObjectSize(msg);
-                if (isFinalResultCalculated && currentDecodingIndex == (int) (Math.floor(MINTALLIES))) {
+                if (isFinalResultCalculated && currentDecodingIndex == MINTALLIES) {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
@@ -627,14 +627,14 @@ public class CryptoNode extends Node {
                 if (!isVoteTaskOver) {
                     //  specialDump("VoteTask");
                     E_CryptoNodeID tempID = null;
-                    int mycount=0;
+                    int mycount = 0;
                     for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
                         for (int j = 0; j < nodesPerMachine; j++) {
 
                             tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
                             peerView.add(tempID);
                             if (nodeId.equals(tempID)) {
-                                secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile +mycount);
+                                secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                             }
                             mycount++;
 
@@ -717,7 +717,7 @@ public class CryptoNode extends Node {
             //  System.out.println("isIndivSendingOver:"+isIndivSendingOver);
             //System.out.println("isResultOutputed:"+isResultOutputed);
             synchronized (LOCK) {
-                if (isVoteTaskOver && isLocalCountingOver && computedFinalResult) {
+                if (isVoteTaskOver && isLocalCountingOver && computedFinalResult &&isShareSendingOver) {
 
                     /*		       try {
                     doSendUDP(new DEAD_MSG(nodeId, bootstrap));
@@ -877,11 +877,13 @@ public class CryptoNode extends Node {
                     }
                     isShareSendingOver = true;
                     //}
-                    if (currentDecodingIndex == (int) (Math.floor(MINTALLIES))) {
+                    if (currentDecodingIndex == MINTALLIES) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
                     }
+                    taskManager.registerTask(new AttemptSelfDestruct());
+
 
                 }
             }
