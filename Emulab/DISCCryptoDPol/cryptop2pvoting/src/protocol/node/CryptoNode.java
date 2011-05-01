@@ -562,7 +562,7 @@ public class CryptoNode extends Node {
                 if (!isViewDiffusionOver) {
                     //       taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
                     //   if (!(peerView.size()<=1)) {
-                    specialDump("ViewDiffusion");
+                  //  specialDump("ViewDiffusion");
                     Set<E_CryptoNodeID> tempSet;
                     CRYPTO_VIEW_MSG mes;
                     for (int i = 0; i < numClusters; i++) {
@@ -626,7 +626,7 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isVoteTaskOver) {
-                    specialDump("VoteTask");
+                  //  specialDump("VoteTask");
                     startInstant = System.nanoTime();
                     CRYPTO_BALLOT_MSG mes = null;
                     taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
@@ -790,7 +790,7 @@ public class CryptoNode extends Node {
             // broadcast
             dump("GlobalCountingTask at begin");
             if (!IsPartialTallyingOver) {
-                specialDump("GlobalCountingTask");
+              //  specialDump("GlobalCountingTask");
                 synchronized (LOCK) {
                     CRYPTO_PARTIAL_TALLY_MSG mes = null;
                     taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
@@ -828,7 +828,7 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
                 taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
                 if (!isShareSendingOver) {
-                    specialDump("TallyDecryptionSharing");
+              //      specialDump("TallyDecryptionSharing");
                     dump("TallyDecryptionSharing");
 
                     dump("final encrypted:" + finalEncryptedResult.toString());
@@ -914,7 +914,7 @@ public class CryptoNode extends Node {
             // broadcast
             synchronized (LOCK) {
                 if ((!isResultDiffusionOver) && !(numClusters == nodeId.groupId + 1)) {
-                    specialDump("ResultDiffusionTask");
+              //      specialDump("ResultDiffusionTask");
                     dump("ResultDiffusionTask at begin");
 
                     CRYPTO_FINAL_RESULT_MSG mes=null;
@@ -1011,7 +1011,7 @@ public class CryptoNode extends Node {
       //      paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
             
 
-            specialDump(MSView+" "+MRView+" "+MSVote+" "+MRBallot+" "+MSPartial+" "+MRPartial+
+            specialDump("\r"+MSView+" "+MRView+" "+MSVote+" "+MRBallot+" "+MSPartial+" "+MRPartial+
                     " "+MSShare+" "+MRShare+" "+MSResult+" "+MRResult+" "+SMSView+" "+SMRView+" "+SMSVote+" "+SMRBallot+
                     " "+SMSPartial+" "+SMRPartial+" "+SMSShare+" "+SMRShare+" "+SMSResult+" "+SMRResult+" "+TallyAggTime+
                     " "+VoteEncTime+" "+VoteDecTime+" "+runningTime+"\r");
