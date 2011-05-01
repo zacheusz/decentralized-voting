@@ -760,6 +760,7 @@ public class CryptoNode extends Node {
                     } else if (computedLocalTally) {
                         partialTally = encryptor.add(localTally, partialTally);
                         taskManager.registerTask(new GlobalCountingTask());
+                        isShareSendingOver=true;
                     }
                 }
 
