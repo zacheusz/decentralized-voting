@@ -627,11 +627,18 @@ public class CryptoNode extends Node {
                 if (!isVoteTaskOver) {
                     //  specialDump("VoteTask");
                     E_CryptoNodeID tempID = null;
+                    int mycount=0;
                     for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
                         for (int j = 0; j < nodesPerMachine; j++) {
 
                             tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
                             peerView.add(tempID);
+                            if (nodeId.equals(tempID)) {
+                                secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile +mycount);
+                            }
+                            mycount++;
+
+
                         }
                     }
                     startInstant = System.nanoTime();
@@ -1014,7 +1021,7 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                if (nodeId.name.equals("node-1")&&nodeId.port == basicPort) {
+                if (nodeId.name.equals("node-1") && nodeId.port == basicPort) {
                     paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
                 }
 
