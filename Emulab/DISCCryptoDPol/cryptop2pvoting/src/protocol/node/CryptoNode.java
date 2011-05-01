@@ -93,7 +93,7 @@ public class CryptoNode extends Node {
     // public static boolean isMalicious;
     public static int order;
     public static int numReceivedViews = 0;
-    public static double threshold = 0.95;
+    public static double threshold = 1;
     public static boolean receivedAllViews = false;
     public static boolean isViewDiffusionOver = false;
     public static boolean isFirstView = true;
@@ -562,7 +562,7 @@ public class CryptoNode extends Node {
                 if (!isViewDiffusionOver) {
                     //       taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
                     //   if (!(peerView.size()<=1)) {
-                  //  specialDump("ViewDiffusion");
+                    specialDump("ViewDiffusion");
                     Set<E_CryptoNodeID> tempSet;
                     CRYPTO_VIEW_MSG mes;
                     for (int i = 0; i < numClusters; i++) {
@@ -626,7 +626,7 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isVoteTaskOver) {
-                  //  specialDump("VoteTask");
+                    specialDump("VoteTask");
                     startInstant = System.nanoTime();
                     CRYPTO_BALLOT_MSG mes = null;
                     taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
@@ -790,7 +790,7 @@ public class CryptoNode extends Node {
             // broadcast
             dump("GlobalCountingTask at begin");
             if (!IsPartialTallyingOver) {
-              //  specialDump("GlobalCountingTask");
+                specialDump("GlobalCountingTask");
                 synchronized (LOCK) {
                     CRYPTO_PARTIAL_TALLY_MSG mes = null;
                     taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
@@ -828,7 +828,7 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
                 taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
                 if (!isShareSendingOver) {
-              //      specialDump("TallyDecryptionSharing");
+                    specialDump("TallyDecryptionSharing");
                     dump("TallyDecryptionSharing");
 
                     dump("final encrypted:" + finalEncryptedResult.toString());
@@ -864,7 +864,7 @@ public class CryptoNode extends Node {
                     }
                     isShareSendingOver = true;
                     //}
-                    if (currentDecodingIndex == (int) (Math.floor(nodesPerCluster * threshold))) {
+                    if (currentDecodingIndex == (int) (Math.floor(MINTALLIES * threshold))) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
@@ -914,7 +914,7 @@ public class CryptoNode extends Node {
             // broadcast
             synchronized (LOCK) {
                 if ((!isResultDiffusionOver) && !(numClusters == nodeId.groupId + 1)) {
-              //      specialDump("ResultDiffusionTask");
+                    specialDump("ResultDiffusionTask");
                     dump("ResultDiffusionTask at begin");
 
                     CRYPTO_FINAL_RESULT_MSG mes=null;
