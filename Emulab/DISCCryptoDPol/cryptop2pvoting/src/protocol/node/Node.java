@@ -142,6 +142,7 @@ public abstract class Node implements Receiver {
 		}
 		synchronized(System.out) {
 			System.out.println(msg);
+                        System.out.println("");
 		}
 
 
