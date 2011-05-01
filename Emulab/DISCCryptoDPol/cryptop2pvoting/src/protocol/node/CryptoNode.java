@@ -150,6 +150,8 @@ public class CryptoNode extends Node {
     public long TallyAggTime = 0;
     public long VoteEncTime = 0;
     public long VoteDecTime = 0;
+    public long ShareCompTime = 0;
+             
     //protected boolean vote;
 //    protected Tally tally;
 //    protected Vote vote;
@@ -845,7 +847,9 @@ public class CryptoNode extends Node {
                     dump("TallyDecryptionSharing");
 
                     dump("final encrypted:" + finalEncryptedResult.toString());
+                    long startT = System.nanoTime();                                        
                     nodeResultShare = secKey.decrypt(finalEncryptedResult);
+                    ShareCompTime += System.nanoTime() - startT;
 
 
                     resultSharesList.add(nodeResultShare);
@@ -1031,7 +1035,7 @@ public class CryptoNode extends Node {
                         + " " + MRShare + " " + MRResult + " " + SMSView + " " + SMSVote + " " + SMSPartial + " " + SMSShare + " " + 
                         SMSResult + " " + SMRKeys+" "+SMRView + " "
                         + SMRBallot + " " + SMRPartial + " " + SMRShare + " " + SMRResult + " " + TallyAggTime
-                        + " " + VoteEncTime + " " + VoteDecTime + " " + runningTime + "\r");
+                        + " " + VoteEncTime + " " +ShareCompTime+" "+ VoteDecTime + " " + runningTime + "\r");
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
                 taskManager.registerTask(new SelfDestructTask());
