@@ -128,11 +128,15 @@ public class CryptoNode extends Node {
     public int MSVote = 0;
     public int MRBallot = 0;
     public int MSPartial = 0;
+    
+    public int MRKeys=1;
     public int MRPartial = 0;
     public int MSShare = 0;
     public int MRShare = 0;
     public int MSResult = 0;
     public int MRResult = 0;
+    
+    public int SMRKeys=0;
     public double SMSView = 0;
     public double SMRView = 0;
     public double SMSVote = 0;
@@ -517,6 +521,7 @@ public class CryptoNode extends Node {
                     IAmThreshold = true;
                     
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
+                    SMRKeys+=getObjectSize(secKey);
                     //  System.out.println("keynum:" + nodeToCluster.keyNum);
                 }
 		else
@@ -1020,9 +1025,11 @@ public class CryptoNode extends Node {
                     paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
                 }
 
-
-                specialDump("\r" + MSView + " " + Math.pow(MSVote,2) + " " + MSPartial + " " + MSShare + " " + MSResult + " " + MRView + " " + MRBallot + " " + MRPartial
-                        + " " + MRShare + " " + MRResult + " " + SMSView + " " + SMSVote + " " + SMSPartial + " " + SMSShare + " " + SMSResult + " " + SMRView + " "
+                
+                specialDump("\r" +" "+ MSView + " " + Math.pow(MSVote,2) + " " + MSPartial + " " + MSShare + " " + MSResult + " " +MRKeys+" "+
+                        MRView + " " + MRBallot + " " + MRPartial
+                        + " " + MRShare + " " + MRResult + " " + SMSView + " " + SMSVote + " " + SMSPartial + " " + SMSShare + " " + SMRKeys+" "+
+                        SMSResult + " " + SMRView + " "
                         + SMRBallot + " " + SMRPartial + " " + SMRShare + " " + SMRResult + " " + TallyAggTime
                         + " " + VoteEncTime + " " + VoteDecTime + " " + runningTime + "\r");
                 isResultOutputed = true;
