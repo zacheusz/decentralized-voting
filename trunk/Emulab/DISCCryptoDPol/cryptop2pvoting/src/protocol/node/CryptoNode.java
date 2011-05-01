@@ -514,7 +514,10 @@ public class CryptoNode extends Node {
 //                    System.out.println(nodeId.toString());
 //                }
                 if (nodeId.groupId == 0) {
-                    IAmThreshold = true;
+                    {IAmThreshold = true;
+                      isShareSendingOver=true;
+
+                    }
 
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
                     //  System.out.println("keynum:" + nodeToCluster.keyNum);
