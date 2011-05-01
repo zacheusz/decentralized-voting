@@ -361,7 +361,6 @@ public class CryptoNode extends Node {
     private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoSuchAlgorithmException {
         
         if (!isLocalCountingOver) {
-            synchronized (LOCK) {
                 dump("Received a ballot (" + msg.getVote() + ") from " + msg.getSrc());
                 aggrLocalTally(msg.getVote());
                 MRBallot++;
@@ -369,7 +368,7 @@ public class CryptoNode extends Node {
                 
             }
             
-        } else {
+         else {
             dump("Discarded an ballot message (cause: sent too late)");
         }
     }
