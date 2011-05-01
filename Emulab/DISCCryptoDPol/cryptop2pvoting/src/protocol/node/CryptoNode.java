@@ -701,7 +701,7 @@ public class CryptoNode extends Node {
             //  System.out.println("isIndivSendingOver:"+isIndivSendingOver);
             //System.out.println("isResultOutputed:"+isResultOutputed);
             synchronized (LOCK) {
-                if (IsPartialTallyingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult && isResultDiffusionOver) {
+                if (IsPartialTallyingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult && isResultDiffusionOver &&isShareSendingOver) {
 
                     /*		       try {
                     doSendUDP(new DEAD_MSG(nodeId, bootstrap));
@@ -881,8 +881,8 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isTallyDecryptionOver) {
-                    dump("TallyDecryption");
-
+                    specialDump("TallyDecryption");
+                    isDecryptionSharingOver=true;
                     PartialDecryption[] decArray = new PartialDecryption[resultSharesList.size()];
             //        System.out.println("shares: ");
                     for (int i = 0; i < resultSharesList.size(); i++) {
