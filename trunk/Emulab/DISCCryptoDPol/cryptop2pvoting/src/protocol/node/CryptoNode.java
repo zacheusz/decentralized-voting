@@ -53,8 +53,8 @@ public class CryptoNode extends Node {
     //                                1  second  to get proxies
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
-    private static int VIEW_DIFF_DELAY = 30 * 1000;// Delay before voting: 50 seconds
-    private static int VOTE_DELAY = VIEW_DIFF_DELAY + 20 * 1000;
+    private static int VIEW_DIFF_DELAY = 50 * 1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = VIEW_DIFF_DELAY + 40 * 1000;
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 320 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 320 * 1000;		// Duration of the local counting phase: 1 minute
@@ -664,7 +664,7 @@ public class CryptoNode extends Node {
                     taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
                     
                     aggrLocalTally(Emsg);
-                    taskManager.registerTask(new AttemptSelfDestruct());
+                    //taskManager.registerTask(new AttemptSelfDestruct());
                     //     taskManager.registerTask(new CloseVoteTask());
 
 
@@ -705,13 +705,13 @@ public class CryptoNode extends Node {
     private class AttemptSelfDestruct implements Task {
 
         public void execute() {
-//                   System.out.println("IsPartialTallyingOver:"+IsPartialTallyingOver);
-//                System.out.println("isVoteTaskOver:"+isVoteTaskOver);
-//              System.out.println("isLocalCountingOver:"+isLocalCountingOver);
-//            System.out.println("computedFinalResult:"+computedFinalResult);
-//            System.out.println("isResultDiffusionOver:"+isResultDiffusionOver);
-//            System.out.println("isShareSendingOver:"+isShareSendingOver);
-//            
+                   System.out.println("IsPartialTallyingOver:"+IsPartialTallyingOver);
+                System.out.println("isVoteTaskOver:"+isVoteTaskOver);
+              System.out.println("isLocalCountingOver:"+isLocalCountingOver);
+            System.out.println("computedFinalResult:"+computedFinalResult);
+            System.out.println("isResultDiffusionOver:"+isResultDiffusionOver);
+            System.out.println("isShareSendingOver:"+isShareSendingOver);
+            
             synchronized (LOCK) {
                 if (IsPartialTallyingOver && isVoteTaskOver && isLocalCountingOver && computedFinalResult && isResultDiffusionOver && isShareSendingOver) {
 
@@ -820,7 +820,6 @@ public class CryptoNode extends Node {
                         try {
                             mes = new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally);
                             doSendUDP(mes);
-                            Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
@@ -831,7 +830,7 @@ public class CryptoNode extends Node {
                     MSPartial += proxyView.size();
                     SMSPartial += getObjectSize(mes);
                     // taskManager.registerTask(new CloseGlobalCountingTask());
-
+		taskManager.registerTask(new AttemptSelfDestruct());	
                 }
                 dump("GlobalCountingTask at end");
             }
@@ -892,6 +891,7 @@ public class CryptoNode extends Node {
                         taskManager.registerTask(new TallyDecryption());
                     }
                             }
+		taskManager.registerTask(new AttemptSelfDestruct());
                 
             }
         }
@@ -934,13 +934,13 @@ public class CryptoNode extends Node {
 
         public void execute() {
             // broadcast
+            synchronized (LOCK) {
                 if (!isResultDiffusionOver) {
                 if (!(numClusters == nodeId.groupId + 1)) {
                     //specialDump("ResultDiffusionTask");
                     dump("ResultDiffusionTask at begin");
-            }
+
                     CRYPTO_FINAL_RESULT_MSG mes = null;
-                
                     for (E_CryptoNodeID proxyId : proxyView) {
 
 //                        if (isMalicious) {
@@ -950,7 +950,6 @@ public class CryptoNode extends Node {
                         try {
                             mes = new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult);
                             doSendUDP(mes);
-                            Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast final result");
                         }
@@ -959,13 +958,13 @@ public class CryptoNode extends Node {
                     MSResult += proxyView.size();
                     SMSResult += getObjectSize(mes) * proxyView.size();
 
-                
+                } 
                 isResultDiffusionOver = true;
 
                 dump("ResultDiffusionTask at end");
                 taskManager.registerTask(new AttemptSelfDestruct());
 
-            
+            }
             }
 
         }
@@ -984,7 +983,6 @@ public class CryptoNode extends Node {
                 numFinalResults++;
 
                 finalResults.add(msg.getResult());
-            }
                 MRResult++;
                 SMRResult += getObjectSize(msg);
                 dump("finals:" + numFinalResults + " " + clientView.size());
@@ -1000,7 +998,7 @@ public class CryptoNode extends Node {
                     }
                 }
 
-            
+            }
 
             //         }
         }
@@ -1032,9 +1030,9 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-//                if (nodeToCluster.keyNum == 0) {
-//                    paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
-//                }
+                if (nodeToCluster.keyNum == 0) {
+                    paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
+                }
 
                 
                 specialDump("\r" +" "+ MSView + " " + Math.pow(MSVote,2) + " " + MSPartial + " " + MSShare + " " + MSResult + " " +MRKeys+" "+

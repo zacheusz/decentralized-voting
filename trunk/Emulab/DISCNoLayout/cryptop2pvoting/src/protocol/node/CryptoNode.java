@@ -53,15 +53,15 @@ public class CryptoNode extends Node {
     //                                1  second  to get proxies
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
-    private static int VOTE_DELAY = 120 * 1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = 80 * 1000;// Delay before voting: 50 seconds
     private static int VIEW_DIFF_DELAY = 120 * 1000;
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
-    private static int CLOSE_COUNTING_DELAY = 320 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 320 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_DecryptionSharing_DELAY = 320 * 1000;
-    private static int CLOSE_ResultDiffusion_DELAY = 320 * 1000;
+    private static int CLOSE_COUNTING_DELAY = 3200 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 3200 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_DecryptionSharing_DELAY = 3200 * 1000;
+    private static int CLOSE_ResultDiffusion_DELAY = 3200 * 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
-    private static int SELF_DESTRUCT_DELAY = 1500 * 1000;
+    private static int SELF_DESTRUCT_DELAY = 15000 * 1000;
     // private static int COUNTING_PERIOD = 20 * 1000;		
     // Duration of epidemic dissemination: 20 seconds
     public static int kvalue;
@@ -716,10 +716,10 @@ public class CryptoNode extends Node {
     private class AttemptSelfDestruct implements Task {
         
         public void execute() {
-            System.out.println("isVoteTaskOver:" + isVoteTaskOver);
-            System.out.println("isLocalCountingOver:" + isLocalCountingOver);
-            System.out.println("isTallyDecryptionOver:" + isTallyDecryptionOver);
-            System.out.println("isShareSendingOver:" + isShareSendingOver);
+         //   System.out.println("isVoteTaskOver:" + isVoteTaskOver);
+         //   System.out.println("isLocalCountingOver:" + isLocalCountingOver);
+          //  System.out.println("isTallyDecryptionOver:" + isTallyDecryptionOver);
+          //  System.out.println("isShareSendingOver:" + isShareSendingOver);
             synchronized (LOCK) {
                 if (isVoteTaskOver && isLocalCountingOver && isTallyDecryptionOver && isShareSendingOver) {
 

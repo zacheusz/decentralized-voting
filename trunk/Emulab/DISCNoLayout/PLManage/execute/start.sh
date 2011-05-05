@@ -32,7 +32,7 @@ head -$NB_NODES nodesGoodPL > $nodesFile
 cd -;
 
 START=$(date +%s)
-./startTrustedThirdParty.sh
+#./startTrustedThirdParty.sh
 AFTERTRUSTED=$(date +%s)
 DIFF1=$(( $AFTERTRUSTED - $START ))
 echo "time for trusted 3rd party $DIFF1"
