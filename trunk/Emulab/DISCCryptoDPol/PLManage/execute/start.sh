@@ -1,6 +1,6 @@
 #!/bin/bash
 source ../configure.sh
-delay=10
+delay=15
 nb=$1
 
 echo "Running $nb experiments"
@@ -32,12 +32,13 @@ head -$NB_NODES nodesGoodPL > $nodesFile
 cd -;
 
 START=$(date +%s)
-./startTrustedThirdParty.sh
+#./startTrustedThirdParty.sh
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "java -classpath $BINHOME $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -bits $BITS -kvalue $KVALUE"
 AFTERTRUSTED=$(date +%s)
 DIFF1=$(( $AFTERTRUSTED - $START ))
 echo "time for trusted 3rd party $DIFF1"
 
-rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey*  $LOGIN_NAME@$home_node:$PROJECT_HOME/keys/
+#rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey*  $LOGIN_NAME@$home_node:$PROJECT_HOME/keys/
 
 sleep $delay
 
