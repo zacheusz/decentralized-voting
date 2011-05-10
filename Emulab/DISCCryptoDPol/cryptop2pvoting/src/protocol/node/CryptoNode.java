@@ -53,13 +53,13 @@ public class CryptoNode extends Node {
     //                                1  second  to get proxies
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
-    private static int VIEW_DIFF_DELAY = 50 * 1000;// Delay before voting: 50 seconds
-    private static int VOTE_DELAY = VIEW_DIFF_DELAY + 40 * 1000;
+    private static int VIEW_DIFF_DELAY = 100 * 1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = VIEW_DIFF_DELAY + 60 * 1000;
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
-    private static int CLOSE_COUNTING_DELAY = 320 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 320 * 1000;		// Duration of the local counting phase: 1 minute
-    private static int CLOSE_DecryptionSharing_DELAY = 320 * 1000;
-    private static int CLOSE_ResultDiffusion_DELAY = 320 * 1000;
+    private static int CLOSE_COUNTING_DELAY = 3200 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 3200 * 1000;		// Duration of the local counting phase: 1 minute
+    private static int CLOSE_DecryptionSharing_DELAY = 3200 * 1000;
+    private static int CLOSE_ResultDiffusion_DELAY = 3200 * 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
     private static int SELF_DESTRUCT_DELAY = 1500 * 1000;
     // private static int COUNTING_PERIOD = 20 * 1000;		
@@ -93,7 +93,7 @@ public class CryptoNode extends Node {
     // public static boolean isMalicious;
     public static int order;
     public static int numReceivedViews = 0;
-    public static double threshold = 0.99;
+    public static double threshold = 0.97;
     public static boolean receivedAllViews = false;
     public static boolean isViewDiffusionOver = false;
     public static boolean isFirstView = true;
@@ -391,7 +391,7 @@ public class CryptoNode extends Node {
 
                 MRShare++;
                 SMRShare += getObjectSize(msg);
-                if (isFinalResultCalculated && currentDecodingIndex == (int) (Math.floor(MINTALLIES))) {
+                if (isFinalResultCalculated && currentDecodingIndex >= (int) (Math.floor(MINTALLIES))) {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
@@ -420,7 +420,7 @@ public class CryptoNode extends Node {
                 MRPartial++;
                 SMRPartial += getObjectSize(msg);
 
-                if (numPartialTallies == (int) (Math.floor(clientView.size() * threshold))) {
+                if (numPartialTallies >= (int) (Math.floor(clientView.size() * threshold))) {
                     partialTally = mostPresent(partialTallies);
                     computedPartialTally = true;
 
@@ -597,7 +597,7 @@ public class CryptoNode extends Node {
                     isViewDiffusionOver = true;
                     //  taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
                     //     aggrLocalTally(Emsg);
-                    taskManager.registerTask(new AttemptSelfDestruct());
+                  //  taskManager.registerTask(new AttemptSelfDestruct());
                     //     taskManager.registerTask(new CloseVoteTask());
 
 
@@ -683,7 +683,7 @@ public class CryptoNode extends Node {
 
         dump("ballots " + numBallots + " " + peerView.size());
 
-        if (numBallots == peerView.size()) {
+        if (numBallots >= (int) (Math.floor(peerView.size()*threshold))) {
             computedLocalTally = true;
             if (IAmThreshold) {
                 partialTally = localTally;
@@ -885,7 +885,7 @@ public class CryptoNode extends Node {
                     //}
                             synchronized (LOCK) {
     
-                    if (currentDecodingIndex == (int) (Math.floor(MINTALLIES))) {
+                    if (currentDecodingIndex >= (int) (Math.floor(MINTALLIES))) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
@@ -986,7 +986,7 @@ public class CryptoNode extends Node {
                 MRResult++;
                 SMRResult += getObjectSize(msg);
                 dump("finals:" + numFinalResults + " " + clientView.size());
-                if (numFinalResults == (int) (Math.floor(clientView.size() * threshold))) {
+                if (numFinalResults >= (int) (Math.floor(clientView.size() * threshold))) {
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
 
