@@ -8,6 +8,8 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import paillierp.key.*;
+import protocol.communication.ClusterChoice;
+import protocol.node.CryptoNode;
 import zkp.*;
 
 /**
@@ -324,7 +326,7 @@ public class PaillierThreshold extends AbstractPaillier {
 					if (shares[i].getID()-shares[iprime].getID() != 0)
 						lambda = lambda.multiply(BigInteger.valueOf(-shares[iprime].getID())).divide(BigInteger.valueOf(shares[i].getID()-shares[iprime].getID()));
 					else
-						throw new IllegalArgumentException("You cannot have repeated shares.");
+						throw new IllegalArgumentException("You cannot have repeated shares."+ " keynum: " +ClusterChoice.keyNum);
 				}
 			}
 			cprime = cprime.multiply(shares[i].getDecryptedValue().modPow(BigInteger.valueOf(2).multiply(lambda), nSquare)).mod(nSquare);

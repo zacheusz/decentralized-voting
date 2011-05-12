@@ -19,7 +19,7 @@ import protocol.node.CryptoNode;
 public class ClusterChoice implements Serializable {
 
     public List< Set<E_CryptoNodeID>> nodeToClusterList;
-    public int keyNum=-1;
+    public static int keyNum=-1;
     //       public int steps;
 
     public void add(int chosenCluster, E_CryptoNodeID nodeID) {
