@@ -22,7 +22,7 @@ export SSH_TIMEOUT=80
 export BETA=0.05
 #tried deploying on fewer nodes
 export EPSILON=0.2
-export NB_NODES=30
+export NB_NODES=60
 export NB_MALICIOUS=0
 #export NB_GROUPS=10
 export K=8
@@ -32,7 +32,7 @@ export VOTECOUNT=3
 export nodesPerMachine=7
 export TALLYCOUNT=$(( $nodesPerMachine * $NB_NODES ))
 export VOTERCOUNT=$TALLYCOUNT
-export KVALUE=20
+export KVALUE=10
 #export MINTALLIES=$(((($VOTERCOUNT/$NB_GROUPS))))
 #export CERTAINTY=64
 export BITS=64
