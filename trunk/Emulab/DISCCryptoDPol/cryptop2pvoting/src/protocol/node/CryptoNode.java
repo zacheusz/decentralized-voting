@@ -524,7 +524,7 @@ public class CryptoNode extends Node {
                     
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
                     SMRKeys+=getObjectSize(secKey);
-                    //  System.out.println("keynum:" + nodeToCluster.keyNum);
+                    System.out.println("keynum:" + nodeToCluster.keyNum);
                 }
 		else
                     isShareSendingOver=true;
