@@ -840,7 +840,8 @@ public class CryptoNode extends Node {
     private class TallyDecryptionSharing implements Task {
 
         public void execute() {
-                taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
+            synchronized (LOCK) {
+            taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
                 if (!isShareSendingOver) {
                     //specialDump("TallyDecryptionSharing");
                     dump("TallyDecryptionSharing");
@@ -850,12 +851,12 @@ public class CryptoNode extends Node {
                     nodeResultShare = secKey.decrypt(finalEncryptedResult);
                     ShareCompTime += System.nanoTime() - startT;
 
-            synchronized (LOCK) {
+         
 
                     resultSharesList.add(nodeResultShare);
             
                     currentDecodingIndex++;
-                 }
+                 
             isFinalResultCalculated = true;
                     dump("sharesize: " + currentDecodingIndex);
 
@@ -883,16 +884,17 @@ public class CryptoNode extends Node {
                     }
                     isShareSendingOver = true;
                     //}
-                            synchronized (LOCK) {
+                          
     
-                    if (currentDecodingIndex >= (int) (Math.floor(MINTALLIES))) {
+                    if (currentDecodingIndex >= MINTALLIES){
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
                     }
-                            }
+                            
 		taskManager.registerTask(new AttemptSelfDestruct());
                 
+            }
             }
         }
     }
