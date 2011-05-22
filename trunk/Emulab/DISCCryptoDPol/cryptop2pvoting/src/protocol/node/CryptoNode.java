@@ -441,7 +441,7 @@ public class CryptoNode extends Node {
                 numPartialTallies++;
 
                 partialTallies.add(msg.getTally());
-                dump("partial:" + numPartialTallies + " " + clientView.size());
+                dump("partial:" + numPartialTallies + " " + (int) (Math.floor(clientView.size() * threshold)));
 
                 MRPartial++;
                 SMRPartial += getObjectSize(msg);
