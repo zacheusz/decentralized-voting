@@ -15,9 +15,9 @@ beta=$BETA
 
 function launch () {
 #    rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1  $LOGIN_NAME@$node:$PROJECT_HOME/keys/
-if [ $1 -eq 0 ]
+if [ $1 -eq $GOSSIP_PORT ]
 then
-	echo "mkdir -p $BINHOME2 ;cp -r $BINHOME/* $BINHOME2"
+#	echo "mkdir -p $BINHOME2 ;cp -r $BINHOME/* $BINHOME2"
     ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "mkdir -p $BINHOME2 ;cp -r $BINHOME/* $BINHOME2 ; pkill java; $JAVA_ -classpath $BINHOME2 $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON"
 else
 ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME2 $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON"
