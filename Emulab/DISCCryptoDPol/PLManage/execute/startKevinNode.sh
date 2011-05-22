@@ -63,7 +63,7 @@ do
   # j=$(($i/$NB_GROUPS))
   # echo "gid:" $gid
  #  echo "j:" $j
-   node_local_name=`expr match "$node" '\(node-*.[0-9]\)'`
+   node_local_name=`expr match "$node" '\(node-[0-9]*\)'`
 #   if [ $(($i)) -lt $(($thresh)) ]
 #then
 #      launch  $(( $GOSSIP_PORT + $k  )) $i &
