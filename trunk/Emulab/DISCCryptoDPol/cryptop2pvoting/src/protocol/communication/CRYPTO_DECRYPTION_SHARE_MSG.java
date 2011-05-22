@@ -8,16 +8,17 @@ import zkp.DecryptionZKP;
 
 public class CRYPTO_DECRYPTION_SHARE_MSG extends Message {
 	private static final long serialVersionUID = 1L;
-	private PartialDecryption share;
+	//private PartialDecryption share;
+        private DecryptionZKP share;
         private int shareOrder;
 	
-	public CRYPTO_DECRYPTION_SHARE_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, PartialDecryption share) {
+	public CRYPTO_DECRYPTION_SHARE_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, DecryptionZKP share) {
 		super(Message.CRYPTO_DECRYPTION_SHARE_MSG, src, dest);
 		this.share = share;
                 this.shareOrder=shareOrder;
 	}
 	
-	public PartialDecryption getShare() {
+	public DecryptionZKP getShare() {
 		return share;
 	}
 	public int getShareOrder() {
