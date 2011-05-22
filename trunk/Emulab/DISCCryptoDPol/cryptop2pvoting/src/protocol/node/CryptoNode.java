@@ -6,11 +6,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 import protocol.communication.*;
@@ -939,14 +942,22 @@ public class CryptoNode extends Node {
                                 continue;
                             }
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
+//                            try {
+//                                mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
+//                                doSendUDP(mes);
+//                            } catch (Exception e) {
+//                                dump("TCP: cannot send decryption share");
+//                            }
+//                        }
+                              mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
                             try {
-                                mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
                                 doSendUDP(mes);
-                            } catch (Exception e) {
-                                dump("TCP: cannot send decryption share");
+                            } catch (UnknownHostException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-
                         MSShare += peerView.size() - 1;
                         SMSShare += getObjectSize(mes) * (peerView.size() - 1);
 
