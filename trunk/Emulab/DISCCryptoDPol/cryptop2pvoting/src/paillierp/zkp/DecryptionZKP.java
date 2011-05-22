@@ -34,7 +34,7 @@ import paillierp.ByteUtils;
  * @author James Garrity
  * @see paillierp.PaillierThreshold
  */
-public class DecryptionZKP extends ZKP implements Serializable{
+public  class DecryptionZKP extends ZKP implements Serializable{
 
 	/*
 	 * 
