@@ -860,7 +860,7 @@ public class CryptoNode extends Node {
 
         //   private int localTallyGroupId;
         public void execute() {
-
+            synchronized(LOCK){
             // broadcast
             dump("GlobalCountingTask at begin");
             if (!IsPartialTallyingOver) {
@@ -891,6 +891,7 @@ public class CryptoNode extends Node {
                 taskManager.registerTask(new AttemptSelfDestruct());
             }
             dump("GlobalCountingTask at end");
+        }
         }
     }
 
