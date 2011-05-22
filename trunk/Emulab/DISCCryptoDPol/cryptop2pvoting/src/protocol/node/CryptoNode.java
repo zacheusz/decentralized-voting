@@ -53,8 +53,8 @@ public class CryptoNode extends Node {
     //                                1  second  to get proxies
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
-    private static int VIEW_DIFF_DELAY = 58 * 1000;// Delay before voting: 50 seconds
-    private static int VOTE_DELAY = VIEW_DIFF_DELAY + 120 * 1000;
+    private static int VIEW_DIFF_DELAY = 20 * 1000;// Delay before voting: 50 seconds
+    private static int VOTE_DELAY = VIEW_DIFF_DELAY + 20 * 1000;
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 3200 * 1000;		// Duration of the local counting phase: 1 minute
     private static int CLOSE_PARTIAL_TALLYING_DELAY = CLOSE_COUNTING_DELAY + 3200 * 1000;		// Duration of the local counting phase: 1 minute
@@ -736,7 +736,7 @@ public class CryptoNode extends Node {
 
             System.out.println("ballots " + numBallots + " " + peerView.size());
 
-            if (numBallots >= (int) (Math.floor(peerView.size() * thresholdBallot))) {
+            if (numBallots >= (int) (Math.floor(peerView.size()*thresholdBallot))) {
                 System.out.println((int) (Math.floor(peerView.size() * thresholdBallot)));
                 computedLocalTally = true;
                 if (IAmThreshold) {
