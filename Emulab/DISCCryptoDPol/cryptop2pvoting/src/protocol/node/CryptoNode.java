@@ -100,6 +100,8 @@ public class CryptoNode extends Node {
     public static boolean isFirstView = true;
     public static long startViewTime = 0;
     public static long viewDuration = 0;
+    public static int voteTimes=0;
+    public static int ballotTimes=0;
     // Fields
     // protected final E_CryptoNodeID bootstrap;
     //Keys
@@ -360,7 +362,8 @@ public class CryptoNode extends Node {
     }
 
     private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoSuchAlgorithmException {
-
+                ballotTimes++;
+                dump ("BallotTimes: "+ballotTimes);
         if (!isLocalCountingOver) {
             dump("Received a ballot (" + msg.getVote() + ") from " + msg.getSrc());
 
@@ -657,8 +660,9 @@ public class CryptoNode extends Node {
         public void execute() {
             if (!isVoteTaskOver) {
                 //specialDump("VoteTask");
-
-
+                voteTimes++;
+                dump ("VoteTimes: "+voteTimes);
+                
                 startInstant = System.nanoTime();
 
                 CRYPTO_BALLOT_MSG mes = null;
@@ -736,7 +740,7 @@ public class CryptoNode extends Node {
 
             System.out.println("ballots " + numBallots + " " + peerView.size());
 
-            if (numBallots >= (int) (Math.floor(peerView.size()*thresholdBallot))) {
+            if (numBallots >= (int) (Math.floor(peerView.size() * thresholdBallot))) {
                 System.out.println((int) (Math.floor(peerView.size() * thresholdBallot)));
                 computedLocalTally = true;
                 if (IAmThreshold) {
