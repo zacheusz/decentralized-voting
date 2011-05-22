@@ -658,39 +658,39 @@ public class CryptoNode extends Node {
             if (!isVoteTaskOver) {
                 //specialDump("VoteTask");
 
-                isVoteTaskOver = true;
+
                 startInstant = System.nanoTime();
 
                 CRYPTO_BALLOT_MSG mes = null;
 
                 taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-                synchronized (LOCK) {
+                //   synchronized (LOCK) {
 
-                    if (!(peerView.size() <= 1)) {
-                        dump("psize: " + peerView.size());
-                        for (E_CryptoNodeID peerId : peerView) {
-                            if (peerId.equals(nodeId)) {
-                                continue;
-                            }
-                            dump("Send a '" + Emsg + "' ballot to " + peerId);
-                            try {
-
-                                mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
-
-                                doSendTCP(mes);
-                            } catch (Exception e) {
-                                dump("TCP: cannot vote");
-                            }
+                if (!(peerView.size() <= 1)) {
+                    dump("psize: " + peerView.size());
+                    for (E_CryptoNodeID peerId : peerView) {
+                        if (peerId.equals(nodeId)) {
+                            continue;
                         }
-                        MSVote += peerView.size() - 1;
-                        SMSVote += getObjectSize(mes) * (peerView.size() - 1);
+                        dump("Send a '" + Emsg + "' ballot to " + peerId);
+                        try {
 
-                    } else {
-                        dump("Cannot vote: no peer view");
+                            mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
 
+                            doSendTCP(mes);
+                        } catch (Exception e) {
+                            dump("TCP: cannot vote");
+                        }
                     }
-//                    isVoteTaskOver = true;
-                    taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
+                    MSVote += peerView.size() - 1;
+                    SMSVote += getObjectSize(mes) * (peerView.size() - 1);
+
+                } else {
+                    dump("Cannot vote: no peer view");
+
+                }
+                isVoteTaskOver = true;
+                taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
 
 //                    BigInteger ballot = Emsg;
 //
@@ -716,12 +716,12 @@ public class CryptoNode extends Node {
 //                    }
 
 
-                    aggrLocalTally(Emsg);
-                    //taskManager.registerTask(new AttemptSelfDestruct());
-                    //     taskManager.registerTask(new CloseVoteTask());
+                aggrLocalTally(Emsg);
+                //taskManager.registerTask(new AttemptSelfDestruct());
+                //     taskManager.registerTask(new CloseVoteTask());
 
-                }
             }
+            //  }
 
         }
     }
