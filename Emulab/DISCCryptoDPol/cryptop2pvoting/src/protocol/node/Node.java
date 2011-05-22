@@ -30,7 +30,8 @@ public abstract class Node implements Receiver {
 	protected final NetworkSend networkSend;
 	// Mutual exclusion
 	protected final Object LOCK = new Object();
-	
+		protected final Object BallotLOCK = new Object();
+
 	public Node(E_CryptoNodeID nodeId, NetworkSend networkSend) {
 		this.nodeId = nodeId;
 		this.networkSend = networkSend;

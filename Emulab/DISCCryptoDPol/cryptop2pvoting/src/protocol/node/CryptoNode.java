@@ -53,7 +53,7 @@ public class CryptoNode extends Node {
     //                                1  second  to get proxies
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
-    private static int VIEW_DIFF_DELAY = 580 * 1000;// Delay before voting: 50 seconds
+    private static int VIEW_DIFF_DELAY = 58 * 1000;// Delay before voting: 50 seconds
     private static int VOTE_DELAY = VIEW_DIFF_DELAY + 120* 1000;
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 3200 * 1000;		// Duration of the local counting phase: 1 minute
@@ -94,7 +94,8 @@ public class CryptoNode extends Node {
     public static int order;
     public static int numReceivedViews = 0;
     public static double threshold = 0.95;
-    public static boolean receivedAllViews = false;
+     public static double thresholdBallot = 1;
+   public static boolean receivedAllViews = false;
     public static boolean isViewDiffusionOver = false;
     public static boolean isFirstView = true;
     public static long startViewTime = 0;
@@ -364,13 +365,38 @@ public class CryptoNode extends Node {
     private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoSuchAlgorithmException {
 
         if (!isLocalCountingOver) {
-        //    synchronized (LOCK) {
                 dump("Received a ballot (" + msg.getVote() + ") from " + msg.getSrc());
-                aggrLocalTally(msg.getVote());
+
+          synchronized (LOCK) {
+                                
+
+               BigInteger ballot=msg.getVote();
+		numBallots++;
+        System.out.println("ballots " + numBallots + " " + peerView.size());
+
+        if (numBallots >= (int)(Math.floor(peerView.size()*thresholdBallot))) {
+           System.out.println((int)(Math.floor(peerView.size()*thresholdBallot)));
+                 computedLocalTally = true;
+            if (IAmThreshold) {
+                partialTally = localTally;
+                taskManager.registerTask(new GlobalCountingTask());
+            } else if (computedPartialTally) {
+                partialTally = encryptor.add(localTally, partialTally);
+                taskManager.registerTask(new GlobalCountingTask());
+            }
+            isLocalCountingOver = true;
+            taskManager.registerTask(new AttemptSelfDestruct());
+
+            //else do nothing
+        }
+        
+
+
+		//aggrLocalTally(msg.getVote());
                 MRBallot++;
                 SMRBallot += getObjectSize(msg);
 
-        //    }
+          }
 
         } else {
             dump("Discarded an ballot message (cause: sent too late)");
@@ -633,12 +659,18 @@ public class CryptoNode extends Node {
 
         public void execute() {
                 if (!isVoteTaskOver) {
-                    //specialDump("VoteTask");
-                    startInstant = System.nanoTime();
-                    CRYPTO_BALLOT_MSG mes = null;
-                    taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-                    if (!(peerView.size() <= 1)) {
+                   //specialDump("VoteTask");
+ 
+  isVoteTaskOver = true;
+		startInstant = System.nanoTime();
 
+                    CRYPTO_BALLOT_MSG mes = null;
+
+                    taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
+                  synchronized (LOCK) {
+   
+		 if (!(peerView.size() <= 1)) {
+		dump("psize: "+peerView.size());
                         for (E_CryptoNodeID peerId : peerView) {
                             if (peerId.equals(nodeId)) {
                                 continue;
@@ -648,7 +680,7 @@ public class CryptoNode extends Node {
 
                                 mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
 
-                                doSendUDP(mes);
+                                doSendTCP(mes);
                             } catch (Exception e) {
                                 dump("TCP: cannot vote");
                             }
@@ -660,31 +692,19 @@ public class CryptoNode extends Node {
                         dump("Cannot vote: no peer view");
 
                     }
-                    isVoteTaskOver = true;
+//                    isVoteTaskOver = true;
                     taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
-                    
-                    aggrLocalTally(Emsg);
-                    //taskManager.registerTask(new AttemptSelfDestruct());
-                    //     taskManager.registerTask(new CloseVoteTask());
+        
+      BigInteger ballot=Emsg;
 
-
-                }
-            
-        }
-    }
-
-    public void aggrLocalTally(BigInteger ballot) {
-            synchronized (LOCK) {
-
-
-        localTally = encryptor.add(localTally, ballot);
+                   localTally = encryptor.add(localTally, ballot);
         numBallots++;
 
+        System.out.println("ballots " + numBallots + " " + peerView.size());
 
-        dump("ballots " + numBallots + " " + peerView.size());
-
-        if (numBallots >= (int)(Math.floor(peerView.size()*threshold))) {
-            computedLocalTally = true;
+        if (numBallots >= (int)(Math.floor(peerView.size()*thresholdBallot))) {
+           System.out.println((int)(Math.floor(peerView.size()*thresholdBallot)));
+                 computedLocalTally = true;
             if (IAmThreshold) {
                 partialTally = localTally;
                 taskManager.registerTask(new GlobalCountingTask());
@@ -697,7 +717,44 @@ public class CryptoNode extends Node {
 
             //else do nothing
         }
+          
+ 
+//                    aggrLocalTally(Emsg);
+                    //taskManager.registerTask(new AttemptSelfDestruct());
+                    //     taskManager.registerTask(new CloseVoteTask());
+		
+			}
+                }
+            
+        }
+    }
+
+    public void aggrLocalTally(BigInteger ballot) {
+            synchronized (BallotLOCK) {
+
+
+        localTally = encryptor.add(localTally, ballot);
+        numBallots++;
+
+
+        System.out.println("ballots " + numBallots + " " + peerView.size());
+
+        if (numBallots >= (int)(Math.floor(peerView.size()*thresholdBallot))) {
+           System.out.println((int)(Math.floor(peerView.size()*thresholdBallot)));
+		 computedLocalTally = true;
+            if (IAmThreshold) {
+                partialTally = localTally;
+                taskManager.registerTask(new GlobalCountingTask());
+            } else if (computedPartialTally) {
+                partialTally = encryptor.add(localTally, partialTally);
+                taskManager.registerTask(new GlobalCountingTask());
             }
+            isLocalCountingOver = true;
+            taskManager.registerTask(new AttemptSelfDestruct());
+
+            //else do nothing
+        }
+          }
 
 
     }
@@ -843,7 +900,9 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
             taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
                 if (!isShareSendingOver) {
-                    //specialDump("TallyDecryptionSharing");
+                    isShareSendingOver = true;
+  
+                  //specialDump("TallyDecryptionSharing");
                     dump("TallyDecryptionSharing");
 
                     dump("final encrypted:" + finalEncryptedResult.toString());
@@ -882,7 +941,7 @@ public class CryptoNode extends Node {
                     } else {
                         receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
                     }
-                    isShareSendingOver = true;
+//                    isShareSendingOver = true;
                     //}
                           
     
@@ -910,11 +969,12 @@ public class CryptoNode extends Node {
                     //        System.out.println("shares: ");
                     for (int i = 0; i < resultSharesList.size(); i++) {
                         decArray[i] = resultSharesList.get(i);
-                        //     System.out.println(" " + decArray[i].getDecryptedValue());
+                        System.out.println(" " + decArray[i].getDecryptedValue());
                     }
-                    //System.out.println("decaraysize: " + resultSharesList.size());
+                    System.out.println("decaraysize: " + resultSharesList.size());
 
                     long startT = System.nanoTime();
+	
                     finalResult = secKey.combineShares(decArray);
                     VoteDecTime += System.nanoTime() - startT;
 
