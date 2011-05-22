@@ -4,6 +4,7 @@
  */
 package zkp;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import paillierp.PartialDecryption;
 import paillierp.key.PaillierPrivateThresholdKey;
@@ -33,7 +34,7 @@ import paillierp.ByteUtils;
  * @author James Garrity
  * @see paillierp.PaillierThreshold
  */
-public class DecryptionZKP extends ZKP {
+public class DecryptionZKP extends ZKP implements Serializable{
 
 	/*
 	 * 

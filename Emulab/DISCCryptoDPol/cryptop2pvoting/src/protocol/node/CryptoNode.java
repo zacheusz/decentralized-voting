@@ -38,6 +38,7 @@ import paillierp.key.PaillierKey;
 import runtime.executor.E_CryptoNodeID;
 
 import protocol.communication.ClusterChoice;
+import zkp.DecryptionZKP;
 
 public class CryptoNode extends Node {
 
@@ -167,8 +168,10 @@ public class CryptoNode extends Node {
     /*protected DecodingShare nodeResultShare;
     protected Map<E_CryptoNodeID, DecodingShare> resultShares = new HashMap<E_CryptoNodeID, DecodingShare>();
     protected DecodingShare[] resultSharesList;*/
-    protected PartialDecryption nodeResultShare;
-    protected List<PartialDecryption> resultSharesList = new LinkedList<PartialDecryption>();
+    //protected PartialDecryption nodeResultShare;
+    protected DecryptionZKP nodeResultShare;
+    //protected List<PartialDecryption> resultSharesList = new LinkedList<PartialDecryption>();
+    protected List<DecryptionZKP> resultSharesList = new LinkedList<DecryptionZKP>();
     //protected List <DecryptionZKP> resultSharesList=new LinkedList<DecryptionZKP>();
     protected int currentDecodingIndex;
     protected int numIndTallies;
@@ -409,8 +412,13 @@ public class CryptoNode extends Node {
             if (!isDecryptionSharingOver) {
 
                 dump("Received a decryption share (" + msg.getShare() + ") from " + msg.getSrc());
-
-                resultSharesList.add(msg.getShare());
+                if (msg.getShare().verify(finalEncryptedResult))
+                {
+                    resultSharesList.add(msg.getShare());
+                    dump ("valid dec share from "+msg.getSrc());
+                }
+                else
+                    dump ("invalid dec share from "+msg.getSrc());
 
                 currentDecodingIndex++;
                 dump("sharesize: " + currentDecodingIndex);
@@ -908,11 +916,14 @@ public class CryptoNode extends Node {
 
                     dump("final encrypted:" + finalEncryptedResult.toString());
                     long startT = System.nanoTime();
-                    nodeResultShare = secKey.decrypt(finalEncryptedResult);
+                    //nodeResultShare = secKey.decrypt(finalEncryptedResult);
+                    nodeResultShare = secKey.decryptProof(finalEncryptedResult);
+                    
                     ShareCompTime += System.nanoTime() - startT;
-
-
-
+                    if (nodeResultShare.verify(finalEncryptedResult))
+                        dump("My share is valid!");
+                    else 
+                        dump ("My share is invalid");
                     resultSharesList.add(nodeResultShare);
 
                     currentDecodingIndex++;
@@ -966,11 +977,11 @@ public class CryptoNode extends Node {
                 if (!isTallyDecryptionOver) {
                     //specialDump("TallyDecryption");
                     isDecryptionSharingOver = true;
-                    PartialDecryption[] decArray = new PartialDecryption[resultSharesList.size()];
+                    DecryptionZKP[] decArray = new DecryptionZKP[resultSharesList.size()];
                     //        System.out.println("shares: ");
                     for (int i = 0; i < resultSharesList.size(); i++) {
                         decArray[i] = resultSharesList.get(i);
-                        System.out.println(" " + decArray[i].getDecryptedValue());
+                        System.out.println(" " + decArray[i].getPartialDecryption().getDecryptedValue());
                     }
                     System.out.println("decaraysize: " + resultSharesList.size());
 
