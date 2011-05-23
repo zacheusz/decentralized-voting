@@ -587,7 +587,7 @@ public class CryptoNode extends Node {
                         taskManager.registerTask(new ResultOutput());
                     }
                 } else {
-                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 1000);
+                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) *3000);
 
                 }
 
@@ -608,13 +608,13 @@ public class CryptoNode extends Node {
 
         if (!receivedAllRumors) {
             synchronized (LOCK) {
-                if (Math.random() < LOSS) {
+                if ((msg.round>=currentRound)||(Math.random() < LOSS) ){
                     dump("Discarded rumor");
                     return;
                 }
                 dump("Received rumor from" + msg.getSrc());
                 //update current counter
-                currentRound = msg.round;
+                 currentRound= msg.round;
                 MRRumors++;
                 taskManager.registerTask(new ReadCounter());
 
