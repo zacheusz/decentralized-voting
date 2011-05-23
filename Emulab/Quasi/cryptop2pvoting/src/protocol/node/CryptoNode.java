@@ -71,11 +71,11 @@ public class CryptoNode extends Node {
     public static ClusterChoice nodeToCluster = null;
     public static int chosenCluster;
     public static int currentNeighbour = 0;
-public static int firstRound = 0;
+    public static int firstRound = 0;
     public static int currentRound = 0;
     public static int currentCounter = 0;
     public static int numClusters;
-    public static double LOSS=0.5;
+    public static double LOSS = 0.5;
     E_CryptoNodeID bid;
     public static Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
     public static Map<E_CryptoNodeID, Integer> finalIDAssignment = new HashMap<E_CryptoNodeID, Integer>();
@@ -197,7 +197,7 @@ public static int firstRound = 0;
     protected final TaskManager taskManager;
     protected final Stopper stopper;
     // Stats
-    public  long startTime=0;
+    public long startTime = 0;
     public boolean stopped = false;
     public double threshOrder;
 
@@ -311,7 +311,7 @@ public static int firstRound = 0;
         dump("Node " + nodeId.getName() + " is born: ");
         //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
-        
+
     }
 
     // **************************************************************************
@@ -476,7 +476,7 @@ public static int firstRound = 0;
         public void execute() {
             synchronized (LOCK) {
                 READ_CTR_MSG mes = null;
-
+                dump("Read Counter value");
                 try {
                     mes = new READ_CTR_MSG(nodeId, bid);
                     doSendUDP(mes);
@@ -494,6 +494,7 @@ public static int firstRound = 0;
         public void execute() {
             synchronized (LOCK) {
                 INC_CTR_MSG mes = null;
+                dump("Incremenet Counter value");
 
                 try {
                     mes = new INC_CTR_MSG(nodeId, bid);
@@ -511,19 +512,22 @@ public static int firstRound = 0;
 
         if (!receivedAllRumors) {
             synchronized (LOCK) {
+                dump("Received counter value");
 
                 currentCounter = msg.counter;
 
                 Random generator;
 
                 if (isFirstDiffusion) {
-                    firstRound=currentRound;
+                    firstRound = currentRound;
                     currentCounter++;
                     taskManager.registerTask(new IncCounter());
-                
+
                     generator = new Random();
                     currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
                     isFirstDiffusion = false;
+                    dump("First Time Received");
+
 
                 } else {
                     currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
@@ -536,11 +540,12 @@ public static int firstRound = 0;
 
                 if (currentCounter == VOTERCOUNT) {
                     {
-                    receivedAllRumors=true;
-                    taskManager.registerTask(new ResultOutput());
+                        dump("All received rumors.");
+                        receivedAllRumors = true;
+                        taskManager.registerTask(new ResultOutput());
                     }
                 } else {
-                    taskManager.registerTask(new RumorDiffusion(),(long)exp(1)*1000);
+                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 1000);
 
                 }
 
@@ -548,22 +553,24 @@ public static int firstRound = 0;
         }
     }
 
-    
     /**
      * Return a real number from an exponential distribution with rate lambda.
      */
-    public static double exp(double lambda) {
-        return -Math.log(1 - Math.random()) / lambda;
+    public double exp(double lambda) {
+        double time = -Math.log(1 - Math.random()) / lambda;
+        dump("time: " + time);
+        return time;
     }
 
-    
     private void receiveRumor(RUMOR_MSG msg) {
 
         if (!receivedAllRumors) {
             synchronized (LOCK) {
-                if (Math.random() < LOSS)
+                if (Math.random() < LOSS) {
+                    dump ("Discarded rumor");
                     return;
-                
+                }
+                dump ("Received rumor from"+ msg.getSrc());
                 //update current counter
                 currentRound = msg.round;
                 MRRumors++;
@@ -580,12 +587,13 @@ public static int firstRound = 0;
 
         public void execute() {
             synchronized (LOCK) {
-                long duration=0;
-                if (IAmSource) 
-                    duration = System.currentTimeMillis()-startTime;
+                long duration = 0;
+                if (IAmSource) {
+                    duration = System.currentTimeMillis() - startTime;
+                }
 
 
-                specialDump("\r" + " " + MSRumors +" "+MRRumors+ " "+firstRound+" "+currentRound+" " +duration+"\r");
+                specialDump("\r" + " " + MSRumors + " " + MRRumors + " " + firstRound + " " + currentRound + " " + duration + "\r");
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
                 taskManager.registerTask(new SelfDestructTask());
