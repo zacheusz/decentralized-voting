@@ -406,15 +406,17 @@ public class CryptoNode extends Node {
                 for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
                     for (int j = 0; j < nodesPerMachine; j++) {
                         tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
-
+                        if (tempID.equals(nodeId))
+                            continue;
                         IDAssignment.put(tempID, tempID.getOrder());
                         mycount++;
                     }
                 }
                 sortedIDs = sortByValue(IDAssignment);
 
-                IAmSource = (nodeId.equals(sortedIDs.get(0)));
-                sortedIDs.remove(nodeId);
+                IAmSource=((nodeId.port==basicPort)&&nodeId.name.equals("node-1"));
+                    
+                
                 if (sortedIDs.size() == VOTERCOUNT - 1) {
                     dump("I was removed");
                 }
