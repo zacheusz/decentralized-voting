@@ -485,6 +485,7 @@ public class CryptoNode extends Node {
                 }
                 MSRumors++;
                 //       SMSView += getObjectSize(mes);
+                taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 1000);
             }
 
 
