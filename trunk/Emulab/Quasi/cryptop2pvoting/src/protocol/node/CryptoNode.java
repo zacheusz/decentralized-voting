@@ -437,7 +437,7 @@ public class CryptoNode extends Node {
                     currentRound = 0;
                     currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
                     isFirstDiffusion = false;
-            //        isFirstReception=false;
+                    isFirstReception=false;
                     taskManager.registerTask(new RumorDiffusion(), VIEW_DIFF_DELAY);
                 }
             }
@@ -676,7 +676,7 @@ public class CryptoNode extends Node {
                 }
 
 
-                specialDump("\r" + " " + MSRumors + " " + MRRumors + " " + firstRound + " " + currentRound + " " + duration + "\r");
+                specialDump("\r" + " " + MSRumors + " " + MRRumors + " " + firstRound + " " + currentRound  + "\r");
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
                 taskManager.registerTask(new SelfDestructTask());
