@@ -77,7 +77,7 @@ public class CryptoNode extends Node {
     public static int chosenCluster;
     public static int currentNeighbour = 0;
     public static int firstRound = 0;
-    public static int currentRound = 0;
+    public static int currentRound = 1;
     public static int currentCounter = 1;
     public static int numClusters;
     public static double LOSS = 0.5;
@@ -431,6 +431,7 @@ public class CryptoNode extends Node {
                     startTime = System.currentTimeMillis();
                     dump("I am source");
                     Random generator = new Random();
+                    currentRound=0;
                     currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
                     isFirstDiffusion = false;
                     taskManager.registerTask(new RumorDiffusion(), VIEW_DIFF_DELAY);
