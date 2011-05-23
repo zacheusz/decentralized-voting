@@ -99,6 +99,7 @@ public class CryptoNode extends Node {
     public int numBallots = 0;
     public boolean isResultDiffusionOver = false;
     public boolean isFirstDiffusion = true;
+    public boolean isFirstReception = true;
     public int numFinalResults = 0;
     protected List<BigInteger> finalResults = new LinkedList<BigInteger>();
     public boolean computedFinalResult = false;
@@ -296,7 +297,7 @@ public class CryptoNode extends Node {
 
 //        MINTALLIES = nodesPerCluster / 2 + 1;
 //        //  System.out.println("min:" + MINTALLIES)
-         VIEW_DIFF_DELAY = 15+700*VOTERCOUNT/3000 * 1000;
+        VIEW_DIFF_DELAY = 15 + 700 * VOTERCOUNT / 3000 * 1000;
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
@@ -432,7 +433,7 @@ public class CryptoNode extends Node {
                     startTime = System.currentTimeMillis();
                     dump("I am source");
                     Random generator = new Random();
-                    currentRound=0;
+                    currentRound = 0;
                     currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
                     isFirstDiffusion = false;
                     taskManager.registerTask(new RumorDiffusion(), VIEW_DIFF_DELAY);
@@ -514,8 +515,7 @@ public class CryptoNode extends Node {
                     return;
 
                 } catch (UnknownHostException ex) {
-                    Logger.getLogger
-                            (CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -593,7 +593,7 @@ public class CryptoNode extends Node {
                         return;
                     }
                 } else {
-                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) *5000);
+                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 5000);
 
                 }
 
@@ -615,24 +615,24 @@ public class CryptoNode extends Node {
         if (!receivedAllRumors) {
             synchronized (LOCK) {
                 // msg.round>=currentRound &&
-                if ( !isFirstDiffusion){
+                if (!isFirstReception) {
+
+                    if (Math.random() < LOSS) {
+                        dump("Discarded rumor: loss");
+                        return;
+                    }
+
+                    dump("Received rumor from" + msg.getSrc());
+                    //update current counter
+                    currentRound = msg.round;
+                    MRRumors++;
+                    taskManager.registerTask(new ReadCounter());
+                    isFirstReception = false;
+                } else {
                     dump("Discarded rumor: duplicate");
                     MRRumors++;
-                    return;
+                    
                 }
-                else if (Math.random() < LOSS) 
-                {
-                        dump("Discarded rumor: loss");
-                    return;
-                }
-                dump("Received rumor from" + msg.getSrc());
-                //update current counter
-                 currentRound= msg.round;
-                MRRumors++;
-                taskManager.registerTask(new ReadCounter());
-
-
-
 
             }
         }
