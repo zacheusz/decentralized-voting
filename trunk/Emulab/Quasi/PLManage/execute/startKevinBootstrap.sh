@@ -24,7 +24,7 @@ fi
 echo -e "\e[32;32mUsing bootstrap: $BOOTSTRAP and port $BOOTSTRAP_PORT"; tput sgr0 # green
 
 echo -e "\e[32;32mLaunching bootstrap ($BOOTSTRAP) on port $BOOTSTRAP_PORT at time `date`"; tput sgr0 # green
-ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$full_bname "$JAVA_ -classpath $BINHOME $BOOTSTRAPCLASSNAME -name $BOOTSTRAP -port $BOOTSTRAP_PORT -nbGroups $NB_GROUPS"
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$full_bname "$JAVA_ -classpath $BINHOME $BOOTSTRAPCLASSNAME -bname $BOOTSTRAP -bport $BOOTSTRAP_PORT -votercount $VOTERCOUNT"
 
 
 wait
