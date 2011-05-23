@@ -26,6 +26,7 @@ public abstract class Message implements Serializable, Cloneable {
     public static final byte COUNTER_MSG = 16;
     public static final byte RUMOR_MSG = 17;
 	public static final byte INC_CTR_MSG = 18;
+       public static final byte  PING_MSG = 19;
     protected byte header;
     protected E_CryptoNodeID src;
     protected E_CryptoNodeID dest;
