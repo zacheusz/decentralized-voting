@@ -62,7 +62,7 @@ public class CentralNode extends Node {
     private static int CLOSE_DecryptionSharing_DELAY = 3200 * 1000;
     private static int CLOSE_ResultDiffusion_DELAY = 3200 * 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
-    private static int SELF_DESTRUCT_DELAY = 1500 * 1000;
+        private static int SELF_DESTRUCT_DELAY = 200 * 1000;
     // private static int COUNTING_PERIOD = 20 * 1000;		
     // Duration of epidemic dissemination: 20 seconds
     public static int kvalue;
@@ -258,7 +258,7 @@ public static int firstRound = 0;
         this.sec = sec;
         res = new Result(pub);
         tally = new Tally(sec, pub);//returns the distributed key share*/
-        this.individualTally = BigInteger.ONE;
+//        this.individualTally = BigInteger.ONE;
 //        this.localTally = BigInteger.ONE;
 //        finalEncryptedResult = BigInteger.ONE;
 //        finalResult = BigInteger.ONE;
@@ -290,23 +290,22 @@ public static int firstRound = 0;
 
 //        MINTALLIES = nodesPerCluster / 2 + 1;
 //        //  System.out.println("min:" + MINTALLIES);
-        try {
-//            taskManager.registerTask(new AnnouncerTask());
-//            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
-//            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PROXIES), GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY);
-//            taskManager.registerTask(new VoteTask(), VOTE_DELAY);
-            //     taskManager.registerTask(new PreemptCloseLocalElectionTask(), CLOSE_VOTE_DELAY);
-//            taskManager.registerTask(new getViews());
-
-//            taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-//            taskManager.registerTask(new PreemptCloseGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
-//            taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
-//            taskManager.registerTask(new PreemptTallyDecryption(), CLOSE_TallyDecryption_DELAY);
-            taskManager.registerTask(new SelfDestructTask(), SELF_DESTRUCT_DELAY);
-        } catch (Error e) {
-            dump(nodeId + ": " + e.getMessage());
-            e.printStackTrace();
-        }
+//        try {
+////            taskManager.registerTask(new AnnouncerTask());
+////            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
+////            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PROXIES), GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY);
+////            taskManager.registerTask(new VoteTask(), VOTE_DELAY);
+//            //     taskManager.registerTask(new PreemptCloseLocalElectionTask(), CLOSE_VOTE_DELAY);
+////            taskManager.registerTask(new getViews());
+//
+////            taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
+////            taskManager.registerTask(new PreemptCloseGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
+////            taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
+////            taskManager.registerTask(new PreemptTallyDecryption(), CLOSE_TallyDecryption_DELAY);
+//        } catch (Error e) {
+//            dump(nodeId + ": " + e.getMessage());
+//            e.printStackTrace();
+//        }
         dump("Node " + nodeId.getName() + " is born: ");
         //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
@@ -496,7 +495,9 @@ public static int firstRound = 0;
             synchronized (LOCK) {
                 
                 currentCounter++;
-      
+                if (currentCounter==VOTERCOUNT)
+                        taskManager.registerTask(new SelfDestructTask(), SELF_DESTRUCT_DELAY);
+
             }
        
     }
