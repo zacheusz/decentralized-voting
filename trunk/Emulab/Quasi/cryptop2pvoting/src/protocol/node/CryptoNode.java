@@ -470,6 +470,9 @@ public class CryptoNode extends Node {
 
 
                 peerId = sortedIDs.get(currentNeighbour);
+                //update current neighbor for next time
+                currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
+                
                 dump("Send a rumor to " + peerId);
 
                 mes = new RUMOR_MSG(nodeId, peerId, currentRound);
@@ -561,11 +564,12 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
                 dump("Received counter value");
 
+
+                if (isFirstDiffusion) {
+                    
                 currentCounter = msg.counter;
 
                 Random generator;
-
-                if (isFirstDiffusion) {
                     firstRound = currentRound;
                     currentCounter++;
                     taskManager.registerTask(new IncCounter());
@@ -576,9 +580,10 @@ public class CryptoNode extends Node {
                     dump("First Time Received");
 
 
-                } else {
-                    currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
-                }
+               } else 
+//                {
+//                    currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
+//                }
 //                if (isFirstView) {
 //                    currentCounter++;
 //                    taskManager.registerTask(new IncCounter());
