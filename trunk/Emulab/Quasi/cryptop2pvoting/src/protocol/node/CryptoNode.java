@@ -512,8 +512,8 @@ public class CryptoNode extends Node {
                 }
                 MSRumors++;
                 //       SMSView += getObjectSize(mes);
-            //    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * period);
-                            taskManager.registerTask(new RumorDiffusion(), (long) period);
+                taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * period);
+            //                taskManager.registerTask(new RumorDiffusion(), (long) period);
 
             }
 
@@ -620,8 +620,8 @@ public class CryptoNode extends Node {
                         return;
                     }
                 } else {
-                //    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * period);
-                        taskManager.registerTask(new RumorDiffusion(), (long)  period);
+                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * period);
+                //        taskManager.registerTask(new RumorDiffusion(), (long)  period);
 
                 }
 
