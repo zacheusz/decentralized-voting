@@ -476,6 +476,7 @@ public static int firstRound = 0;
                 
                 
                 COUNTER_MSG mes = null;
+               dump ("Received read counter from "+msg.getSrc());    
 
                 try {
                     mes = new COUNTER_MSG(nodeId,msg.getSrc(),currentCounter);
@@ -495,6 +496,7 @@ public static int firstRound = 0;
             synchronized (LOCK) {
                 
                 currentCounter++;
+                dump ("Received increment counter from "+mes.getSrc()+ " and incremented counter to "+currentCounter);    
                 if (currentCounter==VOTERCOUNT)
                         taskManager.registerTask(new SelfDestructTask(), SELF_DESTRUCT_DELAY);
 
