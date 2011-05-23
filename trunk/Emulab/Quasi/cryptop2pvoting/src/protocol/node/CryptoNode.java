@@ -475,9 +475,9 @@ public class CryptoNode extends Node {
                 try {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
-                    System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    dump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
                 } catch (ConnectException e) {
-                    System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                    dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
                     return;
 
@@ -488,7 +488,7 @@ public class CryptoNode extends Node {
                 }
                 MSRumors++;
                 //       SMSView += getObjectSize(mes);
-                taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 1000);
+                taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 5000);
             }
 
 
@@ -507,9 +507,9 @@ public class CryptoNode extends Node {
                 try {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
-                    System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    dump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
                 } catch (ConnectException e) {
-                    System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                    dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
                     return;
 
@@ -540,9 +540,9 @@ public class CryptoNode extends Node {
                 try {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
-                    System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    dump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
                 } catch (ConnectException e) {
-                    System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                    dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
                     return;
                 } catch (UnknownHostException ex) {
@@ -614,7 +614,8 @@ public class CryptoNode extends Node {
 
         if (!receivedAllRumors) {
             synchronized (LOCK) {
-                if ( msg.round>=currentRound && !isFirstDiffusion){
+                // msg.round>=currentRound &&
+                if ( !isFirstDiffusion){
                     dump("Discarded rumor: duplicate");
                     MRRumors++;
                     return;
