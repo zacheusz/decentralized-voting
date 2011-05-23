@@ -67,7 +67,7 @@ public class CryptoNode extends Node {
     private static int CLOSE_DecryptionSharing_DELAY = 3200 * 1000;
     private static int CLOSE_ResultDiffusion_DELAY = 3200 * 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
-    private static int SELF_DESTRUCT_DELAY = 1500 * 1000;
+    private static int SELF_DESTRUCT_DELAY = 3200 * 1000;
     // private static int COUNTING_PERIOD = 20 * 1000;		
     // Duration of epidemic dissemination: 20 seconds
     public static int kvalue;

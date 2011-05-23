@@ -31,12 +31,12 @@ head -$NB_NODES nodesGoodPL > $nodesFile
 
 cd -;
 
-START=$(date +%s)
+#START=$(date +%s)
 #./startTrustedThirdParty.sh
-ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "java -classpath $BINHOME $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -bits $BITS -kvalue $KVALUE"
-AFTERTRUSTED=$(date +%s)
-DIFF1=$(( $AFTERTRUSTED - $START ))
-echo "time for trusted 3rd party $DIFF1"
+#ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "java -classpath $BINHOME $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -bits $BITS -kvalue $KVALUE"
+#AFTERTRUSTED=$(date +%s)
+#DIFF1=$(( $AFTERTRUSTED - $START ))
+#echo "time for trusted 3rd party $DIFF1"
 
 #rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey*  $LOGIN_NAME@$home_node:$PROJECT_HOME/keys/
 
@@ -47,7 +47,7 @@ for ((i=0;i<nb;i++)) do
 #  sdate="`date +\"%y%m%d%H%M%S\"`"
 #  shuf $nodesFile > tmp$sdate
 #  mv tmp$sdate $nodesFile
- # ./startKevinBootstrap.sh $bname:$bport stamp &
+  ./startKevinBootstrap.sh $bname:$bport stamp &
  # sleep $delay
   ./startKevinNode.sh $nodesFile $bname:$bport $pport stamp &
   wait
@@ -56,7 +56,7 @@ done
 END=$(date +%s)
 
 
-DIFF2=$(( $END - $AFTERTRUSTED ))
+#DIFF2=$(( $END - $AFTERTRUSTED ))
 
 
 echo "time for voting $DIFF2"
