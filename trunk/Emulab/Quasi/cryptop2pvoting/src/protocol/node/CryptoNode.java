@@ -309,6 +309,7 @@ public class CryptoNode extends Node {
             e.printStackTrace();
         }
         dump("Node " + nodeId.getName() + " is born: ");
+        dump("Central Node " + bid.getName() + ": "+bid.getPort());
         //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
 
