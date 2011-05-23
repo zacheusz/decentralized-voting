@@ -6,11 +6,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 import protocol.communication.*;
@@ -22,6 +25,8 @@ import runtime.TaskManager;
 
 //import OldVoting.*;
 import java.math.BigInteger;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 import java.util.Collections;
@@ -73,7 +78,7 @@ public class CryptoNode extends Node {
     public static int currentNeighbour = 0;
     public static int firstRound = 0;
     public static int currentRound = 0;
-    public static int currentCounter = 0;
+    public static int currentCounter = 1;
     public static int numClusters;
     public static double LOSS = 0.5;
     E_CryptoNodeID bid;
@@ -309,7 +314,7 @@ public class CryptoNode extends Node {
             e.printStackTrace();
         }
         dump("Node " + nodeId.getName() + " is born: ");
-        dump("Central Node " + bid.getName() + ": "+bid.getPort());
+        dump("Central Node " + bid.getName() + ": " + bid.getPort());
         //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
 
@@ -406,17 +411,18 @@ public class CryptoNode extends Node {
                 for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
                     for (int j = 0; j < nodesPerMachine; j++) {
                         tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
-                        if (tempID.equals(nodeId))
+                        if (tempID.equals(nodeId)) {
                             continue;
+                        }
                         IDAssignment.put(tempID, tempID.getOrder());
                         mycount++;
                     }
                 }
                 sortedIDs = sortByValue(IDAssignment);
 
-                IAmSource=((nodeId.port==basicPort)&&nodeId.name.equals("node-1"));
-                    
-                
+                IAmSource = ((nodeId.port == basicPort) && nodeId.name.equals("node-1"));
+
+
                 if (sortedIDs.size() == VOTERCOUNT - 1) {
                     dump("I was removed");
                 }
@@ -459,15 +465,23 @@ public class CryptoNode extends Node {
                 E_CryptoNodeID peerId = null;
                 RUMOR_MSG mes = null;
 
-             
+
                 peerId = sortedIDs.get(currentNeighbour);
                 dump("Send a rumor to " + peerId);
 
+                mes = new RUMOR_MSG(nodeId, peerId, currentRound);
                 try {
-                    mes = new RUMOR_MSG(nodeId, peerId, currentRound);
-                    doSendUDP(mes);
-                } catch (Exception e) {
-                    dump("TCP: cannot vote");
+                    networkSend.sendUDP(mes);
+                } catch (SocketTimeoutException e) {
+                    System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                } catch (ConnectException e) {
+                    System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                    taskManager.registerTask(new ResultOutput());
+
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 MSRumors++;
                 //       SMSView += getObjectSize(mes);
@@ -483,15 +497,28 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
                 READ_CTR_MSG mes = null;
                 dump("Read Counter value");
+
+                mes = new READ_CTR_MSG(nodeId, bid);
+
                 try {
-                    mes = new READ_CTR_MSG(nodeId, bid);
-                    doSendUDP(mes);
-                } catch (Exception e) {
-                    dump("TCP: cannot vote");
+                    networkSend.sendUDP(mes);
+                } catch (SocketTimeoutException e) {
+                    System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                } catch (ConnectException e) {
+                    System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                    taskManager.registerTask(new ResultOutput());
+
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
 
+
             }
+
+
         }
     }
 
@@ -502,13 +529,21 @@ public class CryptoNode extends Node {
                 INC_CTR_MSG mes = null;
                 dump("Incremenet Counter value");
 
-                try {
-                    mes = new INC_CTR_MSG(nodeId, bid);
-                    doSendUDP(mes);
-                } catch (Exception e) {
-                    dump("TCP: cannot vote");
-                }
 
+                mes = new INC_CTR_MSG(nodeId, bid);
+                try {
+                    networkSend.sendUDP(mes);
+                } catch (SocketTimeoutException e) {
+                    System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                } catch (ConnectException e) {
+                    System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                    taskManager.registerTask(new ResultOutput());
+
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
             }
         }
@@ -573,10 +608,10 @@ public class CryptoNode extends Node {
         if (!receivedAllRumors) {
             synchronized (LOCK) {
                 if (Math.random() < LOSS) {
-                    dump ("Discarded rumor");
+                    dump("Discarded rumor");
                     return;
                 }
-                dump ("Received rumor from"+ msg.getSrc());
+                dump("Received rumor from" + msg.getSrc());
                 //update current counter
                 currentRound = msg.round;
                 MRRumors++;

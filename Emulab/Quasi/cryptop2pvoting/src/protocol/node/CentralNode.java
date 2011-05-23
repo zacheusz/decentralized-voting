@@ -73,7 +73,7 @@ public class CentralNode extends Node {
     public static int currentNeighbour = 0;
 public static int firstRound = 0;
     public static int currentRound = 0;
-    public static int currentCounter = 0;
+    public static int currentCounter = 1;
     public static int numClusters;
     public static double LOSS=0.5;
     E_CryptoNodeID bid;
@@ -498,7 +498,7 @@ public static int firstRound = 0;
                 currentCounter++;
                 dump ("Received increment counter from "+mes.getSrc()+ " and incremented counter to "+currentCounter);    
                 if (currentCounter==VOTERCOUNT)
-                        taskManager.registerTask(new SelfDestructTask(), SELF_DESTRUCT_DELAY);
+                        taskManager.registerTask(new SelfDestructTask());
 
             }
        
