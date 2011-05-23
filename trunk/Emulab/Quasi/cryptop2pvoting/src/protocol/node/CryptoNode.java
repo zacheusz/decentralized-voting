@@ -400,7 +400,6 @@ public class CryptoNode extends Node {
                 E_CryptoNodeID tempID;
 
                 Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
-                List<E_CryptoNodeID> sortedIDs;
 
                 int mycount = 1;
                 for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
@@ -459,12 +458,7 @@ public class CryptoNode extends Node {
                 E_CryptoNodeID peerId = null;
                 RUMOR_MSG mes = null;
 
-                for (E_CryptoNodeID pid: sortedIDs) 
-                {
-                    System.out.println(pid);
-                }
-                System.out.println("currentNeighbour: "+ currentNeighbour );
-                
+             
                 peerId = sortedIDs.get(currentNeighbour);
                 dump("Send a rumor to " + peerId);
 
