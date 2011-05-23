@@ -372,7 +372,7 @@ public class CryptoNode extends Node {
     }
 
     public static List sortByValue(final Map m) {
-        List keys = new ArrayList();
+        List keys = new LinkedList();
         keys.addAll(m.keySet());
         Collections.sort(keys, new Comparator() {
 
