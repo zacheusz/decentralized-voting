@@ -615,7 +615,7 @@ public class CryptoNode extends Node {
         if (!receivedAllRumors) {
             synchronized (LOCK) {
                 // msg.round>=currentRound &&
-                if (!isFirstReception) {
+                if (isFirstReception) {
 
                     if (Math.random() < LOSS) {
                         dump("Discarded rumor: loss");
