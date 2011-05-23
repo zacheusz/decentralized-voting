@@ -466,24 +466,24 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 currentRound++;
-
-                 PING_MSG mes0= new PING_MSG(nodeId, bid);;
-                 try {
-                    networkSend.sendTCP(mes0);
-                } catch (SocketTimeoutException e) {
-                    dump("TCP: " + nodeId + ":" + mes0.getDest() + " might be dead!");
-                } catch (ConnectException e) {
-                    dump("TCP: " + nodeId + ":" + mes0.getDest() + " is dead!");
-                    taskManager.registerTask(new ResultOutput());
-       //             currentCounter--;
-                    return;
-
-                } catch (UnknownHostException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                 
+//
+//                 PING_MSG mes0= new PING_MSG(nodeId, bid);;
+//                 try {
+//                    networkSend.sendTCP(mes0);
+//                } catch (SocketTimeoutException e) {
+//                    dump("TCP: " + nodeId + ":" + mes0.getDest() + " might be dead!");
+//                } catch (ConnectException e) {
+//                    dump("TCP: " + nodeId + ":" + mes0.getDest() + " is dead!");
+//                    taskManager.registerTask(new ResultOutput());
+//       //             currentCounter--;
+//                    return;
+//
+//                } catch (UnknownHostException ex) {
+//                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (IOException ex) {
+//                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                 
                  
                 E_CryptoNodeID peerId = null;
                 RUMOR_MSG mes = null;
