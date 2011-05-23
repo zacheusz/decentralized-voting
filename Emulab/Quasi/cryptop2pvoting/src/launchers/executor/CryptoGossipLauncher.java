@@ -38,7 +38,8 @@ public class CryptoGossipLauncher {
 		}
 		CryptoSetup.configure(arguments);
 		
-                
+                 CryptoNode.period = Integer.parseInt(arguments.get("-period"));
+                        
 		// From Launcher
 		String bname = arguments.get("-bname");
                 int bport = Integer.parseInt(arguments.get("-bport"));

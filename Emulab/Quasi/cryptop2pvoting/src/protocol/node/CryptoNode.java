@@ -206,6 +206,7 @@ public class CryptoNode extends Node {
     public long startTime = 0;
     public boolean stopped = false;
     public double threshOrder;
+    public static int period;
 
     // **************************************************************************
     // Constructors
@@ -492,7 +493,7 @@ public class CryptoNode extends Node {
                 }
                 MSRumors++;
                 //       SMSView += getObjectSize(mes);
-                taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 2000);
+                taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * period);
             }
 
 
@@ -598,7 +599,7 @@ public class CryptoNode extends Node {
                         return;
                     }
                 } else {
-                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 2000);
+                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * period);
 
                 }
 
