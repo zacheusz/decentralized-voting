@@ -62,7 +62,7 @@ public class CentralNode extends Node {
     private static int CLOSE_DecryptionSharing_DELAY = 3200 * 1000;
     private static int CLOSE_ResultDiffusion_DELAY = 3200 * 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
-        private static int SELF_DESTRUCT_DELAY = 200 * 1000;
+    private static int SELF_DESTRUCT_DELAY = 200 * 1000;
     // private static int COUNTING_PERIOD = 20 * 1000;		
     // Duration of epidemic dissemination: 20 seconds
     public static int kvalue;
@@ -71,11 +71,11 @@ public class CentralNode extends Node {
     public static ClusterChoice nodeToCluster = null;
     public static int chosenCluster;
     public static int currentNeighbour = 0;
-public static int firstRound = 0;
+    public static int firstRound = 0;
     public static int currentRound = 0;
     public static int currentCounter = 1;
     public static int numClusters;
-    public static double LOSS=0.5;
+    public static double LOSS = 0.5;
     E_CryptoNodeID bid;
     public static Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
     public static Map<E_CryptoNodeID, Integer> finalIDAssignment = new HashMap<E_CryptoNodeID, Integer>();
@@ -197,7 +197,7 @@ public static int firstRound = 0;
     protected final TaskManager taskManager;
     protected final Stopper stopper;
     // Stats
-    public  long startTime=0;
+    public long startTime = 0;
     public boolean stopped = false;
     public double threshOrder;
 
@@ -309,7 +309,7 @@ public static int firstRound = 0;
         dump("Node " + nodeId.getName() + " is born: ");
         //  dump("Parameters: Vote Ratio=" + VOTE_RATIO);
         // dump("Parameters: DT=" + DECISION_THRESHOLD + " DD=" + DECISION_DELAY);
-        
+
     }
 
     // **************************************************************************
@@ -349,6 +349,9 @@ public static int firstRound = 0;
                     break;
                 case Message.READ_CTR_MSG:
                     receiveReadCounter((READ_CTR_MSG) msg);
+                    break;
+                case Message.PING_MSG:
+                    receivePing((PING_MSG) msg);
                     break;
 
 
@@ -468,42 +471,43 @@ public static int firstRound = 0;
 //
 //        }
 //    }
-
-    private void receiveReadCounter (READ_CTR_MSG msg) {
-
-            synchronized (LOCK) {
-                
-                
-                
-                COUNTER_MSG mes = null;
-               dump ("Received read counter from "+msg.getSrc());    
-
-                try {
-                    mes = new COUNTER_MSG(nodeId,msg.getSrc(),currentCounter);
-                    doSendUDP(mes);
-                } catch (Exception e) {
-                    dump("TCP: cannot vote");
-                }
-
-
-            }
-        }
-    
-
-     private void  receiveIncrement (INC_CTR_MSG mes) {
-
-    
-            synchronized (LOCK) {
-                
-                currentCounter++;
-                dump ("Received increment counter from "+mes.getSrc()+ " and incremented counter to "+currentCounter);    
-                if (currentCounter==VOTERCOUNT)
-                        taskManager.registerTask(new SelfDestructTask());
-
-            }
-       
+    private void receivePing(PING_MSG msg) {
     }
 
+    private void receiveReadCounter(READ_CTR_MSG msg) {
+
+        synchronized (LOCK) {
+
+
+
+            COUNTER_MSG mes = null;
+            dump("Received read counter from " + msg.getSrc());
+
+            try {
+                mes = new COUNTER_MSG(nodeId, msg.getSrc(), currentCounter);
+                doSendUDP(mes);
+            } catch (Exception e) {
+                dump("TCP: cannot vote");
+            }
+
+
+        }
+    }
+
+    private void receiveIncrement(INC_CTR_MSG mes) {
+
+
+        synchronized (LOCK) {
+
+            currentCounter++;
+            dump("Received increment counter from " + mes.getSrc() + " and incremented counter to " + currentCounter);
+            if (currentCounter == VOTERCOUNT) {
+                taskManager.registerTask(new SelfDestructTask());
+            }
+
+        }
+
+    }
 //    private void receiveCounter(COUNTER_MSG msg) {
 //
 //        if (!receivedAllRumors) {
@@ -544,16 +548,12 @@ public static int firstRound = 0;
 //            }
 //        }
 //    }
-
-    
     /**
      * Return a real number from an exponential distribution with rate lambda.
      */
 //    public static double exp(double lambda) {
 //        return -Math.log(1 - Math.random()) / lambda;
 //    }
-
-    
 //    private void receiveRumor(RUMOR_MSG msg) {
 //
 //        if (!receivedAllRumors) {
@@ -572,7 +572,6 @@ public static int firstRound = 0;
 //            }
 //        }
 //    }
-
 //    private class ResultOutput implements Task {
 //
 //        public void execute() {
