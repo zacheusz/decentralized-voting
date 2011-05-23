@@ -421,6 +421,10 @@ public class CryptoNode extends Node {
 
                 if (IAmSource) {
                     startTime = System.currentTimeMillis();
+                    dump("I am source");
+                    Random generator = new Random();
+                    currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
+                    isFirstDiffusion = false;
                     taskManager.registerTask(new RumorDiffusion(), VIEW_DIFF_DELAY);
                 }
             }
