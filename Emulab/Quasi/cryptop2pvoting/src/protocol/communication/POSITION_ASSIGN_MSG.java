@@ -18,7 +18,7 @@ public class POSITION_ASSIGN_MSG extends Message {
     ClusterChoice nodeToCluster;
 
     public POSITION_ASSIGN_MSG(E_CryptoNodeID src, E_CryptoNodeID dest,  ClusterChoice nodeToCluster) {
-        super(Message.POSITION_ASSIGN_MSG, src, dest);
+        super(Message.READ_CTR_MSG, src, dest);
 		this.nodeToCluster = nodeToCluster;
     }
     public ClusterChoice getNodeToCluster() {

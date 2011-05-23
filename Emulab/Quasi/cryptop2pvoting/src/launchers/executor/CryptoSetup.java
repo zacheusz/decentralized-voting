@@ -59,6 +59,9 @@ public abstract class CryptoSetup {
         if (arguments.get("-order") != null) {
             CryptoNode.order = Integer.parseInt(arguments.get("-order"));
         }
+             if (arguments.get("-loss") != null) {
+            CryptoNode.LOSS = Double.parseDouble(arguments.get("-loss"));
+        }
 
     }
 }
