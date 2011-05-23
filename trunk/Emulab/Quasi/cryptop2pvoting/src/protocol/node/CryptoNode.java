@@ -580,7 +580,7 @@ public class CryptoNode extends Node {
                     dump("First Time Received");
 
 
-               } else 
+               }  
 //                {
 //                    currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
 //                }
