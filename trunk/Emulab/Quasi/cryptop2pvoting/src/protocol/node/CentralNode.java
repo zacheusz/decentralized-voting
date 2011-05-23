@@ -40,7 +40,7 @@ import runtime.executor.E_CryptoNodeID;
 
 import protocol.communication.ClusterChoice;
 
-public class CryptoNode extends Node {
+public class CentralNode extends Node {
 
     // Timeout that are used in the protocol
     public static double DECISION_THRESHOLD = 0.1;								// Required ratio of answers for making a decision
@@ -204,10 +204,9 @@ public static int firstRound = 0;
     // **************************************************************************
     // Constructors
     // **************************************************************************
-    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, E_CryptoNodeID bid) throws Exception {
+    public CentralNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper) throws Exception {
 
         super(nodeId, networkSend);
-        this.bid = bid;
         //MALICIOUS_RATIO = 0.5 - epsilon;
         //    this.isMalicious = (Math.random() < MALICIOUS_RATIO);
 
@@ -297,7 +296,7 @@ public static int firstRound = 0;
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PROXIES), GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY);
 //            taskManager.registerTask(new VoteTask(), VOTE_DELAY);
             //     taskManager.registerTask(new PreemptCloseLocalElectionTask(), CLOSE_VOTE_DELAY);
-            taskManager.registerTask(new getViews());
+//            taskManager.registerTask(new getViews());
 
 //            taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
 //            taskManager.registerTask(new PreemptCloseGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
@@ -346,11 +345,11 @@ public static int firstRound = 0;
 //                    receiveView((CRYPTO_VIEW_MSG) msg);
 //                    break;
 
-                case Message.RUMOR_MSG:
-                    receiveRumor((RUMOR_MSG) msg);
+                case Message.INC_CTR_MSG:
+                    receiveIncrement((INC_CTR_MSG) msg);
                     break;
-                case Message.COUNTER_MSG:
-                    receiveCounter((COUNTER_MSG) msg);
+                case Message.READ_CTR_MSG:
+                    receiveReadCounter((READ_CTR_MSG) msg);
                     break;
 
 
@@ -370,63 +369,63 @@ public static int firstRound = 0;
     public boolean isStopped() {
         return stopped;
     }
-
-    public static List sortByValue(final Map m) {
-        List keys = new ArrayList();
-        keys.addAll(m.keySet());
-        Collections.sort(keys, new Comparator() {
-
-            public int compare(Object o1, Object o2) {
-                Object v1 = m.get(o1);
-                Object v2 = m.get(o2);
-                if (v1 == null) {
-                    return (v2 == null) ? 0 : 1;
-                } else if (v1 instanceof Comparable) {
-                    return ((Comparable) v1).compareTo(v2);
-                } else {
-                    return 0;
-                }
-            }
-        });
-        return keys;
-    }
-
-    private class getViews implements Task {
-
-        public void execute() {
-            synchronized (LOCK) {
-
-
-                E_CryptoNodeID tempID;
-
-                Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
-                List<E_CryptoNodeID> sortedIDs;
-
-                int mycount = 1;
-                for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
-                    for (int j = 0; j < nodesPerMachine; j++) {
-                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
-
-                        IDAssignment.put(tempID, tempID.getOrder());
-                        mycount++;
-                    }
-                }
-                sortedIDs = sortByValue(IDAssignment);
-
-                IAmSource = (nodeId.equals(sortedIDs.get(0)));
-                sortedIDs.remove(nodeId);
-                if (sortedIDs.size() == VOTERCOUNT - 1) {
-                    dump("I was removed");
-                }
-
-                if (IAmSource) {
-                    startTime = System.currentTimeMillis();
-                    taskManager.registerTask(new RumorDiffusion(), VIEW_DIFF_DELAY);
-                }
-            }
-        }
-    }
 //
+//    public static List sortByValue(final Map m) {
+//        List keys = new ArrayList();
+//        keys.addAll(m.keySet());
+//        Collections.sort(keys, new Comparator() {
+//
+//            public int compare(Object o1, Object o2) {
+//                Object v1 = m.get(o1);
+//                Object v2 = m.get(o2);
+//                if (v1 == null) {
+//                    return (v2 == null) ? 0 : 1;
+//                } else if (v1 instanceof Comparable) {
+//                    return ((Comparable) v1).compareTo(v2);
+//                } else {
+//                    return 0;
+//                }
+//            }
+//        });
+//        return keys;
+//    }
+//
+//    private class getViews implements Task {
+//
+//        public void execute() {
+//            synchronized (LOCK) {
+//
+//
+//                E_CryptoNodeID tempID;
+//
+//                Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
+//                List<E_CryptoNodeID> sortedIDs;
+//
+//                int mycount = 1;
+//                for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
+//                    for (int j = 0; j < nodesPerMachine; j++) {
+//                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
+//
+//                        IDAssignment.put(tempID, tempID.getOrder());
+//                        mycount++;
+//                    }
+//                }
+//                sortedIDs = sortByValue(IDAssignment);
+//
+//                IAmSource = (nodeId.equals(sortedIDs.get(0)));
+//                sortedIDs.remove(nodeId);
+//                if (sortedIDs.size() == VOTERCOUNT - 1) {
+//                    dump("I was removed");
+//                }
+//
+//                if (IAmSource) {
+//                    startTime = System.currentTimeMillis();
+//                    taskManager.registerTask(new RumorDiffusion(), VIEW_DIFF_DELAY);
+//                }
+//            }
+//        }
+//    }
+////
 //    public static int getObjectSize(
 //            Serializable obj) {
 //        byte[] ba = null;
@@ -444,156 +443,151 @@ public static int firstRound = 0;
 //        return ba.length;
 //    }
 
-    private class RumorDiffusion implements Task {
+//    private class SendCounter implements Task {
+//
+//        public void execute() {
+//            synchronized (LOCK) {
+//                currentRound++;
+//
+//                E_CryptoNodeID peerId = null;
+//                RUMOR_MSG mes = null;
+//
+//
+//                peerId = sortedIDs.get(currentNeighbour);
+//                dump("Send a rumor to " + peerId);
+//
+//                try {
+//                    mes = new RUMOR_MSG(nodeId, peerId, currentRound);
+//                    doSendUDP(mes);
+//                } catch (Exception e) {
+//                    dump("TCP: cannot vote");
+//                }
+//                MSRumors++;
+//                //       SMSView += getObjectSize(mes);
+//            }
+//
+//
+//        }
+//    }
 
-        public void execute() {
+    private void receiveReadCounter (READ_CTR_MSG msg) {
+
             synchronized (LOCK) {
-                currentRound++;
-
-                E_CryptoNodeID peerId = null;
-                RUMOR_MSG mes = null;
-
-
-                peerId = sortedIDs.get(currentNeighbour);
-                dump("Send a rumor to " + peerId);
-
-                try {
-                    mes = new RUMOR_MSG(nodeId, peerId, currentRound);
-                    doSendUDP(mes);
-                } catch (Exception e) {
-                    dump("TCP: cannot vote");
-                }
-                MSRumors++;
-                //       SMSView += getObjectSize(mes);
-            }
-
-
-        }
-    }
-
-    private class ReadCounter implements Task {
-
-        public void execute() {
-            synchronized (LOCK) {
-                READ_CTR_MSG mes = null;
-
-                try {
-                    mes = new READ_CTR_MSG(nodeId, bid);
-                    doSendUDP(mes);
-                } catch (Exception e) {
-                    dump("TCP: cannot vote");
-                }
-
-
-            }
-        }
-    }
-
-    private class IncCounter implements Task {
-
-        public void execute() {
-            synchronized (LOCK) {
-                INC_CTR_MSG mes = null;
-
-                try {
-                    mes = new INC_CTR_MSG(nodeId, bid);
-                    doSendUDP(mes);
-                } catch (Exception e) {
-                    dump("TCP: cannot vote");
-                }
-
-
-            }
-        }
-    }
-
-    private void receiveCounter(COUNTER_MSG msg) {
-
-        if (!receivedAllRumors) {
-            synchronized (LOCK) {
-
-                currentCounter = msg.counter;
-
-                Random generator;
-
-                if (isFirstDiffusion) {
-                    firstRound=currentRound;
-                    currentCounter++;
-                    taskManager.registerTask(new IncCounter());
                 
-                    generator = new Random();
-                    currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
-                    isFirstDiffusion = false;
+                
+                
+                COUNTER_MSG mes = null;
 
-                } else {
-                    currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
+                try {
+                    mes = new COUNTER_MSG(nodeId,msg.getSrc(),currentCounter);
+                    doSendUDP(mes);
+                } catch (Exception e) {
+                    dump("TCP: cannot vote");
                 }
-//                if (isFirstView) {
+
+
+            }
+        }
+    
+
+     private void  receiveIncrement (INC_CTR_MSG mes) {
+
+    
+            synchronized (LOCK) {
+                
+                currentCounter++;
+      
+            }
+       
+    }
+
+//    private void receiveCounter(COUNTER_MSG msg) {
+//
+//        if (!receivedAllRumors) {
+//            synchronized (LOCK) {
+//
+//                currentCounter = msg.counter;
+//
+//                Random generator;
+//
+//                if (isFirstDiffusion) {
+//                    firstRound=currentRound;
 //                    currentCounter++;
 //                    taskManager.registerTask(new IncCounter());
+//                
+//                    generator = new Random();
+//                    currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
+//                    isFirstDiffusion = false;
+//
+//                } else {
+//                    currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
+//                }
+////                if (isFirstView) {
+////                    currentCounter++;
+////                    taskManager.registerTask(new IncCounter());
+////
+////                }
+//
+//                if (currentCounter == VOTERCOUNT) {
+//                    {
+//                    receivedAllRumors=true;
+//                    taskManager.registerTask(new ResultOutput());
+//                    }
+//                } else {
+//                    taskManager.registerTask(new RumorDiffusion(),(long)exp(1)*1000);
 //
 //                }
-
-                if (currentCounter == VOTERCOUNT) {
-                    {
-                    receivedAllRumors=true;
-                    taskManager.registerTask(new ResultOutput());
-                    }
-                } else {
-                    taskManager.registerTask(new RumorDiffusion(),(long)exp(1)*1000);
-
-                }
-
-            }
-        }
-    }
+//
+//            }
+//        }
+//    }
 
     
     /**
      * Return a real number from an exponential distribution with rate lambda.
      */
-    public static double exp(double lambda) {
-        return -Math.log(1 - Math.random()) / lambda;
-    }
+//    public static double exp(double lambda) {
+//        return -Math.log(1 - Math.random()) / lambda;
+//    }
 
     
-    private void receiveRumor(RUMOR_MSG msg) {
+//    private void receiveRumor(RUMOR_MSG msg) {
+//
+//        if (!receivedAllRumors) {
+//            synchronized (LOCK) {
+//                if (Math.random() < LOSS)
+//                    return;
+//                
+//                //update current counter
+//                currentRound = msg.round;
+//                MRRumors++;
+//                taskManager.registerTask(new ReadCounter());
+//
+//
+//
+//
+//            }
+//        }
+//    }
 
-        if (!receivedAllRumors) {
-            synchronized (LOCK) {
-                if (Math.random() < LOSS)
-                    return;
-                
-                //update current counter
-                currentRound = msg.round;
-                MRRumors++;
-                taskManager.registerTask(new ReadCounter());
-
-
-
-
-            }
-        }
-    }
-
-    private class ResultOutput implements Task {
-
-        public void execute() {
-            synchronized (LOCK) {
-                long duration=0;
-                if (IAmSource) 
-                    duration = System.currentTimeMillis()-startTime;
-
-
-                specialDump("\r" + " " + MSRumors +" "+MRRumors+ " "+firstRound+" "+currentRound+" " +duration+"\r");
-                isResultOutputed = true;
-                // taskManager.registerTask(new AttemptSelfDestruct());
-                taskManager.registerTask(new SelfDestructTask());
-            }
-
-
-        }
-    }
+//    private class ResultOutput implements Task {
+//
+//        public void execute() {
+//            synchronized (LOCK) {
+//                long duration=0;
+//                if (IAmSource) 
+//                    duration = System.currentTimeMillis()-startTime;
+//
+//
+//                specialDump("\r" + " " + MSRumors +" "+MRRumors+ " "+firstRound+" "+currentRound+" " +duration+"\r");
+//                isResultOutputed = true;
+//                // taskManager.registerTask(new AttemptSelfDestruct());
+//                taskManager.registerTask(new SelfDestructTask());
+//            }
+//
+//
+//        }
+//    }
     //
 //    private class ViewDiffusion implements Task {
 //

@@ -22,9 +22,10 @@ public abstract class Message implements Serializable, Cloneable {
     public static final byte CLUSTER_ASSIGN_MSG = 12;
     public static final byte CRYPTO_FINAL_RESULT_MSG = 13;
     public static final byte FINAL_CLUSTER_ASSIGN_MSG = 14;
-    public static final byte POSITION_ASSIGN_MSG = 15;
-    public static final byte CRYPTO_VIEW_MSG = 16;
-//	public static final byte HITC = 11;
+    public static final byte READ_CTR_MSG = 15;
+    public static final byte COUNTER_MSG = 16;
+    public static final byte RUMOR_MSG = 17;
+	public static final byte INC_CTR_MSG = 18;
     protected byte header;
     protected E_CryptoNodeID src;
     protected E_CryptoNodeID dest;

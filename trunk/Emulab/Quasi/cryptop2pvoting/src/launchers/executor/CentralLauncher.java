@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import paillierp.PaillierThreshold;
+import protocol.node.CentralNode;
 import protocol.node.CryptoNode;
 
 import runtime.NetworkSend;
@@ -27,7 +28,7 @@ import runtime.executor.E_NetworkSend;
 import runtime.executor.E_Stopper;
 
 
-public class CryptoGossipLauncher {
+public class CentralLauncher {
 
 	public static void main(String[] args) throws Exception {
 
@@ -43,15 +44,12 @@ public class CryptoGossipLauncher {
 		String bname = arguments.get("-bname");
                 int bport = Integer.parseInt(arguments.get("-bport"));
 
-		String name = arguments.get("-name");
-		int port = Integer.parseInt(arguments.get("-port"));
                 
         //        CryptoNode.secKeyFile = arguments.get("-secretKeyFile");
           //      String pubKeyFile = arguments.get("-publicKeyFile");
 
             //    int groupId = Integer.parseInt(arguments.get("-groupId"));
 		
-		E_CryptoNodeID id = new E_CryptoNodeID(name, port,false);
 		E_CryptoNodeID bid = new E_CryptoNodeID(bname, bport,false);
 
 		TaskManager taskManager = new E_CryptoThreadPerTaskTaskManager();
@@ -66,11 +64,11 @@ public class CryptoGossipLauncher {
                 int shareOrder=Integer.parseInt(arguments.get("-shareOrder"));
 */
             //    PaillierThreshold sec=(PaillierThreshold) getObject(CryptoNode.secKeyFile+"0");
-                CryptoNode node = new CryptoNode(id,taskManager,networkSend,stopper,bid);
+                CentralNode node = new CentralNode(bid,taskManager,networkSend,stopper);
 
 		((E_CryptoThreadPerTaskTaskManager) taskManager).setCryptoNode(node);
 
-		new Thread(new E_CryptoConnectionListener(port, taskManager, node)).start();
+		new Thread(new E_CryptoConnectionListener(bport, taskManager, node)).start();
 	}
  public static Object getObject(String filename)
         {
@@ -84,7 +82,7 @@ public class CryptoGossipLauncher {
             in.close();
             return obj;
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(CryptoGossipLauncher.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CentralLauncher.class.getName()).log(Level.SEVERE, null, ex);
 
        }
        catch(IOException ex)
