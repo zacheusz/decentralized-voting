@@ -492,7 +492,7 @@ public class CryptoNode extends Node {
                 }
                 MSRumors++;
                 //       SMSView += getObjectSize(mes);
-                taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 5000);
+                taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 2000);
             }
 
 
@@ -598,7 +598,7 @@ public class CryptoNode extends Node {
                         return;
                     }
                 } else {
-                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 5000);
+                    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * 2000);
 
                 }
 
