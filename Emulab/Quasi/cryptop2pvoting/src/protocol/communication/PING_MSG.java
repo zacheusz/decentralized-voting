@@ -15,7 +15,7 @@ public class PING_MSG extends Message {
 //        protected Set<E_CryptoNodeID> clientView = new HashSet<E_CryptoNodeID>();
 	
 	public PING_MSG(E_CryptoNodeID src, E_CryptoNodeID dest) {
-		super(Message.READ_CTR_MSG, src, dest);
+		super(Message.PING_MSG, src, dest);
 //		this.peerView.addAll(peerView);
 //                this.proxyView.addAll(peerView);
 //                this.clientView.addAll(peerView);
