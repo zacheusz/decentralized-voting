@@ -478,6 +478,7 @@ public class CryptoNode extends Node {
                 } catch (ConnectException e) {
                     System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
+                    return;
 
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
@@ -509,9 +510,11 @@ public class CryptoNode extends Node {
                 } catch (ConnectException e) {
                     System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
+                    return;
 
                 } catch (UnknownHostException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger
+                            (CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -540,7 +543,7 @@ public class CryptoNode extends Node {
                 } catch (ConnectException e) {
                     System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
-
+                    return;
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -586,6 +589,7 @@ public class CryptoNode extends Node {
                         dump("All received rumors.");
                         receivedAllRumors = true;
                         taskManager.registerTask(new ResultOutput());
+                        return;
                     }
                 } else {
                     taskManager.registerTask(new RumorDiffusion(), (long) exp(1) *5000);
@@ -609,8 +613,14 @@ public class CryptoNode extends Node {
 
         if (!receivedAllRumors) {
             synchronized (LOCK) {
-                if (( msg.round>=currentRound && !isFirstDiffusion)||(Math.random() < LOSS) ){
-                    dump("Discarded rumor");
+                if ( msg.round>=currentRound && !isFirstDiffusion){
+                    dump("Discarded rumor: duplicate");
+                    MRRumors++;
+                    return;
+                }
+                else if (Math.random() < LOSS) 
+                {
+                        dump("Discarded rumor: loss");
                     return;
                 }
                 dump("Received rumor from" + msg.getSrc());
