@@ -437,7 +437,7 @@ public class CryptoNode extends Node {
                     currentRound = 0;
                     currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
                     isFirstDiffusion = false;
-                    isFirstReception = false;
+                    isFirstReception=false;
                     taskManager.registerTask(new RumorDiffusion(), VIEW_DIFF_DELAY);
                 }
             }
@@ -475,6 +475,7 @@ public class CryptoNode extends Node {
                 } catch (ConnectException e) {
                     dump("TCP: " + nodeId + ":" + mes0.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
+                    currentCounter--;
                     return;
 
                 } catch (UnknownHostException ex) {
@@ -593,9 +594,15 @@ public class CryptoNode extends Node {
                 Random generator;
                     firstRound = currentRound;
                     currentCounter++;
-               
+                    taskManager.registerTask(new IncCounter());
 
-                
+                    generator = new Random();
+                    currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
+                    isFirstDiffusion = false;
+                    dump("First Time Received");
+
+
+               }  
 //                {
 //                    currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
 //                }
@@ -613,18 +620,11 @@ public class CryptoNode extends Node {
                         return;
                     }
                 } else {
-                         taskManager.registerTask(new IncCounter());
-
-                    generator = new Random();
-                    currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
-                    isFirstDiffusion = false;
-                    dump("First Time Received");
-
                 //    taskManager.registerTask(new RumorDiffusion(), (long) exp(1) * period);
                         taskManager.registerTask(new RumorDiffusion(), (long)  period);
 
                 }
-            }   
+
             }
         }
     }
