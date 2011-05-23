@@ -114,10 +114,10 @@ public abstract class Node implements Receiver {
 
 	public void dump(String message) {
 
-		return;
+    		return;
 //		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
 //		if(out != null) {
-//			synchronized(out) {
+//			synchronized(out) { 
 //				out.println(msg);
 //				out.flush();
 //			}
@@ -133,7 +133,7 @@ public abstract class Node implements Receiver {
 	//	if (!nodeId.name.contains("06"))
 //                 return;
 		
-		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " +"\r" + message;
+		String msg = "Node " + nodeId + " (" + getGroupId(nodeId) +  "): " + message;
            // String msg = message;
 		if(out != null) {
 			synchronized(out) {
