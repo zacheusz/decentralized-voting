@@ -295,7 +295,8 @@ public class CryptoNode extends Node {
 //        nodesPerCluster = (int) test;
 
 //        MINTALLIES = nodesPerCluster / 2 + 1;
-//        //  System.out.println("min:" + MINTALLIES);
+//        //  System.out.println("min:" + MINTALLIES)
+         VIEW_DIFF_DELAY = 15+700*VOTERCOUNT/3000 * 1000;
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
