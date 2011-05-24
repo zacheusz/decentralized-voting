@@ -168,6 +168,7 @@ public class CryptoNode extends Node {
     public long VoteEncTime = 0;
     public long VoteDecTime = 0;
     public long ShareCompTime = 0;
+    public boolean notInc=true;
     //protected boolean vote;
 //    protected Tally tally;
 //    protected Vote vote;
@@ -500,6 +501,7 @@ public class CryptoNode extends Node {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
                     specialDump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    
                 } catch (ConnectException e) {
                     dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
@@ -524,7 +526,12 @@ public class CryptoNode extends Node {
     private class ReadCounter implements Task {
 
         public void execute() {
+       
             synchronized (LOCK) {
+                
+                
+
+                
                 READ_CTR_MSG mes = null;
                 dump("Read Counter value");
 
@@ -534,6 +541,8 @@ public class CryptoNode extends Node {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
                     specialDump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    taskManager.registerTask(new ReadCounter(), (long) exp(1) * period);
+                    return; 
                 } catch (ConnectException e) {
                     dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
@@ -544,10 +553,11 @@ public class CryptoNode extends Node {
                 } catch (IOException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
+                
 
 
             }
+            
 
 
         }
@@ -566,6 +576,9 @@ public class CryptoNode extends Node {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
                     specialDump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    taskManager.registerTask(new IncCounter(), (long) exp(1) * period);
+                    //notInc=true;
+                    return;
                 } catch (ConnectException e) {
                     dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
@@ -575,6 +588,7 @@ public class CryptoNode extends Node {
                 } catch (IOException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
+               // notInc=false;
 
             }
         }
@@ -655,6 +669,7 @@ public class CryptoNode extends Node {
                     currentRound = msg.round;
                     MRRumors++;
                     taskManager.registerTask(new ReadCounter());
+                    
                     isFirstReception = false;
                 } else {
                     dump("Discarded rumor: duplicate");
