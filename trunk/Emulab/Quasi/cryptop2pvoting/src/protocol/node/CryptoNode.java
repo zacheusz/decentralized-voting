@@ -493,9 +493,9 @@ public class CryptoNode extends Node {
 
                 peerId = sortedIDs.get(currentNeighbour);
                 //update current neighbor for next time
-               // currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
-                    Random generator = new Random();
-                    currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
+                currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
+               //     Random generator = new Random();
+                 //   currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
                 
                 dump("Send a rumor to " + peerId);
 
