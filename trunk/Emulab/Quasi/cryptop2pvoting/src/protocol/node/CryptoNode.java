@@ -695,7 +695,7 @@ public class CryptoNode extends Node {
                 }
 
 
-                specialDump("\r" + " " + MSRumors + " " + MRRumors + " " + firstRound + " " + currentRound +" "+MDuplicates + "\r");
+                specialDump("\r" + " " + MSRumors + " " + MRRumors + " " + firstRound + " " + currentRound  + "\r");
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
                 taskManager.registerTask(new SelfDestructTask());
