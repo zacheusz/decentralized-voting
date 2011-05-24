@@ -144,6 +144,7 @@ public class CryptoNode extends Node {
     public static String secKeyFile;
     public int MSRumors = 0;
     public int MRRumors = 0;
+    public int MDuplicates = 0;
     public int MSVote = 0;
     public int MRBallot = 0;
     public int MSPartial = 0;
@@ -676,6 +677,7 @@ public class CryptoNode extends Node {
                 } else {
                     dump("Discarded rumor: duplicate");
                     MRRumors++;
+                    MDuplicates++;
                     
                 }
 
@@ -693,7 +695,7 @@ public class CryptoNode extends Node {
                 }
 
 
-                specialDump("\r" + " " + MSRumors + " " + MRRumors + " " + firstRound + " " + currentRound  + "\r");
+                specialDump("\r" + " " + MSRumors + " " + MRRumors + " " + firstRound + " " + currentRound +" "+MDuplicates + "\r");
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
                 taskManager.registerTask(new SelfDestructTask());
