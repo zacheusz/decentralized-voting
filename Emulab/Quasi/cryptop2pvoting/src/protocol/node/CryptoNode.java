@@ -499,7 +499,7 @@ public class CryptoNode extends Node {
                 try {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
-                    dump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    specialDump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
                 } catch (ConnectException e) {
                     dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
@@ -533,7 +533,7 @@ public class CryptoNode extends Node {
                 try {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
-                    dump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    specialDump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
                 } catch (ConnectException e) {
                     dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
@@ -565,7 +565,7 @@ public class CryptoNode extends Node {
                 try {
                     networkSend.sendTCP(mes);
                 } catch (SocketTimeoutException e) {
-                    dump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                    specialDump("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
                 } catch (ConnectException e) {
                     dump("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
                     taskManager.registerTask(new ResultOutput());
