@@ -1,7 +1,8 @@
-package protocol.node;
+package protocol.communication;
 
 //import Exception.NoLegalVotes;
 //import Exception.NotEnoughTallies;
+import protocol.node.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -45,7 +46,7 @@ import runtime.executor.E_CryptoNodeID;
 
 import protocol.communication.ClusterChoice;
 
-public class CryptoNode extends Node {
+public class RandomNode extends Node {
 
     // Timeout that are used in the protocol
     public static double DECISION_THRESHOLD = 0.1;								// Required ratio of answers for making a decision
@@ -212,7 +213,7 @@ public class CryptoNode extends Node {
     // **************************************************************************
     // Constructors
     // **************************************************************************
-    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, E_CryptoNodeID bid) throws Exception {
+    public RandomNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, E_CryptoNodeID bid) throws Exception {
 
         super(nodeId, networkSend);
         this.bid = bid;
@@ -492,9 +493,7 @@ public class CryptoNode extends Node {
 
                 peerId = sortedIDs.get(currentNeighbour);
                 //update current neighbor for next time
-               // currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
-                    Random generator = new Random();
-                    currentNeighbour = generator.nextInt(VOTERCOUNT - 1);
+                currentNeighbour = (currentNeighbour + 1) % (VOTERCOUNT - 1);
                 
                 dump("Send a rumor to " + peerId);
 
@@ -510,9 +509,9 @@ public class CryptoNode extends Node {
                     return;
 
                 } catch (UnknownHostException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RandomNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RandomNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 MSRumors++;
                 //       SMSView += getObjectSize(mes);
@@ -551,9 +550,9 @@ public class CryptoNode extends Node {
                     return;
 
                 } catch (UnknownHostException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RandomNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RandomNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
 
@@ -586,9 +585,9 @@ public class CryptoNode extends Node {
                     taskManager.registerTask(new ResultOutput());
                     return;
                 } catch (UnknownHostException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RandomNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
-                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RandomNode.class.getName()).log(Level.SEVERE, null, ex);
                 }
                // notInc=false;
 
@@ -660,7 +659,7 @@ public class CryptoNode extends Node {
             synchronized (LOCK) {
                 // msg.round>=currentRound &&
                 if (isFirstReception) {
-                    specialDump("loss"+LOSS);
+
                     if (Math.random() < LOSS) {
                         dump("Discarded rumor: loss");
                         return;
