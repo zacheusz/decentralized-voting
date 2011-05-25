@@ -280,6 +280,8 @@ public class CryptoNode extends Node {
 
         MINTALLIES = nodesPerCluster / 2 + 1;
         //  System.out.println("min:" + MINTALLIES);
+        VIEW_DIFF_DELAY = 15 + 1000 * VOTERCOUNT / 3000 * 1000;
+        VOTE_DELAY=VIEW_DIFF_DELAY*3/2;
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
