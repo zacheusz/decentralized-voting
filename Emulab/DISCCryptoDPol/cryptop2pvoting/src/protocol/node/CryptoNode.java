@@ -443,12 +443,13 @@ public class CryptoNode extends Node {
                 numPartialTallies++;
 
                 partialTallies.add(msg.getTally());
-                dump("partial:" + numPartialTallies + " " + (int) (Math.floor(clientView.size() * threshold)));
+                int bound=(int) (Math.floor(clientView.size() * threshold));
+                dump("partial:" + numPartialTallies + " " + bound);
 
                 MRPartial++;
                 SMRPartial += getObjectSize(msg);
 
-                if (numPartialTallies >= (int) (Math.floor(clientView.size() * threshold))) {
+                if (numPartialTallies == bound) {
                     partialTally = mostPresent(partialTallies);
                     computedPartialTally = true;
 
@@ -1050,8 +1051,9 @@ public class CryptoNode extends Node {
                 finalResults.add(msg.getResult());
                 MRResult++;
                 SMRResult += getObjectSize(msg);
-                dump("finals:" + numFinalResults + " " + clientView.size());
-                if (numFinalResults >= (int) (Math.floor(clientView.size() * threshold))) {
+                int bound=(int) (Math.floor(clientView.size() * threshold));
+                dump("finals:" + numFinalResults + " " +bound);
+                if (numFinalResults >=bound ) {
                     finalResult = mostPresent(finalResults);
                     computedFinalResult = true;
 
