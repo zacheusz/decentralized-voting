@@ -706,6 +706,9 @@ if (!computedPartialTally) {
                             }
 		} catch (ConnectException e) {
 			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                        synchronized(LOCK){
+                        numBallots++;
+                        }
 		} catch (UnknownHostException ex) {
                                 Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             } catch (IOException ex) {
