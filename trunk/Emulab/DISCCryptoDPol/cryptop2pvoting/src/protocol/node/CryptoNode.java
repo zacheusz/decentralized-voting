@@ -6,11 +6,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 import protocol.communication.*;
@@ -22,6 +25,8 @@ import runtime.TaskManager;
 
 //import OldVoting.*;
 import java.math.BigInteger;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 import java.util.Collections;
@@ -555,9 +560,9 @@ if (!computedPartialTally) {
                 if (nodeId.groupId == 0) {
                     IAmThreshold = true;
 
-                    secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
+                    secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + ClusterChoice.keyNum);
                     SMRKeys += getObjectSize(secKey);
-                    System.out.println("keynum:" + nodeToCluster.keyNum);
+                    System.out.println("keynum:" + ClusterChoice.keyNum);
                 } else {
                     isShareSendingOver = true;
                 }
@@ -685,14 +690,27 @@ if (!computedPartialTally) {
                             continue;
                         }
                         dump("Send a '" + Emsg + "' ballot to " + peerId);
-                        try {
-
-                            mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
-
-                            doSendTCP(mes);
-                        } catch (Exception e) {
-                            dump("TCP: cannot vote");
-                        }
+                        mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
+                      
+                            try {
+                                networkSend.sendTCP(mes);                            
+			
+		} catch (SocketTimeoutException e) {
+			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                            try {
+                                networkSend.sendTCP(mes);
+                            } catch (UnknownHostException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+		} catch (ConnectException e) {
+			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+		} catch (UnknownHostException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                     }
                     MSVote += peerView.size() - 1;
                     SMSVote += getObjectSize(mes) * (peerView.size() - 1);
