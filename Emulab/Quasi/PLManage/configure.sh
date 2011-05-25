@@ -24,14 +24,15 @@ export BETA=0.05
 #tried deploying on fewer nodes
 export EPSILON=0.2
 export NB_NODES=99
-export loss=0;
+export loss=0.5;
+export period=7000;
 export NB_MALICIOUS=0
 #export NB_GROUPS=10
 export K=8
 #export NB_BALLOTS=$((2*$K+1))
 export NB_BALLOTS=1
 export VOTECOUNT=3
-export nodesPerMachine=3
+export nodesPerMachine=14
 export TALLYCOUNT=$(( $nodesPerMachine * $NB_NODES ))
 export VOTERCOUNT=$TALLYCOUNT
 export KVALUE=9
