@@ -622,7 +622,7 @@ if (!computedPartialTally) {
 
                             try {
                                 mes = new CRYPTO_VIEW_MSG(nodeId, peerId, nodeToCluster.get((peerId.groupId)), nodeToCluster.get((peerId.groupId + 1) % numClusters), nodeToCluster.get((peerId.groupId + numClusters - 1) % numClusters));
-                                doSendTCP(mes);
+                                doSendUDP(mes);
                             } catch (Exception e) {
                                 dump("TCP: cannot vote");
                             }
@@ -904,18 +904,37 @@ if (!computedPartialTally) {
 
                 for (E_CryptoNodeID proxyId : proxyView) {
                     dump("Send partial tally (" + partialTally + ") to " + proxyId);
-                    try {
+                   
                         mes = new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally);
-                        doSendTCP(mes);
-                    } catch (Exception e) {
-                        dump("TCP: cannot broadcast local tally");
-                    }
+  try {
+                                networkSend.sendTCP(mes);                            
+			
+		} catch (SocketTimeoutException e) {
+			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                            try {
+                                networkSend.sendTCP(mes);
+                            } catch (UnknownHostException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+		} catch (ConnectException e) {
+			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                        synchronized(LOCK){
+                        numBallots++;
+                        }
+		} catch (UnknownHostException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                                       
 
                 }
 
                 IsPartialTallyingOver = true;
                 MSPartial += proxyView.size();
-                SMSPartial += getObjectSize(mes);
+                SMSPartial += getObjectSize(mes) * (proxyView.size() );
                 // taskManager.registerTask(new CloseGlobalCountingTask());
                 taskManager.registerTask(new AttemptSelfDestruct());
             }
@@ -957,12 +976,9 @@ if (!computedPartialTally) {
                                 continue;
                             }
                             dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
-                            try {
+                          
                                 mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                                doSendTCP(mes);
-                            } catch (Exception e) {
-                                dump("TCP: cannot send decryption share");
-                            }
+                          
                         }
 
                         MSShare += peerView.size() - 1;
@@ -1039,12 +1055,32 @@ if (!computedPartialTally) {
 //                            finalResult = votes[0].multiply(BigInteger.valueOf(VOTERCOUNT));
 //                        }
                             dump("Send final result (" + finalResult + ") to " + proxyId);
-                            try {
+                     
                                 mes = new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult);
-                                doSendTCP(mes);
-                            } catch (Exception e) {
-                                dump("TCP: cannot broadcast final result");
+                                   try {
+                                networkSend.sendTCP(mes);                            
+			
+		} catch (SocketTimeoutException e) {
+			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+                            try {
+                                networkSend.sendTCP(mes);
+                            } catch (UnknownHostException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             }
+		} catch (ConnectException e) {
+			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+                        synchronized(LOCK){
+                        numBallots++;
+                        }
+		} catch (UnknownHostException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                    
+                         
 
                         }
                         MSResult += proxyView.size();
