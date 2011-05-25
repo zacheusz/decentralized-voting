@@ -450,8 +450,10 @@ public class CryptoNode extends Node {
                 SMRPartial += getObjectSize(msg);
 
                 if (numPartialTallies == bound) {
+                        
                     partialTally = mostPresent(partialTallies);
                     computedPartialTally = true;
+                    dump("computedPartialTally");
 
                     if (IAmThreshold) {
 
@@ -468,6 +470,9 @@ public class CryptoNode extends Node {
                 }
             }
         }
+        else
+                                dump("discarded the partial tally");
+
     }
 
     private BigInteger mostPresent(List<BigInteger> values) {
