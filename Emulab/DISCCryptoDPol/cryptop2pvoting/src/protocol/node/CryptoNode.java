@@ -364,12 +364,12 @@ public class CryptoNode extends Node {
     }
 
     private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoSuchAlgorithmException {
-                ballotTimes++;
+               
+            synchronized (LOCK) {
+ ballotTimes++;
                 dump ("BallotTimes: "+ballotTimes);
         if (!isLocalCountingOver) {
             dump("Received a ballot (" + msg.getVote() + ") from " + msg.getSrc());
-
-            synchronized (LOCK) {
 
 
 //                BigInteger ballot = msg.getVote();
@@ -397,12 +397,13 @@ public class CryptoNode extends Node {
                 aggrLocalTally(msg.getVote());
                 MRBallot++;
                 SMRBallot += getObjectSize(msg);
+                } else {
+            dump("Discarded an ballot message (cause: sent too late)");
+        }
 
             }
 
-        } else {
-            dump("Discarded an ballot message (cause: sent too late)");
-        }
+        
     }
 
     private void receiveDecryptionShare(CRYPTO_DECRYPTION_SHARE_MSG msg) throws NoSuchAlgorithmException {
@@ -436,9 +437,9 @@ public class CryptoNode extends Node {
 
     private void receivePartialTally(CRYPTO_PARTIAL_TALLY_MSG msg) {
 
-        if (!computedPartialTally) {
+        
             synchronized (LOCK) {
-
+if (!computedPartialTally) {
                 dump("Received a partial tally (" + msg.getTally() + ") from " + msg.getSrc());
                 numPartialTallies++;
 
@@ -470,9 +471,7 @@ public class CryptoNode extends Node {
                 }
             }
         }
-        else
-                                dump("discarded the partial tally");
-
+        
     }
 
     private BigInteger mostPresent(List<BigInteger> values) {
@@ -642,8 +641,9 @@ public class CryptoNode extends Node {
 
     private void receiveView(CRYPTO_VIEW_MSG msg) {
 
-        if (!receivedAllViews) {
+        
             synchronized (LOCK) {
+                if (!receivedAllViews) {
                 if (isFirstView) {
                     startViewTime = System.nanoTime();
                     isFirstView = false;
