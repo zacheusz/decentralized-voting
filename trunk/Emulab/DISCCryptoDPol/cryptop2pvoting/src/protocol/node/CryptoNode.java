@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
 import protocol.communication.*;
 import runtime.NetworkSend;
 
@@ -59,6 +58,7 @@ public class CryptoNode extends Node {
     public static int VOTECOUNT;
     public static int VOTERCOUNT;
     private static int VIEW_DIFF_DELAY = 975 * 1000;// Delay before voting: 50 seconds
+    private static int PREEMPT_PARTIAL_DELAY ;
     private static int VOTE_DELAY = VIEW_DIFF_DELAY + 430 * 1000;
     //   private static int CLOSE_VOTE_DELAY = 490 * 1000; 				// Duration of the local voting phase: 1 minute
     private static int CLOSE_COUNTING_DELAY = 3200 * 1000;		// Duration of the local counting phase: 1 minute
@@ -286,7 +286,8 @@ public class CryptoNode extends Node {
         MINTALLIES = nodesPerCluster / 2 + 1;
         //  System.out.println("min:" + MINTALLIES);
         VIEW_DIFF_DELAY = 15 + 1000 * VOTERCOUNT / 3000 * 1000;
-        VOTE_DELAY = VIEW_DIFF_DELAY * 3 / 2;
+        VOTE_DELAY = VIEW_DIFF_DELAY * 3 / 2;     
+        PREEMPT_PARTIAL_DELAY=VOTERCOUNT*100;
         try {
 //            taskManager.registerTask(new AnnouncerTask());
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PEERS), GET_PEER_VIEW_FROM_BOOTSTRAP_DELAY);
@@ -445,6 +446,10 @@ public class CryptoNode extends Node {
 
         synchronized (LOCK) {
             if (!computedPartialTally) {
+//                if (numPartialTallies == 0) {
+//                    taskManager.registerTask(new PreemptPartialTallyingTask(),PREEMPT_PARTIAL_DELAY);
+//                }
+
                 dump("Received a partial tally (" + msg.getTally() + ") from " + msg.getSrc());
                 numPartialTallies++;
 
@@ -623,6 +628,7 @@ public class CryptoNode extends Node {
                             try {
                                 mes = new CRYPTO_VIEW_MSG(nodeId, peerId, nodeToCluster.get((peerId.groupId)), nodeToCluster.get((peerId.groupId + 1) % numClusters), nodeToCluster.get((peerId.groupId + numClusters - 1) % numClusters));
                                 doSendUDP(mes);
+                                this.wait(30);
                             } catch (Exception e) {
                                 dump("TCP: cannot vote");
                             }
@@ -764,8 +770,10 @@ public class CryptoNode extends Node {
     public void aggrLocalTally(BigInteger ballot) {
         synchronized (BallotLOCK) {
 
-
+            long startT = System.nanoTime();
             localTally = encryptor.add(localTally, ballot);
+            TallyAggTime += System.nanoTime() - startT;
+
             numBallots++;
 
 
@@ -778,7 +786,10 @@ public class CryptoNode extends Node {
                     partialTally = localTally;
                     taskManager.registerTask(new GlobalCountingTask());
                 } else if (computedPartialTally) {
+                    startT = System.nanoTime();
                     partialTally = encryptor.add(localTally, partialTally);
+                    TallyAggTime += System.nanoTime() - startT;
+                    
                     taskManager.registerTask(new GlobalCountingTask());
                 }
                 isLocalCountingOver = true;
@@ -860,7 +871,10 @@ public class CryptoNode extends Node {
                         finalEncryptedResult = partialTally;
                         taskManager.registerTask(new TallyDecryptionSharing());
                     } else if (computedLocalTally) {
+                        long startT = System.nanoTime();
                         partialTally = encryptor.add(localTally, partialTally);
+                        TallyAggTime += System.nanoTime() - startT;
+
                         taskManager.registerTask(new GlobalCountingTask());
                         isShareSendingOver = true;
                     }
@@ -909,6 +923,7 @@ public class CryptoNode extends Node {
                         try {
                             mes = new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally);
                             doSendUDP(mes);
+                            this.wait(30);
                         } catch (Exception e) {
                             dump("TCP: cannot broadcast local tally");
                         }
@@ -962,6 +977,7 @@ public class CryptoNode extends Node {
                             try {
                                 mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
                                 doSendUDP(mes);
+                                this.wait(30);
                             } catch (Exception e) {
                                 dump("TCP: cannot send decryption share");
                             }
@@ -1044,6 +1060,7 @@ public class CryptoNode extends Node {
                             try {
                                 mes = new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult);
                                 doSendUDP(mes);
+                                this.wait(30);
                             } catch (Exception e) {
                                 dump("TCP: cannot broadcast final result");
                             }
