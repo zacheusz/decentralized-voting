@@ -907,19 +907,19 @@ if (!computedPartialTally) {
                    
                         mes = new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally);
   try {
-                                networkSend.sendTCP(mes);                            
+                                networkSend.sendUDP(mes);                            
 			
 		} catch (SocketTimeoutException e) {
-			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+			System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " might be dead!");
                             try {
-                                networkSend.sendTCP(mes);
+                                networkSend.sendUDP(mes);
                             } catch (UnknownHostException ex) {
                                 Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             } catch (IOException ex) {
                                 Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             }
 		} catch (ConnectException e) {
-			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+			System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " is dead!");
                         synchronized(LOCK){
                         numBallots++;
                         }
@@ -1058,19 +1058,19 @@ if (!computedPartialTally) {
                      
                                 mes = new CRYPTO_FINAL_RESULT_MSG(nodeId, proxyId, finalResult);
                                    try {
-                                networkSend.sendTCP(mes);                            
+                                networkSend.sendUDP(mes);                            
 			
 		} catch (SocketTimeoutException e) {
-			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " might be dead!");
+			System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " might be dead!");
                             try {
-                                networkSend.sendTCP(mes);
+                                networkSend.sendUDP(mes);
                             } catch (UnknownHostException ex) {
                                 Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             } catch (IOException ex) {
                                 Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                             }
 		} catch (ConnectException e) {
-			System.out.println("TCP: " + nodeId + ":" + mes.getDest() + " is dead!");
+			System.out.println("UDP: " + nodeId + ":" + mes.getDest() + " is dead!");
                         synchronized(LOCK){
                         numBallots++;
                         }
