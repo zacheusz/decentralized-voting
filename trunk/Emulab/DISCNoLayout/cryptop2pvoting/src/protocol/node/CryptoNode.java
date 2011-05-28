@@ -430,7 +430,7 @@ public class CryptoNode extends Node {
 
                 MRShare++;
                 SMRShare += getObjectSize(msg);
-                if (isFinalResultCalculated && currentDecodingIndex == MINTALLIES) {
+                if (isFinalResultCalculated && currentDecodingIndex >= MINTALLIES) {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
@@ -911,6 +911,7 @@ public class CryptoNode extends Node {
     private class TallyDecryptionSharing implements Task {
 
         public void execute() {
+           synchronized (LOCK){
             taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
             if (!isShareSendingOver) {
                 //      specialDump("TallyDecryptionSharing");
@@ -921,11 +922,11 @@ public class CryptoNode extends Node {
                 long startT = System.nanoTime();
                 nodeResultShare = secKey.decrypt(finalEncryptedResult);
                 ShareCompTime += System.nanoTime() - startT;
-                synchronized (LOCK) {
+               // synchronized (LOCK) {
                     resultSharesList.add(nodeResultShare);
 
                     currentDecodingIndex++;
-                }
+                //}
                 isFinalResultCalculated = true;
                 dump("sharesize: " + currentDecodingIndex);
 
@@ -945,29 +946,30 @@ public class CryptoNode extends Node {
                             dump("TCP: cannot send decryption share");
                         }
                     }
-                    synchronized (LOCK) {
+                  //  synchronized (LOCK) {
 
                         MSShare += peerView.size() - 1;
                         SMSShare += getObjectSize(mes) * (peerView.size() - 1);
-                    }
+                 //   }
                 } else {
                     receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
                 }
                 isShareSendingOver = true;
                 //}
-                synchronized (LOCK) {
+             //   synchronized (LOCK) {
 
                     if (currentDecodingIndex == MINTALLIES) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
                     }
-                }
+              //  }
                 taskManager.registerTask(new AttemptSelfDestruct());
 
 
             }
         }
+    }
     }
 
     private class TallyDecryption implements Task {
