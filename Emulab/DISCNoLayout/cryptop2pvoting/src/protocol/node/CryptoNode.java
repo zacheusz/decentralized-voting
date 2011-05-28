@@ -192,7 +192,7 @@ public class CryptoNode extends Node {
     // **************************************************************************
     // Constructors
     // **************************************************************************
-    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper, PaillierThreshold sec) throws Exception {
+    public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper) throws Exception {
 
         super(nodeId, networkSend);
         //MALICIOUS_RATIO = 0.5 - epsilon;
@@ -200,40 +200,45 @@ public class CryptoNode extends Node {
 
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
 
-              E_CryptoNodeID tempID = null;
-                    int mycount = 0;
-                    for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
-                        for (int j = 0; j < nodesPerMachine; j++) {
+        E_CryptoNodeID tempID = null;
+        int mycount = 0;
+        for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
+            for (int j = 0; j < nodesPerMachine; j++) {
 
-                            tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
-                            peerView.add(tempID);
-                            if (nodeId.equals(tempID)) {
-                                secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
-                            }
-                            mycount++;
-
-
-                        }
-                    }
-                
-                votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
-                int bits;
-                BigInteger base, temp;
-                int i;
-                
-                pubKey = secKey.getPublicKey();
-                encryptor = new Paillier();
-                encryptor.setEncryption(pubKey);
-
-                bits = pubKey.getNS().bitLength() / VOTECOUNT;
-                base = (new BigInteger("2")).pow(bits);
-                temp = base;
-                votes[0] = BigInteger.ONE;
-
-                for (i = 1; i < VOTECOUNT; i++) {
-                    votes[i] = temp;
-                    temp = temp.multiply(base);
+                tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
+                peerView.add(tempID);
+                if (nodeId.equals(tempID)) {
+                    secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                 }
+                mycount++;
+
+
+            }
+        }
+
+        votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
+        int bits;
+        BigInteger base, temp;
+        int i;
+
+        pubKey = secKey.getPublicKey();
+        encryptor = new Paillier();
+        encryptor.setEncryption(pubKey);
+
+        bits = pubKey.getNS().bitLength() / VOTECOUNT;
+        base = (new BigInteger("2")).pow(bits);
+        temp = base;
+        votes[0] = BigInteger.ONE;
+
+        for (i = 1; i < VOTECOUNT; i++) {
+            votes[i] = temp;
+            temp = temp.multiply(base);
+        }
+
+        long startT = System.nanoTime();
+        Emsg = encryptor.encrypt(votes[1]);
+        VoteEncTime += System.nanoTime() - startT;
+
 //        votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
 //        int bits;
 //        BigInteger base, temp;
