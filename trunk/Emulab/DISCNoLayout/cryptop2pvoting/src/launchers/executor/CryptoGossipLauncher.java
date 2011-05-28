@@ -61,8 +61,8 @@ public class CryptoGossipLauncher {
                 SecretKey sec=(SecretKey) getObject(secKeyFile);
                 int shareOrder=Integer.parseInt(arguments.get("-shareOrder"));
 */
-                PaillierThreshold sec=(PaillierThreshold) getObject(CryptoNode.secKeyFile+"0");
-                CryptoNode node = new CryptoNode(id,taskManager,networkSend,stopper,sec);
+               // PaillierThreshold sec=(PaillierThreshold) getObject(CryptoNode.secKeyFile+"0");
+                CryptoNode node = new CryptoNode(id,taskManager,networkSend,stopper);
 
 		((E_CryptoThreadPerTaskTaskManager) taskManager).setCryptoNode(node);
 
