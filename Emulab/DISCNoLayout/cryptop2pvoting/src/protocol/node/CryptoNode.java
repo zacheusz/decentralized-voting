@@ -106,24 +106,24 @@ public class CryptoNode extends Node {
 //    PublicKey pub;
 //    SecretKey sec;
     // Vote value
-    protected boolean hasToken = true;
-    protected boolean isLocalVoteOver = false;
-    protected boolean isLocalCountingOver = false;
-    protected boolean IsPartialTallyingOver = false;
-    protected boolean isShareSendingOver = false;
-    protected boolean isDecryptionSharingOver = false;
-    protected boolean isFinalResultCalculated = false;
-    protected boolean isTallyDecryptionOver = false;
-    protected boolean isVoteTaskOver = false;
-    protected boolean isIndivSendingOver = false;
-    protected boolean isLocalSendingOver = false;
-    protected boolean isResultOutputed = false;
-    protected PaillierKey pubKey;
-    protected Paillier encryptor;
-    protected PaillierThreshold secKey;
-    protected BigInteger Emsg;
+    protected static boolean hasToken = true;
+    protected static boolean isLocalVoteOver = false;
+    protected static boolean isLocalCountingOver = false;
+    protected static boolean IsPartialTallyingOver = false;
+    protected static boolean isShareSendingOver = false;
+    protected static boolean isDecryptionSharingOver = false;
+    protected static boolean isFinalResultCalculated = false;
+    protected static boolean isTallyDecryptionOver = false;
+    protected static boolean isVoteTaskOver = false;
+    protected static   boolean isIndivSendingOver = false;
+    protected static  boolean isLocalSendingOver = false;
+    protected static boolean isResultOutputed = false;
+    protected static PaillierKey pubKey;
+    protected static Paillier encryptor;
+    protected static PaillierThreshold secKey;
+    protected static  BigInteger Emsg;
     public static int mycount = 0;
-    BigInteger[] votes;
+    public static BigInteger[] votes;
     public static String secKeyFile;
     public int MSView = 0;
     public int MRView = 0;
@@ -155,31 +155,31 @@ public class CryptoNode extends Node {
 //    protected Tally tally;
 //    protected Vote vote;
     protected boolean knownModulation = true;
-    protected BigInteger individualTally;
-    protected BigInteger localTally;
+    protected static BigInteger individualTally;
+    protected static BigInteger localTally;
     //   protected Map<E_CryptoNodeID, BigInteger> individualTallySet = new HashMap<E_CryptoNodeID, BigInteger>();
     //   protected Map<E_CryptoNodeID, BigInteger>[] localTallySets = new Map[E_CryptoNodeID.NB_GROUPS];
     //   protected BigInteger localTallies[] = new BigInteger[E_CryptoNodeID.NB_GROUPS];
     //   protected Result res;
-    protected BigInteger finalEncryptedResult = BigInteger.ONE;
-    protected BigInteger finalResult = BigInteger.ONE;
+    protected static BigInteger finalEncryptedResult = BigInteger.ONE;
+    protected static BigInteger finalResult = BigInteger.ONE;
     /*protected DecodingShare nodeResultShare;
     protected Map<E_CryptoNodeID, DecodingShare> resultShares = new HashMap<E_CryptoNodeID, DecodingShare>();
     protected DecodingShare[] resultSharesList;*/
-    protected PartialDecryption nodeResultShare;
-    protected List<PartialDecryption> resultSharesList = new LinkedList<PartialDecryption>();
+    protected static PartialDecryption nodeResultShare;
+    protected static List<PartialDecryption> resultSharesList = new LinkedList<PartialDecryption>();
     //protected List <DecryptionZKP> resultSharesList=new LinkedList<DecryptionZKP>();
-    protected int currentDecodingIndex;
-    protected int numIndTallies;
+    protected static int currentDecodingIndex;
+    protected static int numIndTallies;
     //protected int shareOrder;
-    protected int nbSentLocalTallies = 0;
+    protected static int nbSentLocalTallies = 0;
     // Overlay management
-    protected boolean receivedPeerView = false;
-    protected boolean receivedProxyView = false;
+    protected static boolean receivedPeerView = false;
+    protected static boolean receivedProxyView = false;
     //     protected boolean receivedClientView = false;
-    protected Set<E_CryptoNodeID> peerView = new HashSet<E_CryptoNodeID>();
-    protected Set<E_CryptoNodeID> proxyView = new HashSet<E_CryptoNodeID>();
-    protected Set<E_CryptoNodeID> clientView = new HashSet<E_CryptoNodeID>();
+    protected static Set<E_CryptoNodeID> peerView = new HashSet<E_CryptoNodeID>();
+    protected static Set<E_CryptoNodeID> proxyView = new HashSet<E_CryptoNodeID>();
+    protected static Set<E_CryptoNodeID> clientView = new HashSet<E_CryptoNodeID>();
     //protected int clientSize;
     //   protected int clientsReceived=0;
     // Runtime functions
@@ -242,7 +242,7 @@ public class CryptoNode extends Node {
         }
 
         long startT = System.nanoTime();
-        Emsg = encryptor.encrypt(votes[1]);
+        Emsg = encryptor.encrypt(votes[0]);
         VoteEncTime += System.nanoTime() - startT;
 
 //        votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
