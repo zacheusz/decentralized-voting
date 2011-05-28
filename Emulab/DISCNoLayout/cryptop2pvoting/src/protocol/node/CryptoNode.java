@@ -958,7 +958,7 @@ public class CryptoNode extends Node {
                 //}
              //   synchronized (LOCK) {
 
-                    if (currentDecodingIndex == MINTALLIES) {
+                    if (currentDecodingIndex >= MINTALLIES) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
