@@ -193,7 +193,6 @@ public class CryptoNode extends Node {
     // **************************************************************************
     // Constructors
     // **************************************************************************
-    
     public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper) throws Exception {
 
         super(nodeId, networkSend);
@@ -212,6 +211,10 @@ public class CryptoNode extends Node {
                 if (nodeId.equals(tempID)) {
                     dump("keynum: " + mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
+                    if (secKey == null) {
+                        taskManager.registerTask(new SelfDestructTask());
+                    }
+
                 }
                 mycount++;
 
@@ -732,7 +735,7 @@ public class CryptoNode extends Node {
                             mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
 
                             doSendUDP(mes);
-                          //  Thread.sleep(10);
+                            //  Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot vote");
                         }
@@ -917,8 +920,8 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isShareSendingOver) {
-                                       isShareSendingOver = true;
- taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
+                    isShareSendingOver = true;
+                    taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
 
                     //      specialDump("TallyDecryptionSharing");
                     dump("TallyDecryptionSharing");
@@ -947,7 +950,7 @@ public class CryptoNode extends Node {
                             try {
                                 mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
                                 doSendUDP(mes);
-                               // Thread.sleep(10);
+                                // Thread.sleep(10);
                             } catch (Exception e) {
                                 dump("TCP: cannot send decryption share");
                             }
@@ -964,7 +967,7 @@ public class CryptoNode extends Node {
                     //   synchronized (LOCK) {
 
                     if (currentDecodingIndex >= MINTALLIES) {
-                        isDecryptionSharingOver=true;
+                        isDecryptionSharingOver = true;
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
