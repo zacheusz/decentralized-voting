@@ -208,7 +208,7 @@ public class CryptoNode extends Node {
                 tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
                 peerView.add(tempID);
                 if (nodeId.equals(tempID)) {
-                    dump("keynum: "+mycount);
+                    dump("keynum: " + mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                 }
                 mycount++;
@@ -728,7 +728,7 @@ public class CryptoNode extends Node {
                             mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
 
                             doSendUDP(mes);
-                            Thread.sleep(10);
+                          //  Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot vote");
                         }
@@ -761,7 +761,7 @@ public class CryptoNode extends Node {
 
             dump("ballots " + numBallots + " " + peerView.size());
 
-            if (numBallots == (int) Math.floor(VOTERCOUNT*threshold)) {
+            if (numBallots == (int) Math.floor(VOTERCOUNT * threshold)) {
                 computedLocalTally = true;
 //            if (IAmThreshold) {
 //                partialTally = localTally;
@@ -911,65 +911,66 @@ public class CryptoNode extends Node {
     private class TallyDecryptionSharing implements Task {
 
         public void execute() {
-           synchronized (LOCK){
-            taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
-            if (!isShareSendingOver) {
-                //      specialDump("TallyDecryptionSharing");
-                dump("TallyDecryptionSharing");
+            synchronized (LOCK) {
+                if (!isShareSendingOver) {
+                    taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
 
-                dump("final encrypted:" + finalEncryptedResult.toString());
+                    //      specialDump("TallyDecryptionSharing");
+                    dump("TallyDecryptionSharing");
 
-                long startT = System.nanoTime();
-                nodeResultShare = secKey.decrypt(finalEncryptedResult);
-                ShareCompTime += System.nanoTime() - startT;
-               // synchronized (LOCK) {
+                    dump("final encrypted:" + finalEncryptedResult.toString());
+
+                    long startT = System.nanoTime();
+                    nodeResultShare = secKey.decrypt(finalEncryptedResult);
+                    ShareCompTime += System.nanoTime() - startT;
+                    // synchronized (LOCK) {
                     resultSharesList.add(nodeResultShare);
 
                     currentDecodingIndex++;
-                //}
-                isFinalResultCalculated = true;
-                dump("sharesize: " + currentDecodingIndex);
+                    //}
+                    isFinalResultCalculated = true;
+                    dump("sharesize: " + currentDecodingIndex);
 
-                CRYPTO_DECRYPTION_SHARE_MSG mes = null;
+                    CRYPTO_DECRYPTION_SHARE_MSG mes = null;
 
-                if (!(peerView.size() <= 1)) {
-                    for (E_CryptoNodeID peerId : peerView) {
-                        if (peerId.equals(nodeId)) {
-                            continue;
+                    if (!(peerView.size() <= 1)) {
+                        for (E_CryptoNodeID peerId : peerView) {
+                            if (peerId.equals(nodeId)) {
+                                continue;
+                            }
+                            dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
+                            try {
+                                mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
+                                doSendUDP(mes);
+                               // Thread.sleep(10);
+                            } catch (Exception e) {
+                                dump("TCP: cannot send decryption share");
+                            }
                         }
-                        dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
-                        try {
-                            mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                            doSendUDP(mes);
-                            Thread.sleep(10);
-                        } catch (Exception e) {
-                            dump("TCP: cannot send decryption share");
-                        }
-                    }
-                  //  synchronized (LOCK) {
+                        //  synchronized (LOCK) {
 
                         MSShare += peerView.size() - 1;
                         SMSShare += getObjectSize(mes) * (peerView.size() - 1);
-                 //   }
-                } else {
-                    receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
-                }
-                isShareSendingOver = true;
-                //}
-             //   synchronized (LOCK) {
+                        //   }
+                    } else {
+                        receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
+                    }
+                    isShareSendingOver = true;
+                    //}
+                    //   synchronized (LOCK) {
 
                     if (currentDecodingIndex >= MINTALLIES) {
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
                     }
-              //  }
-                taskManager.registerTask(new AttemptSelfDestruct());
+                    //  }
+                    taskManager.registerTask(new AttemptSelfDestruct());
 
 
+                }
             }
         }
-    }
     }
 
     private class TallyDecryption implements Task {
