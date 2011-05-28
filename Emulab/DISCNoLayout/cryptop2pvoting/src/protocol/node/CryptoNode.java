@@ -591,8 +591,10 @@ public class CryptoNode extends Node {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(obj);
+            oos.flush();
             oos.close();
             ba = baos.toByteArray();
+            baos.flush();
             baos.close();
         } catch (IOException ioe) {
             return 0;
