@@ -122,6 +122,7 @@ public class CryptoNode extends Node {
     protected Paillier encryptor;
     protected PaillierThreshold secKey;
     protected BigInteger Emsg;
+    public static int mycount = 0;
     BigInteger[] votes;
     public static String secKeyFile;
     public int MSView = 0;
@@ -201,7 +202,7 @@ public class CryptoNode extends Node {
         //this.vote = (Math.random() < VOTE_RATIO && !isMalicious);
 
         E_CryptoNodeID tempID = null;
-        int mycount = 0;
+        mycount = 0;
         for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
             for (int j = 0; j < nodesPerMachine; j++) {
 
