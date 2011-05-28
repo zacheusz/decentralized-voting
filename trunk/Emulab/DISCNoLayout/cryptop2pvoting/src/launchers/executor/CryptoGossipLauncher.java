@@ -80,6 +80,7 @@ public class CryptoGossipLauncher {
             in.close();
             return obj;
         } catch (FileNotFoundException ex) {
+            
             Logger.getLogger(CryptoGossipLauncher.class.getName()).log(Level.SEVERE, null, ex);
 
        }
