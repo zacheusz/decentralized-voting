@@ -913,7 +913,8 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isShareSendingOver) {
-                    taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
+                                       isShareSendingOver = true;
+ taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
 
                     //      specialDump("TallyDecryptionSharing");
                     dump("TallyDecryptionSharing");
@@ -955,11 +956,11 @@ public class CryptoNode extends Node {
                     } else {
                         receiveSTOP(new STOP_MSG(nodeId, nodeId, "cannot share result share: no peer view"));
                     }
-                    isShareSendingOver = true;
                     //}
                     //   synchronized (LOCK) {
 
                     if (currentDecodingIndex >= MINTALLIES) {
+                        isDecryptionSharingOver=true;
                         dump("CloseTallyDecryptionSharing");
                         //actually close the Tally Decryption Sharing session
                         taskManager.registerTask(new TallyDecryption());
