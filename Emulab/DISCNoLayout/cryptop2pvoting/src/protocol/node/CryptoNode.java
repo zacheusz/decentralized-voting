@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Random;
 
 import java.util.Set;
 import launchers.executor.CryptoGossipLauncher;
@@ -276,7 +277,11 @@ public class CryptoNode extends Node {
 //        nodesPerCluster = (int) test;
 
         MINTALLIES = VOTERCOUNT / 2 + 1;
-        VOTE_DELAY = 15 + 1000 * VOTERCOUNT / 3000 * 1000;
+        Random generator = new Random();
+        VOTE_DELAY = 15 + 1000 * VOTERCOUNT / 3000 * 1000+ generator.nextInt(VOTERCOUNT*10);;
+          
+           
+//
         //  System.out.println("min:" + MINTALLIES);
         try {
 //            taskManager.registerTask(new AnnouncerTask());
