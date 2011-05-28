@@ -245,7 +245,7 @@ public abstract class AbstractPaillier implements Serializable {
 	{
 		if(encryptMode==false) throw new IllegalStateException(this.notReadyForEncryption);
 		if(!(key.inModNSPlusOne(c1))) throw new IllegalArgumentException("c1 must be less than n^(s+1)");
-		if(!(key.inModNSPlusOne(c2))) throw new IllegalArgumentException("c2 must be less than n^(s+1)");
+		if(!(key.inModNSPlusOne(c2))) throw new IllegalArgumentException("c2 must be less than n^(s+1):"+c2);
 		return (c1.multiply(c2)).mod(key.getNSPlusOne());	
 	}
 
@@ -267,7 +267,7 @@ public abstract class AbstractPaillier implements Serializable {
 	public static BigInteger add(BigInteger c1, BigInteger c2, BigInteger nsplus1)
 	{	
 		if(c1.abs().compareTo(nsplus1) >= 0) throw new IllegalArgumentException("c1 must be less than n^(s+1)");
-		if(c2.abs().compareTo(nsplus1) >= 0) throw new IllegalArgumentException("c2 must be less than n^(s+1)");
+		if(c2.abs().compareTo(nsplus1) >= 0) throw new IllegalArgumentException("c2 must be less than n^(s+1): "+c2);
 		return (c1.multiply(c2)).mod(nsplus1);
 	}
 
