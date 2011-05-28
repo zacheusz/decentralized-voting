@@ -94,7 +94,7 @@ public class CryptoNode extends Node {
     // public static boolean isMalicious;
     public static int order;
     public static int numReceivedViews = 0;
-    public static double threshold = 0.99;
+    public static double threshold = 0.95;
     public static boolean receivedAllViews = false;
     public static boolean isViewDiffusionOver = false;
     public static boolean isFirstView = true;
@@ -761,7 +761,7 @@ public class CryptoNode extends Node {
 
             dump("ballots " + numBallots + " " + peerView.size());
 
-            if (numBallots == (int) Math.floor(VOTERCOUNT)) {
+            if (numBallots == (int) Math.floor(VOTERCOUNT*threshold)) {
                 computedLocalTally = true;
 //            if (IAmThreshold) {
 //                partialTally = localTally;
