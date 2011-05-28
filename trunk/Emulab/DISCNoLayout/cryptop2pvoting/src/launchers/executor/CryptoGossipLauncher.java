@@ -78,6 +78,7 @@ public class CryptoGossipLauncher {
             in = new ObjectInputStream(fis);
             obj =  in.readObject();
             in.close();
+            fis.close();
             return obj;
         } catch (FileNotFoundException ex) {
             
