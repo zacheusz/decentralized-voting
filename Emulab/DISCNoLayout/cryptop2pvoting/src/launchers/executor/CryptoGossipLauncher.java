@@ -75,10 +75,11 @@ public class CryptoGossipLauncher {
        Object obj=null;
         try {
             fis = new FileInputStream(filename);
-            in = new ObjectInputStream(fis);
+            in = new ObjectInputStream(new BufferedInputStream (fis));
             obj =  in.readObject();            
-            in.close();
             fis.close();
+            in.close();
+            
             return obj;
         } catch (FileNotFoundException ex) {
             System.out.println("file not found, mycount: " +CryptoNode.mycount);
@@ -87,10 +88,13 @@ public class CryptoGossipLauncher {
        }
        catch(IOException ex)
        {
+                       System.out.println("io exception, mycount: " +CryptoNode.mycount);
+
          ex.printStackTrace();
        }
        catch(ClassNotFoundException ex)
        {
+           System.out.println("class not found, mycount: " +CryptoNode.mycount);
          ex.printStackTrace();
        }
        return obj;

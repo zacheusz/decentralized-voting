@@ -88,12 +88,13 @@ public static void writeToFile(String filename,Object obj){
                  try
                  {
                    fos = new FileOutputStream(filename);
-                   out = new ObjectOutputStream(fos);
+                   out = new ObjectOutputStream (new BufferedOutputStream (fos));
                    out.writeObject(obj);
-                   out.flush();                   
-                   out.close();
+                   
                    fos.flush();
                    fos.close();
+                   out.flush();                   
+                   out.close();
                  }
                  catch(IOException ex)
                  {
