@@ -208,6 +208,7 @@ public class CryptoNode extends Node {
                 tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
                 peerView.add(tempID);
                 if (nodeId.equals(tempID)) {
+                    dump("keynum: "+mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                 }
                 mycount++;
