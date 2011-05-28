@@ -21,7 +21,7 @@ public abstract class Node implements Receiver {
 	public static PrintStream out = null;
 	public static final int VIEW_SIZE = Integer.MAX_VALUE;
 	public static final int NB_BALLOTS = 1;
-	protected static final int SELF_DESTRUCT_DELAY = 12 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
+	protected static final int SELF_DESTRUCT_DELAY = 1000 * 60 * 1000;	// Maximum duration of the simulation: 8 minutes
 	protected long startInstant=0;
         protected long endInstant=0;
         protected long runningTime=0;
