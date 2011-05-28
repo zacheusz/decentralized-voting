@@ -61,7 +61,7 @@ public class CryptoNode extends Node {
     private static int CLOSE_DecryptionSharing_DELAY = 3200 * 1000;
     private static int CLOSE_ResultDiffusion_DELAY = 3200 * 1000;
 //    private static int CLOSE_TallyDecryption_DELAY = CLOSE_DecryptionSharing_DELAY + 20 * 1000;
-    private static int SELF_DESTRUCT_DELAY = 15000 * 1000;
+//   private static int SELF_DESTRUCT_DELAY = 15000 * 1000;
     // private static int COUNTING_PERIOD = 20 * 1000;		
     // Duration of epidemic dissemination: 20 seconds
     public static int kvalue;
@@ -276,6 +276,7 @@ public class CryptoNode extends Node {
 //        nodesPerCluster = (int) test;
 
         MINTALLIES = VOTERCOUNT / 2 + 1;
+        VOTE_DELAY = 15 + 1000 * VOTERCOUNT / 3000 * 1000;
         //  System.out.println("min:" + MINTALLIES);
         try {
 //            taskManager.registerTask(new AnnouncerTask());
