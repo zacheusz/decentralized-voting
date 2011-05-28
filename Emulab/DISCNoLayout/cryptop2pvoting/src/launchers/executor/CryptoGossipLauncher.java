@@ -76,12 +76,12 @@ public class CryptoGossipLauncher {
         try {
             fis = new FileInputStream(filename);
             in = new ObjectInputStream(fis);
-            obj =  in.readObject();
+            obj =  in.readObject();            
             in.close();
             fis.close();
             return obj;
         } catch (FileNotFoundException ex) {
-            
+            System.out.println("file not found, mycount: " +CryptoNode.mycount);
             Logger.getLogger(CryptoGossipLauncher.class.getName()).log(Level.SEVERE, null, ex);
 
        }

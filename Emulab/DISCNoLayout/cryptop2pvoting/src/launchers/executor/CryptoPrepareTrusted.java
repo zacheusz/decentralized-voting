@@ -90,9 +90,9 @@ public static void writeToFile(String filename,Object obj){
                    fos = new FileOutputStream(filename);
                    out = new ObjectOutputStream(fos);
                    out.writeObject(obj);
-                   out.flush();
-                   fos.flush();
+                   out.flush();                   
                    out.close();
+                   fos.flush();
                    fos.close();
                  }
                  catch(IOException ex)
