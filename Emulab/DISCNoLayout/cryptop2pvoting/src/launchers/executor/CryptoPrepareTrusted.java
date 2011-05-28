@@ -93,6 +93,7 @@ public static void writeToFile(String filename,Object obj){
                    out.flush();
                    fos.flush();
                    out.close();
+                   fos.close();
                  }
                  catch(IOException ex)
                  {
