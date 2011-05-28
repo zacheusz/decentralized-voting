@@ -91,6 +91,7 @@ public static void writeToFile(String filename,Object obj){
                    out = new ObjectOutputStream(fos);
                    out.writeObject(obj);
                    out.flush();
+                   fos.flush();
                    out.close();
                  }
                  catch(IOException ex)
