@@ -426,7 +426,7 @@ public class CryptoNode extends Node {
                 resultSharesList.add(msg.getShare());
 
                 currentDecodingIndex++;
-                dump("sharesize: " + currentDecodingIndex);
+                dump("sharesize1: " + currentDecodingIndex);
 
                 MRShare++;
                 SMRShare += getObjectSize(msg);
@@ -930,7 +930,7 @@ public class CryptoNode extends Node {
                     currentDecodingIndex++;
                     //}
                     isFinalResultCalculated = true;
-                    dump("sharesize: " + currentDecodingIndex);
+                    dump("sharesize2: " + currentDecodingIndex);
 
                     CRYPTO_DECRYPTION_SHARE_MSG mes = null;
 
