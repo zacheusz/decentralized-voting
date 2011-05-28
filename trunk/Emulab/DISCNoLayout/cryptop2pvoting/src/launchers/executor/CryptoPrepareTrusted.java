@@ -92,8 +92,10 @@ public static void writeToFile(String filename,Object obj){
                    out.writeObject(obj);
                    
                    fos.flush();
+                    out.flush();                   
                    fos.close();
-                   out.flush();                   
+                   
+                  
                    out.close();
                  }
                  catch(IOException ex)
