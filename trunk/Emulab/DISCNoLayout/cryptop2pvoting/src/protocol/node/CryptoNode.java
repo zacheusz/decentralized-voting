@@ -193,6 +193,7 @@ public class CryptoNode extends Node {
     // **************************************************************************
     // Constructors
     // **************************************************************************
+    
     public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper) throws Exception {
 
         super(nodeId, networkSend);
