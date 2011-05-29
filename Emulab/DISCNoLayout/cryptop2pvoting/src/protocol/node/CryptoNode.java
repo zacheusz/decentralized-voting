@@ -323,7 +323,7 @@ public class CryptoNode extends Node {
 
         MINTALLIES = VOTERCOUNT / 2 + 1;
         Random generator = new Random();
-        VOTE_DELAY = 15 + 2500 * VOTERCOUNT / 3000 * 1000 + generator.nextInt(VOTERCOUNT * 20);;
+        VOTE_DELAY = 15 + 3000 * VOTERCOUNT / 3000 * 1000 + generator.nextInt(VOTERCOUNT * 20);;
 
 
 //
@@ -1001,6 +1001,7 @@ public class CryptoNode extends Node {
                         try {
                             mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
                             doSendUDP(mes);
+                            Thread.yield();
                             // Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot send decryption share");
