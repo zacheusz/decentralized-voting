@@ -36,6 +36,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import launchers.executor.CryptoGossipLauncher;
 import paillierp.Paillier;
 import paillierp.PaillierThreshold;
@@ -679,8 +681,23 @@ public class CryptoNode extends Node {
 
     private class VoteTask implements Task {
 
+ private class VoteSenderTask implements Runnable{
         CRYPTO_BALLOT_MSG mes = null;
-
+public VoteSenderTask(CRYPTO_BALLOT_MSG mes ){
+    this.mes=mes;
+}
+                                public void run() {
+                                    try {
+                                        //send packet here
+                                        doSendUDP(mes);
+                                    } catch (UnknownHostException ex) {
+                                        Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                                    } catch (IOException ex) {
+                                        Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                }
+                            }
+    
         public void execute() {
             synchronized (LOCK) {
 //                if (!isVoteTaskOver) {
@@ -728,11 +745,11 @@ public class CryptoNode extends Node {
 //                VoteEncTime += System.nanoTime() - startT;
 
                 startInstant = System.nanoTime();
-                //  CRYPTO_BALLOT_MSG mes = null;
+                  CRYPTO_BALLOT_MSG mes = null;
 
                 taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
                 if (!(peerView.size() <= 1)) {
-
+                    Random generator = new Random();
                     for (E_CryptoNodeID peerId : peerView) {
                         if (peerId.equals(nodeId)) {
                             continue;
@@ -741,22 +758,9 @@ public class CryptoNode extends Node {
                         try {
 
                             mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
-                            Timer timer = new Timer();
-                            TimerTask task = new TimerTask() {
-
-                                public void run() {
-                                    try {
-                                        //send packet here
-                                        doSendUDP(mes);
-                                    } catch (UnknownHostException ex) {
-                                        Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                                    } catch (IOException ex) {
-                                        Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                }
-                            };
-                            Random generator = new Random();
-                            timer.schedule(task, generator.nextInt(20 * 1000));
+                            ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1);   
+                            schedThPoolExec.schedule(new VoteSenderTask(mes), generator.nextInt(20 ), TimeUnit.SECONDS);
+                           
 
                             //  doSendUDP(mes);
                             //  Thread.sleep(10);
@@ -782,6 +786,7 @@ public class CryptoNode extends Node {
             }
         }
     }
+                     
 
     public void aggrLocalTally(BigInteger ballot) {
 
