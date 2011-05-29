@@ -694,6 +694,7 @@ public class CryptoNode extends Node {
                 try {
                     //send packet here
                     doSendUDP(mes);
+                    Thread.yield();
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
