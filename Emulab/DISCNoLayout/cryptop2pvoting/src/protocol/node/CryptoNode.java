@@ -986,6 +986,7 @@ public class CryptoNode extends Node {
         public void execute() {
             synchronized (LOCK) {
                 if (!isTallyDecryptionOver) {
+                    isTallyDecryptionOver = true;
                     dump("TallyDecryption");
                     isDecryptionSharingOver = true;
                     PartialDecryption[] decArray = new PartialDecryption[resultSharesList.size()];
@@ -1003,7 +1004,7 @@ public class CryptoNode extends Node {
                     computedFinalResult = true;
                     dump("Determined final result:" + finalResult);
 
-                    isTallyDecryptionOver = true;
+                    
 
                     //         taskManager.registerTask(new ResultDiffusionTask());
                     taskManager.registerTask(new AttemptSelfDestruct());
