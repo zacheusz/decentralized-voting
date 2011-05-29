@@ -704,56 +704,58 @@ public class CryptoNode extends Node {
         }
 
         public void execute() {
-         //   synchronized (LOCK) {
+            //   synchronized (LOCK) {
 
-                startInstant = System.nanoTime();
-                CRYPTO_BALLOT_MSG mes = null;
+            startInstant = System.nanoTime();
+            CRYPTO_BALLOT_MSG mes = null;
 
-                taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-                ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
+            taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
+            ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 
-                if (!(peerView.size() <= 1)) {
-                    Random generator = new Random();
-                    for (E_CryptoNodeID peerId : peerView) {
-                        if (peerId.equals(nodeId)) {
-                            continue;
-                        }
-                        dump("Send a '" + Emsg + "' ballot to " + peerId);
-                        try {
-
-                            mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
-                            schedThPoolExec.schedule(new VoteSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                            Thread.yield();
-
-                            //  doSendUDP(mes);
-                            //  Thread.sleep(10);
-                        } catch (Exception e) {
-                            dump("TCP: cannot vote");
-                        }
+            if (!(peerView.size() <= 1)) {
+                Random generator = new Random();
+                for (E_CryptoNodeID peerId : peerView) {
+                    if (peerId.equals(nodeId)) {
+                        continue;
                     }
-                    MSVote += peerView.size() - 1;
-                    SMSVote += getObjectSize(mes) * (peerView.size() - 1);
+                    dump("Send a '" + Emsg + "' ballot to " + peerId);
+                    try {
 
-                } else {
-                    dump("Cannot vote: no peer view");
+                        mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
+                        schedThPoolExec.schedule(new VoteSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                        Thread.yield();
 
+                        //  doSendUDP(mes);
+                        //  Thread.sleep(10);
+                    } catch (Exception e) {
+                        dump("TCP: cannot vote");
+                    }
                 }
-                isVoteTaskOver = true;
-                //   taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
-                aggrLocalTally(Emsg);
-                taskManager.registerTask(new AttemptSelfDestruct());
-                //     taskManager.registerTask(new CloseVoteTask());
+                MSVote += peerView.size() - 1;
+                SMSVote += getObjectSize(mes) * (peerView.size() - 1);
+
+            } else {
+                dump("Cannot vote: no peer view");
+
+            }
+            isVoteTaskOver = true;
+            //   taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
+            aggrLocalTally(Emsg);
+            taskManager.registerTask(new AttemptSelfDestruct());
+            //     taskManager.registerTask(new CloseVoteTask());
 
 
 
-      //      }
+            //      }
         }
     }
 
     public void aggrLocalTally(BigInteger ballot) {
 
         synchronized (LOCK) {
+            long startT = System.nanoTime();
             localTally = encryptor.add(localTally, ballot);
+            TallyAggTime += System.nanoTime() - startT;
             numBallots++;
 
 
