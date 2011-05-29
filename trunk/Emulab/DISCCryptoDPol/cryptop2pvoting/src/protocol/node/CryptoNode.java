@@ -1034,7 +1034,7 @@ public class CryptoNode extends Node {
             }
             //specialDump("GlobalCountingTask");
             CRYPTO_PARTIAL_TALLY_MSG mes = null;
-    //        taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
+            //        taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
             dump("GlobalCountingTask");
 
 //                    if (isMalicious) {
@@ -1093,6 +1093,8 @@ public class CryptoNode extends Node {
             }
         }
     }
+    static int sharesSent = 0;
+    protected final Object SharesLOCK = new Object();
 
     private class TallySending implements Task {
 
@@ -1107,7 +1109,16 @@ public class CryptoNode extends Node {
             public void run() {
                 try {
                     //send packet here
-                    doSendTCP(mes);
+                    doSendUDP(mes);
+                    synchronized (SharesLOCK) {
+                        sharesSent++;
+                        if (sharesSent == proxyView.size()) {
+                            isShareSendingOver = true;
+                            taskManager.registerTask(new AttemptSelfDestruct());
+
+                        }
+
+                    }
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -1148,7 +1159,7 @@ public class CryptoNode extends Node {
                 //}
                 synchronized (LOCK) {
                     currentDecodingIndex++;
-                    isShareSendingOver = true;
+                    //   isShareSendingOver = true;
 
                     dump("sharesize2: " + currentDecodingIndex);
                     MSShare += peerView.size() - 1;
