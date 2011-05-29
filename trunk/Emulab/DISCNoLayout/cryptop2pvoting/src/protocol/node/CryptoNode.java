@@ -752,7 +752,7 @@ public class CryptoNode extends Node {
                 CRYPTO_BALLOT_MSG mes = null;
 
                 taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-                ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1);
+                ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 
                 if (!(peerView.size() <= 1)) {
                     Random generator = new Random();
