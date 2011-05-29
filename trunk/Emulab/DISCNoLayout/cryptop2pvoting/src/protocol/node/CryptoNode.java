@@ -86,6 +86,7 @@ public class CryptoNode extends Node {
 //    public ClusterAssignment clusterAssign;
     public boolean IAmThreshold = false;
     public int numPartialTallies = 0;
+    Random generator = new Random();
     public boolean computedLocalTally = false;
     public boolean computedPartialTally = false;
     protected BigInteger partialTally = BigInteger.ONE;
@@ -681,23 +682,26 @@ public class CryptoNode extends Node {
 
     private class VoteTask implements Task {
 
- private class VoteSenderTask implements Runnable{
-        CRYPTO_BALLOT_MSG mes = null;
-public VoteSenderTask(CRYPTO_BALLOT_MSG mes ){
-    this.mes=mes;
-}
-                                public void run() {
-                                    try {
-                                        //send packet here
-                                        doSendUDP(mes);
-                                    } catch (UnknownHostException ex) {
-                                        Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                                    } catch (IOException ex) {
-                                        Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                }
-                            }
-    
+        private class VoteSenderTask implements Runnable {
+
+            CRYPTO_BALLOT_MSG mes = null;
+
+            public VoteSenderTask(CRYPTO_BALLOT_MSG mes) {
+                this.mes = mes;
+            }
+
+            public void run() {
+                try {
+                    //send packet here
+                    doSendUDP(mes);
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
         public void execute() {
             synchronized (LOCK) {
 //                if (!isVoteTaskOver) {
@@ -745,9 +749,11 @@ public VoteSenderTask(CRYPTO_BALLOT_MSG mes ){
 //                VoteEncTime += System.nanoTime() - startT;
 
                 startInstant = System.nanoTime();
-                  CRYPTO_BALLOT_MSG mes = null;
+                CRYPTO_BALLOT_MSG mes = null;
 
                 taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
+                ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1);
+
                 if (!(peerView.size() <= 1)) {
                     Random generator = new Random();
                     for (E_CryptoNodeID peerId : peerView) {
@@ -758,9 +764,8 @@ public VoteSenderTask(CRYPTO_BALLOT_MSG mes ){
                         try {
 
                             mes = new CRYPTO_BALLOT_MSG(nodeId, peerId, Emsg);
-                            ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1);   
-                            schedThPoolExec.schedule(new VoteSenderTask(mes), generator.nextInt(20 ), TimeUnit.SECONDS);
-                           
+                            schedThPoolExec.schedule(new VoteSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                            Thread.yield();
 
                             //  doSendUDP(mes);
                             //  Thread.sleep(10);
@@ -786,7 +791,6 @@ public VoteSenderTask(CRYPTO_BALLOT_MSG mes ){
             }
         }
     }
-                     
 
     public void aggrLocalTally(BigInteger ballot) {
 
@@ -1016,19 +1020,43 @@ public VoteSenderTask(CRYPTO_BALLOT_MSG mes ){
 
     private class TallySending implements Task {
 
+        private class ShareSenderTask implements Runnable {
+
+            CRYPTO_DECRYPTION_SHARE_MSG mes = null;
+
+            public ShareSenderTask(CRYPTO_DECRYPTION_SHARE_MSG mes) {
+                this.mes = mes;
+            }
+
+            public void run() {
+                try {
+                    //send packet here
+                    doSendUDP(mes);
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
         public void execute() {
             if (!isShareSendingOver) {
                 CRYPTO_DECRYPTION_SHARE_MSG mes = null;
 
                 if (!(peerView.size() <= 1)) {
+                    ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1);
+
+
                     for (E_CryptoNodeID peerId : peerView) {
                         if (peerId.equals(nodeId)) {
                             continue;
                         }
                         dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                         try {
+
                             mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                            doSendUDP(mes);
+                            schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
                             Thread.yield();
                             // Thread.sleep(10);
                         } catch (Exception e) {
