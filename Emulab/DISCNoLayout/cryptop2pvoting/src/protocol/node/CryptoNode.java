@@ -67,6 +67,7 @@ public class CryptoNode extends Node {
     // Duration of epidemic dissemination: 20 seconds
     public static int kvalue;
     public static int MINTALLIES;
+
     public static int nodesPerMachine;
     public static ClusterChoice nodeToCluster = null;
     public static int chosenCluster;
@@ -322,7 +323,7 @@ public class CryptoNode extends Node {
 
         MINTALLIES = VOTERCOUNT / 2 + 1;
         Random generator = new Random();
-        VOTE_DELAY = 15 + 1000 * VOTERCOUNT / 2000 * 1000 + generator.nextInt(VOTERCOUNT * 20);;
+        VOTE_DELAY = 15 + 2500 * VOTERCOUNT / 3000 * 1000 + generator.nextInt(VOTERCOUNT * 20);;
 
 
 //
