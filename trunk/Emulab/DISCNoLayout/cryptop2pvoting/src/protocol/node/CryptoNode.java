@@ -323,7 +323,7 @@ public class CryptoNode extends Node {
 
         MINTALLIES = VOTERCOUNT / 2 + 1;
         Random generator = new Random();
-        VOTE_DELAY = 15 + 1000 * VOTERCOUNT / 3000 * 1000 + generator.nextInt(VOTERCOUNT * 20);;
+        VOTE_DELAY = 15 + 1000 * VOTERCOUNT / 3000 * 1000 + generator.nextInt(VOTERCOUNT * 20);
 
 
 //
