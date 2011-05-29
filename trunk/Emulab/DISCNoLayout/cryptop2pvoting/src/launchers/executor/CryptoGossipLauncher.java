@@ -44,6 +44,7 @@ public class CryptoGossipLauncher {
 		int port = Integer.parseInt(arguments.get("-port"));
                 
                 CryptoNode.secKeyFile = arguments.get("-secretKeyFile");
+                CryptoNode.LOGGING = Boolean.parseBoolean(arguments.get("-logging"));
           //      String pubKeyFile = arguments.get("-publicKeyFile");
 
             //    int groupId = Integer.parseInt(arguments.get("-groupId"));
