@@ -1107,7 +1107,7 @@ public class CryptoNode extends Node {
             public void run() {
                 try {
                     //send packet here
-                    doSendUDP(mes);
+                    doSendTCP(mes);
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
