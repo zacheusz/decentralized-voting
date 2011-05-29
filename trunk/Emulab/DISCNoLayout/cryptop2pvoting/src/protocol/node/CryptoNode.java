@@ -936,6 +936,8 @@ public class CryptoNode extends Node {
 
                     //}
                     isFinalResultCalculated = true;
+                    taskManager.registerTask(new TallySending());
+
 //                             currentDecodingIndex++;
 //                    dump("sharesize2: " + currentDecodingIndex);
 
