@@ -1416,7 +1416,7 @@ public class CryptoNode extends Node {
                         + " " + VoteEncTime + " " + ShareCompTime + " " + VoteDecTime + " " + runningTime + "\r");
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
-                taskManager.registerTask(new SelfDestructTask(),1000*20);
+                taskManager.registerTask(new SelfDestructTask(),1000*40);
             }
 
 
