@@ -289,7 +289,7 @@ public class CryptoNode extends Node {
 
         MINTALLIES = nodesPerCluster / 2 + 1;
         //  System.out.println("min:" + MINTALLIES);
-        VIEW_DIFF_DELAY = 15 + 1000 * VOTERCOUNT / 3000 * 1000;
+        VIEW_DIFF_DELAY = 15 + 1000 * VOTERCOUNT / 2000 * 1000;
         VOTE_DELAY = VIEW_DIFF_DELAY * 3 / 2;
         PREEMPT_PARTIAL_DELAY = VOTERCOUNT * 100;
         try {
@@ -874,7 +874,7 @@ public class CryptoNode extends Node {
             numBallots++;
 
 
-            dump("ballots " + numBallots + " " + peerView.size());
+            dump("ballots " + numBallots + " " + (int) (Math.floor(peerView.size() * thresholdBallot)));
 
             if (numBallots >= (int) (Math.floor(peerView.size() * thresholdBallot))) {
                 //System.out.println((int) (Math.floor(peerView.size() * thresholdBallot)));
@@ -1034,7 +1034,7 @@ public class CryptoNode extends Node {
             }
             //specialDump("GlobalCountingTask");
             CRYPTO_PARTIAL_TALLY_MSG mes = null;
-            taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
+    //        taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
             dump("GlobalCountingTask");
 
 //                    if (isMalicious) {
