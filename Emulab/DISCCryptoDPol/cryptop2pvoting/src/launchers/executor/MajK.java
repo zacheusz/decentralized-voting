@@ -4,6 +4,7 @@
  */
 package launchers.executor;
 
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,29 +22,47 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
-/**
- *
- * @author hamza
- */
-public class MajK {
+class runner extends Thread {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-       
-        
+    public static PrintStream out = null;
+    int numVoters;
+    int kvalue;
+    int runs;
+
+    runner(int numVoters, int kvalue, int runs) {
+        this.numVoters = numVoters;
+        this.kvalue = kvalue;
+        this.runs = runs;
+    }
+
+    public void dump(String message) {
+        if (out != null) {
+            synchronized (out) {
+                out.println(message);
+                out.flush();
+            }
+        }
+        synchronized (System.out) {
+            System.out.println(message);
+        }
+
+
+
+    }
+
+    public void run() {
+
         //values to change
-        double epsilon = 0.16667;       
-        int MAXVOTERCOUNT = 2000;               
-        int MINVOTERCOUNT = 2000;
-        int voterstep=3*60;
-        double KMIN=10;
-        double KMAX =30 ;
-        double  kstep=2 ;
-        int runTimes =40000000;
+        double epsilon = 0.16667;
+        int MAXVOTERCOUNT = numVoters;
+        int MINVOTERCOUNT = numVoters;
+        int voterstep = 3 * 60;
+        int KMIN = kvalue;
+        int KMAX = kvalue;
+        double kstep = 2;
+        int runTimes = runs;
 
-        double kval = 0.5;
+        int kval = 1;
         double threshOrder = (0.5 - epsilon) * MAXVOTERCOUNT;
         boolean isMal;
         Random generator = new Random();
@@ -59,13 +78,14 @@ public class MajK {
 //        double[] stdfractionArray = new double[KMAX];
 //        double[] meanfractionArray = new double[KMAX];
         double[] tempfractionArray = new double[runTimes];
+        double tempfraction = 0;
         double[] dishonestFractions;
         List<Double> finalFractions = new LinkedList<Double>();
         double fractionDishonestGroups = 0;
         int ktemp = 0;
         for (int voter = MINVOTERCOUNT; voter <= MAXVOTERCOUNT; voter += voterstep) {
 
-            for (kval = KMIN; kval <= KMAX; kval +=kstep) {
+            for (kval = KMIN; kval <= KMAX; kval += kstep) {
                 for (int u = 0; u < runTimes; u++) {
                     ktemp = 0;
                     fractionDishonestGroups = 0;
@@ -78,11 +98,16 @@ public class MajK {
                         isMal = (i < threshOrder);
 
                         wr = new wrapper(isMal, randomID);
-
-                        IDAssignment.put(wr, getHash(wr.id, MAXVOTERCOUNT));
+                        try {
+                            IDAssignment.put(wr, MajK.getHash(wr.id, MAXVOTERCOUNT));
+                        } catch (UnsupportedEncodingException ex) {
+                            Logger.getLogger(MajK.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (NoSuchAlgorithmException ex) {
+                            Logger.getLogger(MajK.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
 
-                    sortedIDs = sortByValue(IDAssignment);
+                    sortedIDs = MajK.sortByValue(IDAssignment);
 
                     int numClusters = (int) (Math.ceil(MAXVOTERCOUNT / (kval * Math.log(MAXVOTERCOUNT))));
                     int nodesPerCluster = (int) (Math.ceil(MAXVOTERCOUNT * 1.0 / numClusters));
@@ -138,17 +163,18 @@ public class MajK {
                     }
 
                     fractionDishonestGroups = fractionDishonestGroups / numClusters;
-                    tempfractionArray[u] = Math.ceil(fractionDishonestGroups);
+                    //  tempfractionArray[u] += Math.ceil(fractionDishonestGroups);
+                    tempfraction +=  Math.ceil(fractionDishonestGroups);
                     //    System.out.println(kvalue+" "+fractionDishonestGroups);
 
 
                 }
-                System.out.print(voter+" "+kval + " ");
-                for (double s : tempfractionArray) {
-                    System.out.print(s + " ");
-
-                }
-                System.out.println("");
+                dump(voter + " " + kval + " " + tempfraction);
+//                for (double s : tempfractionArray) {
+//                    System.out.print(s + " ");
+//
+//                }
+                //    System.out.println("");
 //                stdfractionArray[ktemp] = standard_deviation(tempfractionArray);
 //                meanfractionArray[ktemp] = mean(tempfractionArray);
 
@@ -175,10 +201,31 @@ public class MajK {
 //                kval += 2;
 //
 //            }
+    }
+}
+
+/**
+ *
+ * @author hamza
+ */
+public class MajK {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+
+
+        for (int kval = 10; kval <= 30; kval += 2) {
+            
+            Thread thread = new runner(1000, kval,40000000 );
+            thread.start();
         }
+    }
 
-    
-
+    //    HashMap<String, String> arguments = new HashMap<String, String>();
+//        int inputK = Integer.parseInt(arguments.get("-inputK"));
+//                int nvoters = Integer.parseInt(arguments.get("-nvoters"));
     public static List sortByValue(final Map m) {
         List keys = new ArrayList();
         keys.addAll(m.keySet());
@@ -215,7 +262,6 @@ public class MajK {
         hash = (hash < 0) ? -hash : hash;
         return hash % VOTERCOUNT;
     }
-
 //    /**
 //     * @param population an array, the population
 //     * @return the variance
