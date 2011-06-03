@@ -80,7 +80,7 @@ class runner extends Thread {
         int KMAX = kvalue;
         double kstep = 2;
         int runTimes = runs;
-
+        int finalcounts=0;
 
         int kval = 1;
         double threshOrder = (0.5 - epsilon) * MAXVOTERCOUNT;
@@ -219,14 +219,19 @@ class runner extends Thread {
 //                    }
 
 
+//
+//        finalcountsArray[(kvalue - 10) / 2] += tempfraction;
+//        counterArray[(kvalue - 10) / 2]++;
+//        //   System.out.println(""+counterArray[(kvalue-10)/2]);
+//        if (counterArray[(kvalue - 10) / 2] >= RUNTHREADS) {
+//            dump(MINVOTERCOUNT + " " + kvalue + " " + finalcountsArray[(kvalue - 10) / 2]);
+//        }
 
-        finalcountsArray[(kvalue - 10) / 2] += tempfraction;
-        counterArray[(kvalue - 10) / 2]++;
-        //   System.out.println(""+counterArray[(kvalue-10)/2]);
-        if (counterArray[(kvalue - 10) / 2] >= RUNTHREADS) {
-            dump(MINVOTERCOUNT + " " + kvalue + " " + finalcountsArray[(kvalue - 10) / 2]);
+        
+        
+        
+            dump(MINVOTERCOUNT + " " + kvalue + " " + finalcounts);
         }
-
 
 //             kval = 2;
 //            for (double s : finalFractions) {
@@ -249,7 +254,7 @@ class runner extends Thread {
 //
 //            }
     }
-}
+
 
 /**
  *
