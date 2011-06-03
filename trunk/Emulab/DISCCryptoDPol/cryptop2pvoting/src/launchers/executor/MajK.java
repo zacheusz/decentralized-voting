@@ -25,15 +25,34 @@ import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 class runner extends Thread {
 
     public static PrintStream out = null;
+    public static Object LOCK = new Object();
+    ;
+
     int numVoters;
     int kvalue;
+    int RUNTHREADS;
     int runs;
+    static int numofkvalues;
+//    static Integer[] finalcountsArray = new Integer[numofkvalues];
+//       static Integer[] counterArray = new Integer[numofkvalues];
+    static int[] finalcountsArray;
+    static int[] counterArray;
 
-    runner(int numVoters, int kvalue, int runs) {
+    runner(int numVoters, int kvalue, int runs, int runthreads, int numofkvalues) {
         this.numVoters = numVoters;
         this.kvalue = kvalue;
         this.runs = runs;
+        this.RUNTHREADS = runthreads;
+        this.numofkvalues = numofkvalues;
+        finalcountsArray = new int[numofkvalues];
+        counterArray = new int[numofkvalues];
+
+        for (int i = 0; i < numofkvalues; i++) {
+            counterArray[i] = 0;
+            finalcountsArray[i] = 0;
+        }
     }
+    static int coun = 0;
 
     public void dump(String message) {
         if (out != null) {
@@ -62,6 +81,7 @@ class runner extends Thread {
         double kstep = 2;
         int runTimes = runs;
 
+
         int kval = 1;
         double threshOrder = (0.5 - epsilon) * MAXVOTERCOUNT;
         boolean isMal;
@@ -77,8 +97,8 @@ class runner extends Thread {
         int index = 0;
 //        double[] stdfractionArray = new double[KMAX];
 //        double[] meanfractionArray = new double[KMAX];
-        double[] tempfractionArray = new double[runTimes];
-        double tempfraction = 0;
+
+        int tempfraction = 0;
         double[] dishonestFractions;
         List<Double> finalFractions = new LinkedList<Double>();
         double fractionDishonestGroups = 0;
@@ -86,7 +106,8 @@ class runner extends Thread {
         for (int voter = MINVOTERCOUNT; voter <= MAXVOTERCOUNT; voter += voterstep) {
 
             for (kval = KMIN; kval <= KMAX; kval += kstep) {
-                for (int u = 0; u < runTimes; u++) {
+                for (int u = 0; u < runTimes / RUNTHREADS; u++) {
+
                     ktemp = 0;
                     fractionDishonestGroups = 0;
                     IDAssignment = new HashMap<wrapper, Integer>();
@@ -164,12 +185,13 @@ class runner extends Thread {
 
                     fractionDishonestGroups = fractionDishonestGroups / numClusters;
                     //  tempfractionArray[u] += Math.ceil(fractionDishonestGroups);
-                    tempfraction +=  Math.ceil(fractionDishonestGroups);
+                    tempfraction += Math.ceil(fractionDishonestGroups);
+
                     //    System.out.println(kvalue+" "+fractionDishonestGroups);
 
-
+                    System.out.println(++coun);
                 }
-                dump(voter + " " + kval + " " + tempfraction);
+
 //                for (double s : tempfractionArray) {
 //                    System.out.print(s + " ");
 //
@@ -180,7 +202,32 @@ class runner extends Thread {
 
                 ktemp++;
             }
+
+
         }
+//            synchronized(finalcountsArray[(kvalue-10)/2])
+//                    {
+//                        synchronized(counterArray[(kvalue-10)/2])
+//                    {
+//                //        System.out.println(""+counterArray[(kvalue-10)/2].intValue());
+//                        finalcountsArray[(kvalue-10)/2]=Integer.valueOf(finalcountsArray[(kvalue-10)/2].intValue()+tempfraction);
+//                        counterArray[(kvalue-10)/2]=Integer.valueOf(counterArray[(kvalue-10)/2].intValue()+1);
+//                        if (counterArray[(kvalue-10)/2].intValue()==RUNTHREADS){
+//                            dump(MINVOTERCOUNT + " " + kvalue + " " + finalcountsArray[(kvalue-10)/2]);
+//                        }
+//                    }
+//                    }
+
+
+
+        finalcountsArray[(kvalue - 10) / 2] += tempfraction;
+        counterArray[(kvalue - 10) / 2]++;
+        //   System.out.println(""+counterArray[(kvalue-10)/2]);
+        if (counterArray[(kvalue - 10) / 2] >= RUNTHREADS) {
+            dump(MINVOTERCOUNT + " " + kvalue + " " + finalcountsArray[(kvalue - 10) / 2]);
+        }
+
+
 //             kval = 2;
 //            for (double s : finalFractions) {
 //                //         System.out.println(VOTERCOUNT+" "+kval + " " + s + " ");
@@ -214,12 +261,19 @@ public class MajK {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        HashMap<String, String> arguments = new HashMap<String, String>();
+        int inputK = Integer.parseInt(arguments.get("-inputK"));
+        int runs = Integer.parseInt(arguments.get("-runs"));
 
-
-        for (int kval = 10; kval <= 30; kval += 2) {
-            
-            Thread thread = new runner(1000, kval,40000000 );
-            thread.start();
+//int runs=10000;
+        int runthreads = 1;
+        int kmin = inputK;
+        int kmax = inputK;
+        for (int kval = kmin; kval <= kmax; kval += 2) {
+            for (int u = 0; u < runthreads; u++) {
+                Thread thread = new runner(1000, kval, runs, runthreads, 1 + (kmax - kmin) / 2);
+                thread.start();
+            }
         }
     }
 
