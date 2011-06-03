@@ -262,6 +262,10 @@ public class MajK {
      */
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         HashMap<String, String> arguments = new HashMap<String, String>();
+        for (int i = 0; i < args.length; i++) {
+			arguments.put(args[i], args[i + 1]);
+			i++;
+		}
         int inputK = Integer.parseInt(arguments.get("-inputK"));
         int runs = Integer.parseInt(arguments.get("-runs"));
 
