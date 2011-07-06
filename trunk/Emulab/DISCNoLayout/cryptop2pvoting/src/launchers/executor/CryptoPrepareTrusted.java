@@ -74,7 +74,7 @@ public class CryptoPrepareTrusted {
                  {
                      //sec=trusted.GetSecretDistributedKeyPart(i);
                      p=new PaillierThreshold(keys[i]);
-                     writeToFile("keys/secKey"+i,p );
+                     writeToFile("keys"+CryptoNode.VOTERCOUNT+"/secKey"+i,p );
                  }
            // }
 
