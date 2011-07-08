@@ -10,7 +10,7 @@ public class CRYPTO_DECRYPTION_SHARE_MSG extends Message {
 	private static final long serialVersionUID = 1L;
 	private PartialDecryption share;
         private int shareOrder;
-	
+            
 	public CRYPTO_DECRYPTION_SHARE_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, PartialDecryption share) {
 		super(Message.CRYPTO_DECRYPTION_SHARE_MSG, src, dest);
 		this.share = share;
