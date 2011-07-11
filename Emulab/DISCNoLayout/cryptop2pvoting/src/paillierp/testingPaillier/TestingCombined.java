@@ -12,6 +12,9 @@ import paillierp.key.KeyGen;
 import paillierp.key.PaillierPrivateThresholdKey;
 import zkp.DecryptionZKP;
 import launchers.executor.*;
+import protocol.communication.CRYPTO_BALLOT_MSG;
+import protocol.node.CryptoNode;
+import runtime.executor.E_CryptoNodeID;
 
 public class TestingCombined {
 
@@ -21,9 +24,9 @@ public class TestingCombined {
             arguments.put(args[i], args[i + 1]);
             i++;
         }
-         int bits_num =128;
-        int servers = 480;
-        int threshold = 40;
+         int bits_num =512;
+        int servers = 3;
+        int threshold = 1;
         int rounds = 1;
         int candidatesLength = 2;
 
@@ -103,7 +106,11 @@ public class TestingCombined {
 
           //  BigInteger msg = BigInteger.valueOf(0);
              Emsg = alice.encrypt(votes[0]);
+             E_CryptoNodeID id = new E_CryptoNodeID("node-1.polling1.abstracts.emulab.net", 23414,false);
+             CRYPTO_BALLOT_MSG mes = new CRYPTO_BALLOT_MSG(id, id, Emsg);
 
+
+            System.out.println("size: "+CryptoNode.getObjectSize(mes));
             encTime[j] = System.nanoTime()-startInstant ;
          //   sizes[j]=Emsg.toByteArray().length;
 
