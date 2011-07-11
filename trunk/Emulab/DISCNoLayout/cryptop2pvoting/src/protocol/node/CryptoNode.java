@@ -459,26 +459,20 @@ public class CryptoNode extends Node {
 
             ArrayList<MutableInt> countList = EchoArray.get(actualSrc);
 
-            if (countList == null) {
-                countList = new ArrayList<MutableInt>();          
+            if ((countList == null) || countList.isEmpty()) {
+                countList = new ArrayList<MutableInt>();
                 countList.add(new MutableInt());
                 countList.add(new MutableInt());
-                
-                EchoArray.put(actualSrc, countList);
-            } else {
-                MutableInt count=countList.get(seqNum);
-                if (count==null){
-                    count=new MutableInt();
-                }
-                    
-                EchoArray.put(actualSrc, countList);
+            }
+
+            countList.get(seqNum).inc();
+            EchoArray.put(actualSrc, countList);
+
+            if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2 + 1) ) {//Sentready
+                taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
 
             }
-           
         }
-        taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
-
-
 
         //} else {
         //  dump("Discarded an ballot message (cause: sent too late)");

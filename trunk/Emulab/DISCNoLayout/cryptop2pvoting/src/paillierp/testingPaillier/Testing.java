@@ -21,19 +21,19 @@ public class Testing {
             arguments.put(args[i], args[i + 1]);
             i++;
         }
-//         int bits_num =128;
-//        int servers = 5;
-//        int threshold = 3;
-//        int rounds = 2;
-//        int candidatesLength = 2;
+         int bits_num =64;
+        int servers = 200;
+        int threshold = 100;
+        int rounds = 1;
+        int candidatesLength = 2;
 
 
       
-        int bits_num = Integer.parseInt(arguments.get("-bitsnum"));
-        int servers = Integer.parseInt(arguments.get("-servers"));
-        int threshold = Integer.parseInt(arguments.get("-threshold"));
-        int rounds = Integer.parseInt(arguments.get("-rounds"));
-        int candidatesLength = Integer.parseInt(arguments.get("-candidatesLength"));
+//        int bits_num = Integer.parseInt(arguments.get("-bitsnum"));
+//        int servers = Integer.parseInt(arguments.get("-servers"));
+//        int threshold = Integer.parseInt(arguments.get("-threshold"));
+//        int rounds = Integer.parseInt(arguments.get("-rounds"));
+//        int candidatesLength = Integer.parseInt(arguments.get("-candidatesLength"));
 
   //      System.out.println(" Create new keypairs .");
         PaillierPrivateThresholdKey[] keys = null;

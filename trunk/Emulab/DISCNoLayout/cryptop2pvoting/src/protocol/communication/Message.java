@@ -25,6 +25,13 @@ public abstract class Message implements Serializable, Cloneable {
     public static final byte POSITION_ASSIGN_MSG = 15;
     public static final byte CRYPTO_VIEW_MSG = 16;
     public static final byte BROADCAST_DATA_MSG = 17;
+    public static final byte VOTE_DATA_MSG = 18;
+    public static final byte VOTE_ECHO_MSG = 19;
+    public static final byte VOTE_READY_MSG = 20;
+        public static final byte SHARE_DATA_MSG = 21;
+    public static final byte SHARE_ECHO_MSG = 22;
+    public static final byte SHARE_READY_MSG = 23;
+
 //	public static final byte HITC = 11;
     protected byte header;
     protected E_CryptoNodeID src;
