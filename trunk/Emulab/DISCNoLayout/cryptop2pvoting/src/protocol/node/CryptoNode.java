@@ -742,6 +742,7 @@ public class CryptoNode extends Node {
     }
 
     public class BroadcastInfo implements Serializable {
+	private static final long serialVersionUID = 1L;
 
         PartialDecryption share;
         BigInteger vote;
@@ -812,7 +813,7 @@ public class CryptoNode extends Node {
                         }
                         //   dump("Send a '" + Emsg + "' ballot to " + peerId);
                         try {
-                            mes = new BROADCAST_MSG(nodeId, peerId, nodeId, info);
+                            mes = new BROADCAST_MSG(nodeId, peerId, info);
 
                             schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
                             Thread.yield();
