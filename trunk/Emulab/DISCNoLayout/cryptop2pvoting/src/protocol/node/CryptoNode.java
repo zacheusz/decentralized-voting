@@ -202,6 +202,7 @@ public class CryptoNode extends Node {
     protected Map<E_CryptoNodeID, ArrayList<MutableInt>> echoCountMap = new HashMap<E_CryptoNodeID, ArrayList<MutableInt>>();
     protected Map<E_CryptoNodeID, ArrayList<MutableInt>> readyCountMap = new HashMap<E_CryptoNodeID, ArrayList<MutableInt>>();
     protected Map<E_CryptoNodeID, ArrayList<Boolean>> readyMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
+    protected Map<E_CryptoNodeID, ArrayList<Boolean>> deliveredMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
     public int sequenceNumber = 0;
 
     // **************************************************************************
@@ -378,7 +379,7 @@ public class CryptoNode extends Node {
 //                    receiveHITV(((HITV_MSG) msg));
 //                    break;
                 case Message.CRYPTO_BALLOT:
-                    receiveBallot((CRYPTO_BALLOT_MSG) msg);
+                    receiveBallot((BROADCAST_MSG) msg);
                     break;
                 //         case Message.CRYPTO_INDIVIDUAL_TALLY_MSG:
                 //             receiveIndividualTally((CRYPTO_INDIVIDUAL_TALLY_MSG) msg);
@@ -483,7 +484,7 @@ public class CryptoNode extends Node {
 
 
                 if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2 + 1) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, isMalicious, msg.getInfo().seqNum)));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -494,7 +495,6 @@ public class CryptoNode extends Node {
 
     private void receiveVoteReadyMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
-        //if (!isLocalCountingOver) {
         synchronized (readyMap) {
             dump("Received a vote ready message from " + msg.getSrc());
 
@@ -506,6 +506,22 @@ public class CryptoNode extends Node {
                 ArrayList<MutableInt> countList = readyCountMap.get(actualSrc);
                 ArrayList<Boolean> readyList = readyMap.get(actualSrc);
                 boolean sentReady = false;
+                boolean delivered = false;
+                ArrayList<Boolean> deliveredList = readyMap.get(actualSrc);
+
+
+                if ((deliveredList == null) || deliveredList.isEmpty()) {
+                    deliveredList = new ArrayList<Boolean>();
+                    deliveredList.add(Boolean.FALSE);
+                    deliveredList.add(Boolean.FALSE);
+                } else {
+                    delivered = deliveredList.get(seqNum);
+                }
+                if (delivered)
+                {
+                    //add statistics
+                    return;
+                }
 
                 if ((readyList == null) || readyList.isEmpty()) {
                     readyList = new ArrayList<Boolean>();
@@ -527,15 +543,14 @@ public class CryptoNode extends Node {
 
 
                 if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, isMalicious, msg.getInfo().seqNum)));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
 
                 if (countList.get(seqNum).value >= Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
-                    readyList.set(seqNum, Boolean.TRUE);
-                    readyMap.put(actualSrc, readyList);
+                    
+                    receiveBallot(msg);
                 }
 
             }
@@ -544,11 +559,11 @@ public class CryptoNode extends Node {
 
     }
 
-    private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoSuchAlgorithmException {
+    private void receiveBallot(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         if (!isLocalCountingOver) {
-            dump("Received a ballot (" + msg.getVote() + ") from " + msg.getSrc());
-            aggrLocalTally(msg.getVote());
+            dump("Received a ballot (" + msg.getInfo().vote + ") from " + msg.getInfo().actualSrc);
+            aggrLocalTally(msg.getInfo().vote);
             MRBallot++;
             SMRBallot += getObjectSize(msg);
 
