@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import paillierp.PartialDecryption;
 import protocol.communication.Message;
-import protocol.node.CryptoNode.BroadcastInfo;
 import runtime.executor.E_CryptoNodeID;
 import zkp.DecryptionZKP;
 
