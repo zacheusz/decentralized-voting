@@ -1,6 +1,7 @@
 package protocol.communication;
 
 //import OldVoting.DecodingShare;
+import java.io.Serializable;
 import java.math.BigInteger;
 import paillierp.PartialDecryption;
 import protocol.communication.Message;
@@ -8,7 +9,7 @@ import protocol.node.CryptoNode.BroadcastInfo;
 import runtime.executor.E_CryptoNodeID;
 import zkp.DecryptionZKP;
 
-public class BROADCAST_MSG extends Message {
+public class BROADCAST_MSG extends Message implements Serializable {
 	private static final long serialVersionUID = 1L;
         private BroadcastInfo info=null;
         private E_CryptoNodeID actualSrc=null;
