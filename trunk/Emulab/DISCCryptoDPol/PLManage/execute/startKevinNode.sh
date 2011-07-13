@@ -18,9 +18,9 @@ function launch () {
 if [ $1 -eq $GOSSIP_PORT ]
 then
 #	echo "mkdir -p $BINHOME2 ;cp -r $BINHOME/* $BINHOME2"
-    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "mkdir -p $BINHOME2 ;cp -r $BINHOME/* $BINHOME2 ; pkill java; $JAVA_ -classpath $BINHOME2 $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON"
+    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "mkdir -p $BINHOME2 ;cp -r $BINHOME/* $BINHOME2 ;cp $HOME/keys/secKey0 /tmp/secKey0 ;pkill java; $JAVA_ -classpath $BINHOME2 $NODELAUNCHERCLASSNAME -bset $HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON -logging $LOGGING"
 else
-ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME2 $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON"
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME2 $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON -logging $LOGGING"
 fi
 }	
 

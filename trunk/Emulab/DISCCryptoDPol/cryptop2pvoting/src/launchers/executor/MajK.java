@@ -188,8 +188,6 @@ class runner extends Thread {
                     tempfraction += Math.ceil(fractionDishonestGroups);
 
                     //    System.out.println(kvalue+" "+fractionDishonestGroups);
-
-                    System.out.println(++coun);
                 }
 
 //                for (double s : tempfractionArray) {
@@ -230,7 +228,7 @@ class runner extends Thread {
         
         
         
-            dump(MINVOTERCOUNT + " " + kvalue + " " + finalcounts);
+            dump(MINVOTERCOUNT + " " + kvalue + " " +tempfraction);
         }
 
 //             kval = 2;
@@ -273,6 +271,8 @@ public class MajK {
 		}
         int inputK = Integer.parseInt(arguments.get("-inputK"));
         int runs = Integer.parseInt(arguments.get("-runs"));
+	int votersc = Integer.parseInt(arguments.get("-voters"));
+	
 
 //int runs=10000;
         int runthreads = 1;
@@ -280,7 +280,7 @@ public class MajK {
         int kmax = inputK;
         for (int kval = kmin; kval <= kmax; kval += 2) {
             for (int u = 0; u < runthreads; u++) {
-                Thread thread = new runner(1000, kval, runs, runthreads, 1 + (kmax - kmin) / 2);
+                Thread thread = new runner(votersc, kval, runs, runthreads, 1 + (kmax - kmin) / 2);
                 thread.start();
             }
         }

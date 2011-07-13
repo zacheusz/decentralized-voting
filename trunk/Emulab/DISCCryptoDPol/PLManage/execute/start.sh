@@ -33,7 +33,7 @@ cd -;
 
 START=$(date +%s)
 #./startTrustedThirdParty.sh
-ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "java -classpath $BINHOME $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -bits $BITS -kvalue $KVALUE"
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "cd keys; rm * ; cd ../ ;java -classpath $BINHOME $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -bits $BITS -kvalue $KVALUE"
 AFTERTRUSTED=$(date +%s)
 DIFF1=$(( $AFTERTRUSTED - $START ))
 echo "time for trusted 3rd party $DIFF1"

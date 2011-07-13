@@ -1,5 +1,5 @@
 #changed login name
-export experiment="polling1"
+export experiment="polling"
 export LOGIN_NAME="harkous"
 export HOME=/users/$LOGIN_NAME
 export PROJECT_NAME="cryptop2pvoting"
@@ -21,6 +21,7 @@ export DEFAULT_NODEFILE="../deploy/nodesPLAllNew"
 export DEFAULT_BOOTSTRAP="localhost"
 export SSH_TIMEOUT=80
 export BETA=0.05
+export LOGGING=false;
 #tried deploying on fewer nodes
 export EPSILON=0.2
 export NB_NODES=100
@@ -30,10 +31,10 @@ export K=8
 #export NB_BALLOTS=$((2*$K+1))
 export NB_BALLOTS=1
 export VOTECOUNT=3
-export nodesPerMachine=3
+export nodesPerMachine=14
 export TALLYCOUNT=$(( $nodesPerMachine * $NB_NODES ))
 export VOTERCOUNT=$TALLYCOUNT
-export KVALUE=9
+export KVALUE=22
 #export MINTALLIES=$(((($VOTERCOUNT/$NB_GROUPS))))
 #export CERTAINTY=64
 export BITS=64
