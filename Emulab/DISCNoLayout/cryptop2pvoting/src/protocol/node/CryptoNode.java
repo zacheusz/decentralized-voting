@@ -765,7 +765,7 @@ public class CryptoNode extends Node {
                 try {
                     //send packet here
                     doSendUDP(mes);
-                    Thread.yield();
+    //                Thread.yield();
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -795,7 +795,7 @@ public class CryptoNode extends Node {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
                             schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                            Thread.yield();
+                  //          Thread.yield();
 
 
                             //  doSendUDP(mes);
