@@ -12,15 +12,15 @@ import zkp.DecryptionZKP;
 public class BROADCAST_MSG extends Message implements Serializable {
 	private static final long serialVersionUID = 1L;
         private BroadcastInfo info=null;
-        private E_CryptoNodeID actualSrc=null;
+       
         
     
             
-	public BROADCAST_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, E_CryptoNodeID actualSrc, BroadcastInfo info) {
+	public BROADCAST_MSG(E_CryptoNodeID src, E_CryptoNodeID dest, BroadcastInfo info) {
 		
             super(Message.BROADCAST_DATA_MSG, src, dest);
 		this.info=info;
-                this.actualSrc=actualSrc;
+       
 	}
 	
 	public BroadcastInfo getInfo() {
