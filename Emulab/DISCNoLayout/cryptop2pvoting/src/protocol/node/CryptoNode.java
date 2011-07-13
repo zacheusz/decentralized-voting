@@ -218,24 +218,33 @@ public class CryptoNode extends Node {
 
         E_CryptoNodeID tempID = null;
         mycount = 0;
+        threshOrder = (0.5 - epsilon) * VOTERCOUNT;
+        boolean isMal;
         for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
             for (int j = 0; j < nodesPerMachine; j++) {
+                isMal = (mycount < threshOrder);
+                tempID = new E_CryptoNodeID("node-" + i, basicPort + j, isMal);
 
-                tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
-                peerView.add(tempID);
                 if (nodeId.equals(tempID)) {
                     dump("keynum: " + mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                     if (secKey == null) {
                         taskManager.registerTask(new SelfDestructTask());
-                    }
 
+                    }
+                    nodeId.isMalicious = isMal;
                 }
+                peerView.add(tempID);
                 mycount++;
 
 
             }
         }
+
+
+
+
+
 
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
         int bits;
