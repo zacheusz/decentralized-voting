@@ -13,6 +13,7 @@ import paillierp.key.PaillierPrivateThresholdKey;
 import zkp.DecryptionZKP;
 import launchers.executor.*;
 import protocol.communication.CRYPTO_BALLOT_MSG;
+import protocol.communication.CRYPTO_DECRYPTION_SHARE_MSG;
 import protocol.node.CryptoNode;
 import runtime.executor.E_CryptoNodeID;
 
@@ -135,6 +136,10 @@ public class TestingCombined {
                 
                 pshare[k]=p[k].decrypt(Emsg);
             }
+            E_CryptoNodeID id = new E_CryptoNodeID("node-1.polling1.abstracts.emulab.net", 23414,false);
+
+           CRYPTO_DECRYPTION_SHARE_MSG mes2 = new CRYPTO_DECRYPTION_SHARE_MSG(id, id, pshare[0]);
+            System.out.println("size2: "+CryptoNode.getObjectSize(mes2));
             
             sharedecTime[i] = (System.nanoTime()-startInstant)/threshold;
 

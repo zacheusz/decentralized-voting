@@ -381,6 +381,24 @@ public class CryptoNode extends Node {
                 case Message.CRYPTO_BALLOT:
                     receiveBallot((BROADCAST_MSG) msg);
                     break;
+                case Message.BROADCAST_DATA_MSG:
+                    switch (((BROADCAST_MSG) msg).getInfo().type) {
+                        case Message.VOTE_DATA_MSG:
+                            receiveVoteDataMsg((BROADCAST_MSG) msg);
+                            break;
+
+                        case Message.VOTE_ECHO_MSG:
+                            receiveVoteEchoMsg((BROADCAST_MSG) msg);
+                            break;
+
+                        case Message.VOTE_READY_MSG:
+                            receiveVoteReadyMsg((BROADCAST_MSG) msg);
+                            break;
+                        default:
+                            dump("Discarded a message from " + msg.getSrc() + " of type " + msg.getHeader() + "(cause: unknown type)");
+
+                    }
+                    break;
                 //         case Message.CRYPTO_INDIVIDUAL_TALLY_MSG:
                 //             receiveIndividualTally((CRYPTO_INDIVIDUAL_TALLY_MSG) msg);
                 //       break;
@@ -436,12 +454,75 @@ public class CryptoNode extends Node {
         }
     }
 
+        private class getViews implements Task {
+
+        public void execute() {
+            synchronized (LOCK) {
+
+
+                E_CryptoNodeID tempID;
+           //     Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
+              //  List<E_CryptoNodeID> sortedIDs;
+
+                int mycount = 1;
+                threshOrder = (0.5 - epsilon) * VOTERCOUNT;
+                boolean isMal;
+                for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
+                    for (int j = 0; j < nodesPerMachine; j++) {
+                        isMal = (mycount < threshOrder);
+                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j, isMal);
+
+                        if (tempID.equals(nodeId)) {
+                            nodeId.isMalicious = isMal;
+                            //     System.out.println("I am " + isMal);
+                        }
+                        peerView.add(tempID);
+                       // IDAssignment.put(tempID, tempID.getOrder());
+                        mycount++;
+                    }
+                }
+               
+//                //      System.out.println(nodeId.toString() + ":");
+////                for (int i=0;i<sortedIDs.size();i++)
+////                    System.out.println(sortedIDs.get(i).toString()+" ,");
+////                
+//                // System.out.println(sortedIDs.size());
+//                nodeToCluster = new ClusterChoice(sortedIDs, nodeId);
+//                nodeId.groupId = nodeToCluster.myGroupID;
+////                if (nodeId.groupId == -1) {
+////                    System.out.println(nodeId.toString());
+////                }
+//                if (nodeId.groupId == 0) {
+//                    IAmThreshold = true;
+//
+//                    secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
+//                    //  System.out.println("keynum:" + nodeToCluster.keyNum);
+//                }
+//
+//                //        System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
+//                proxyView = nodeToCluster.get((nodeId.groupId + 1) % numClusters);
+////                   for (int i=0;i<proxyView.size();i++)
+////                    System.out.println(proxyView.toArray()[i].toString()+" ,");
+////             
+//                peerView = nodeToCluster.get((nodeId.groupId));
+//                //    peerView.remove(nodeId);
+//                clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
+//
+//                if (IAmThreshold) {
+//                    taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
+//
+//
+//                }
+                taskManager.registerTask(new VoteTask(), VOTE_DELAY);
+            }
+        }
+    }
     private void receiveVoteDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         //if (!isLocalCountingOver) {
         dump("Received a vote data message from " + msg.getSrc());
 
-        taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
+        taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)));
 
 
         //} else {
@@ -456,7 +537,7 @@ public class CryptoNode extends Node {
             dump("Received a vote echo message from " + msg.getSrc());
 
 
-            if (!msg.getInfo().isCorrupt) {
+            if (!msg.getSrc().isMalicious) {
 
                 E_CryptoNodeID actualSrc = msg.getInfo().actualSrc;
                 int seqNum = msg.getInfo().seqNum;
@@ -484,7 +565,7 @@ public class CryptoNode extends Node {
 
 
                 if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2 + 1) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, isMalicious, msg.getInfo().seqNum)));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc,  msg.getInfo().seqNum)));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -499,7 +580,7 @@ public class CryptoNode extends Node {
             dump("Received a vote ready message from " + msg.getSrc());
 
 
-            if (!msg.getInfo().isCorrupt) {
+            if (!msg.getSrc().isMalicious) {
 
                 E_CryptoNodeID actualSrc = msg.getInfo().actualSrc;
                 int seqNum = msg.getInfo().seqNum;
@@ -517,8 +598,7 @@ public class CryptoNode extends Node {
                 } else {
                     delivered = deliveredList.get(seqNum);
                 }
-                if (delivered)
-                {
+                if (delivered) {
                     //add statistics
                     return;
                 }
@@ -543,13 +623,13 @@ public class CryptoNode extends Node {
 
 
                 if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, isMalicious, msg.getInfo().seqNum)));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
 
                 if (countList.get(seqNum).value >= Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-                    
+
                     receiveBallot(msg);
                 }
 
@@ -667,15 +747,15 @@ public class CryptoNode extends Node {
         BigInteger vote;
         byte type;
         E_CryptoNodeID actualSrc;
-        boolean isCorrupt;
+     //   boolean isCorrupt;
         int seqNum;
 
-        public BroadcastInfo(PartialDecryption share, BigInteger vote, byte type, E_CryptoNodeID actualSrc, boolean isCorrupt, int seqNum) {
+        public BroadcastInfo(PartialDecryption share, BigInteger vote, byte type, E_CryptoNodeID actualSrc,  int seqNum) {
             this.share = share;
             this.vote = vote;
             this.type = type;
             this.actualSrc = actualSrc;
-            this.isCorrupt = isCorrupt;
+           // this.isCorrupt = isCorrupt;
             this.seqNum = seqNum;
         }
 
@@ -684,7 +764,7 @@ public class CryptoNode extends Node {
             this.vote = otherInfo.vote;
             this.type = otherInfo.type;
             this.actualSrc = otherInfo.actualSrc;
-            this.isCorrupt = otherInfo.isCorrupt;
+      //      this.isCorrupt = otherInfo.isCorrupt;
             this.seqNum = otherInfo.seqNum;
 
         }
@@ -784,7 +864,7 @@ public class CryptoNode extends Node {
 
             taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
 
-            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, isMalicious, sequenceNumber)));
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)));
 
 //            ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 //
@@ -1340,68 +1420,7 @@ public class CryptoNode extends Node {
 //            }
 //        }
 //    }
-//    private class getViews implements Task {
-//
-//        public void execute() {
-//            synchronized (LOCK) {
-//
-//
-//                E_CryptoNodeID tempID;
-//                Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
-//                List<E_CryptoNodeID> sortedIDs;
-//
-//                int mycount = 1;
-//                threshOrder = (0.5 - epsilon) * VOTERCOUNT;
-//                boolean isMal;
-//                for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
-//                    for (int j = 0; j < nodesPerMachine; j++) {
-//                        isMal = (mycount < threshOrder);
-//                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j, isMal);
-//
-//                        if (tempID.equals(nodeId)) {
-//                            nodeId.isMalicious = isMal;
-//                            //     System.out.println("I am " + isMal);
-//                        }
-//                        IDAssignment.put(tempID, tempID.getOrder());
-//                        mycount++;
-//                    }
-//                }
-//                sortedIDs = sortByValue(IDAssignment);
-//                //      System.out.println(nodeId.toString() + ":");
-////                for (int i=0;i<sortedIDs.size();i++)
-////                    System.out.println(sortedIDs.get(i).toString()+" ,");
-////                
-//                // System.out.println(sortedIDs.size());
-//                nodeToCluster = new ClusterChoice(sortedIDs, nodeId);
-//                nodeId.groupId = nodeToCluster.myGroupID;
-////                if (nodeId.groupId == -1) {
-////                    System.out.println(nodeId.toString());
-////                }
-//                if (nodeId.groupId == 0) {
-//                    IAmThreshold = true;
-//
-//                    secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
-//                    //  System.out.println("keynum:" + nodeToCluster.keyNum);
-//                }
-//
-//                //        System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
-//                proxyView = nodeToCluster.get((nodeId.groupId + 1) % numClusters);
-////                   for (int i=0;i<proxyView.size();i++)
-////                    System.out.println(proxyView.toArray()[i].toString()+" ,");
-////             
-//                peerView = nodeToCluster.get((nodeId.groupId));
-//                //    peerView.remove(nodeId);
-//                clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
-//
-//                if (IAmThreshold) {
-//                    taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
-//
-//
-//                }
-//                taskManager.registerTask(new VoteTask(), VOTE_DELAY);
-//            }
-//        }
-//    }
+
     //    private class PreemptPartialTallyingTask implements Task {
 //
 //        public void execute() {
