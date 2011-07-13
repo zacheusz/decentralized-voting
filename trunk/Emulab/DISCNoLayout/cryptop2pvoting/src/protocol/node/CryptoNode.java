@@ -245,7 +245,6 @@ public class CryptoNode extends Node {
 
 
 
-
         votes = new BigInteger[VOTECOUNT]; //a vector with same length as the candidates
         int bits;
         BigInteger base, temp;
@@ -530,7 +529,7 @@ public class CryptoNode extends Node {
     private void receiveVoteDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         //if (!isLocalCountingOver) {
-        dump("Received a vote data message from " + msg.getSrc() + "with actual src: " + msg.getInfo().actualSrc);
+        dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
 
         taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)));
 
@@ -544,7 +543,7 @@ public class CryptoNode extends Node {
 
         //if (!isLocalCountingOver) {
         synchronized (readyMap) {
-            dump("Received a vote echo message from " + msg.getSrc() + "with actual src: " + msg.getInfo().actualSrc);
+            dump("Received a vote echo message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
 
 
             if (!msg.getSrc().isMalicious) {
@@ -587,7 +586,7 @@ public class CryptoNode extends Node {
     private void receiveVoteReadyMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         synchronized (readyMap) {
-            dump("Received a vote ready message from " + msg.getSrc() + "with actual src: " + msg.getInfo().actualSrc);
+            dump("Received a vote ready message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
 
 
             if (!msg.getSrc().isMalicious) {
@@ -791,7 +790,7 @@ public class CryptoNode extends Node {
                         if (peerId.equals(nodeId)) {
                             continue;
                         }
-                        //   dump("Send a '" + Emsg + "' ballot to " + peerId);
+                        dump("Send a '" + Emsg + "' ballot to " + peerId);
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
