@@ -32,9 +32,9 @@ head -$NB_NODES nodesGoodPL > $nodesFile
 cd -;
 
 START=$(date +%s)
-#./startTrustedThirdParty.sh
-ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "cd $PROJECT_HOME/keys; rm * ; cd $PROJECT_HOME; java -classpath $BINHOME $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -bits $BITS -kvalue $KVALUE"
-
+##./startTrustedThirdParty.sh
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$home_node "cd $KEYDIR; java -classpath $BINHOME $TRUSTEDTHIRDPARTYCLASS -votercount $VOTERCOUNT -votecount $VOTECOUNT -bits $BITS -kvalue $KVALUE"
+#cd $KEYDIR; rm * ;
 AFTERTRUSTED=$(date +%s)
 DIFF1=$(( $AFTERTRUSTED - $START ))
 echo "time for trusted 3rd party $DIFF1"
