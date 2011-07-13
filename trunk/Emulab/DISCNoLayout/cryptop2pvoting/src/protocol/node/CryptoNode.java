@@ -199,7 +199,9 @@ public class CryptoNode extends Node {
     public double threshOrder;
     protected final Object BROADCASTLOCK = new Object();
     protected BROADCAST_MSG broadcastMsg;
-    public Map<E_CryptoNodeID, ArrayList<MutableInt>> EchoArray = new HashMap<E_CryptoNodeID, ArrayList<MutableInt>>();
+    protected Map<E_CryptoNodeID, ArrayList<MutableInt>> echoCountMap = new HashMap<E_CryptoNodeID, ArrayList<MutableInt>>();
+    protected Map<E_CryptoNodeID, ArrayList<MutableInt>> readyCountMap = new HashMap<E_CryptoNodeID, ArrayList<MutableInt>>();
+    protected Map<E_CryptoNodeID, ArrayList<Boolean>> readyMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
     public int sequenceNumber = 0;
 
     // **************************************************************************
@@ -449,34 +451,97 @@ public class CryptoNode extends Node {
     private void receiveVoteEchoMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         //if (!isLocalCountingOver) {
-        dump("Received a vote echo message from " + msg.getSrc());
+        synchronized (readyMap) {
+            dump("Received a vote echo message from " + msg.getSrc());
 
 
-        if (!msg.getInfo().isCorrupt) {
-            E_CryptoNodeID actualSrc = msg.getInfo().actualSrc;
-            int seqNum = msg.getInfo().seqNum;
+            if (!msg.getInfo().isCorrupt) {
+
+                E_CryptoNodeID actualSrc = msg.getInfo().actualSrc;
+                int seqNum = msg.getInfo().seqNum;
+                ArrayList<MutableInt> countList = echoCountMap.get(actualSrc);
+                ArrayList<Boolean> readyList = readyMap.get(actualSrc);
+                boolean sentReady = false;
+
+                if ((readyList == null) || readyList.isEmpty()) {
+                    readyList = new ArrayList<Boolean>();
+                    readyList.add(Boolean.FALSE);
+                    readyList.add(Boolean.FALSE);
+                } else {
+                    sentReady = readyList.get(seqNum);
+                }
 
 
-            ArrayList<MutableInt> countList = EchoArray.get(actualSrc);
+                if ((countList == null) || countList.isEmpty()) {
+                    countList = new ArrayList<MutableInt>();
+                    countList.add(new MutableInt());
+                    countList.add(new MutableInt());
+                }
 
-            if ((countList == null) || countList.isEmpty()) {
-                countList = new ArrayList<MutableInt>();
-                countList.add(new MutableInt());
-                countList.add(new MutableInt());
+                countList.get(seqNum).inc();
+                echoCountMap.put(actualSrc, countList);
+
+
+                if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2 + 1) && !sentReady) {
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
+                    readyList.set(seqNum, Boolean.TRUE);
+                    readyMap.put(actualSrc, readyList);
+                }
             }
+        }
 
-            countList.get(seqNum).inc();
-            EchoArray.put(actualSrc, countList);
+    }
 
-            if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2 + 1) ) {//Sentready
-                taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
+    private void receiveVoteReadyMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
+
+        //if (!isLocalCountingOver) {
+        synchronized (readyMap) {
+            dump("Received a vote ready message from " + msg.getSrc());
+
+
+            if (!msg.getInfo().isCorrupt) {
+
+                E_CryptoNodeID actualSrc = msg.getInfo().actualSrc;
+                int seqNum = msg.getInfo().seqNum;
+                ArrayList<MutableInt> countList = readyCountMap.get(actualSrc);
+                ArrayList<Boolean> readyList = readyMap.get(actualSrc);
+                boolean sentReady = false;
+
+                if ((readyList == null) || readyList.isEmpty()) {
+                    readyList = new ArrayList<Boolean>();
+                    readyList.add(Boolean.FALSE);
+                    readyList.add(Boolean.FALSE);
+                } else {
+                    sentReady = readyList.get(seqNum);
+                }
+
+
+                if ((countList == null) || countList.isEmpty()) {
+                    countList = new ArrayList<MutableInt>();
+                    countList.add(new MutableInt());
+                    countList.add(new MutableInt());
+                }
+
+                countList.get(seqNum).inc();
+                readyCountMap.put(actualSrc, countList);
+
+
+                if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
+                    readyList.set(seqNum, Boolean.TRUE);
+                    readyMap.put(actualSrc, readyList);
+                }
+
+                if (countList.get(seqNum).value >= Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, msg.getSrc(), isMalicious, msg.getInfo().seqNum)));
+                    readyList.set(seqNum, Boolean.TRUE);
+                    readyMap.put(actualSrc, readyList);
+                }
 
             }
         }
 
-        //} else {
-        //  dump("Discarded an ballot message (cause: sent too late)");
-        // }
+
     }
 
     private void receiveBallot(CRYPTO_BALLOT_MSG msg) throws NoSuchAlgorithmException {
