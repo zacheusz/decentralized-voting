@@ -15,11 +15,11 @@ beta=$BETA
 
 function launch () {
 #    rsync -p -e "ssh -c arcfour -l $LOGIN_NAME -i $SSHHOME -o StrictHostKeyChecking=no -o ConnectTimeout=$SSH_TIMEOUT -o Compression=no -x" --timeout=$RSYNC_TIMEOUT -al --force --delete keys/secKey$1  $LOGIN_NAME@$node:$PROJECT_HOME/keys/
-if [ $1 -eq 0 ]
+if [ $1 -eq $GOSSIP_PORT ]
 then
-    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "pkill java; $JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $PROJECT_HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON"
+    ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "mkdir -p $BINHOME2 ;cp -r $BINHOME/* $BINHOME2 ;pkill java; $JAVA_ -classpath $BINHOME2 $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $PROJECT_HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON -logging $LOGGING"
 else
-ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $PROJECT_HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON"
+ssh -i $SSHHOME -o ConnectTimeout=$SSH_TIMEOUT -o StrictHostKeyChecking=no ${LOGIN_NAME}@$node "$JAVA_ -classpath $BINHOME2 $NODELAUNCHERCLASSNAME -bset $PROJECT_HOME/bootstrapset.txt -name $node_local_name -port $1 -alpha $alpha -beta 1 -decision 0.3 -secretKeyFile $PROJECT_HOME/keys/secKey -votecount $VOTECOUNT -nbBallots $NB_BALLOTS -kvalue $KVALUE -nodesPerMachine $nodesPerMachine -basicPort $GOSSIP_PORT -nbVoters $VOTERCOUNT -order $2 -epsilon $EPSILON -logging $LOGGING"
 fi
 }	
 
@@ -62,7 +62,7 @@ do
   # j=$(($i/$NB_GROUPS))
   # echo "gid:" $gid
  #  echo "j:" $j
-   node_local_name=`expr match "$node" '\(node-*.[0-9]\)'`
+   node_local_name=`expr match "$node" '\(node-[0-9]*\)'`
 #   if [ $(($i)) -lt $(($thresh)) ]
 #then
 #      launch  $(( $GOSSIP_PORT + $k  )) $i &
@@ -71,7 +71,7 @@ do
       launch  $(( $GOSSIP_PORT + $k  )) $i &
 #   fi
    i=$(($i+1))
-   sleep 0.15
+   sleep 0.4
 
 done
 done
