@@ -790,7 +790,7 @@ public class CryptoNode extends Node {
                         if (peerId.equals(nodeId)) {
                             continue;
                         }
-                        dump("Send a '" + Emsg + "' ballot to " + peerId);
+                        dump("Send a '" + Emsg + "' ballot to " + peerId +" of type "+info.type);
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
