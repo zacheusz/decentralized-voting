@@ -454,15 +454,15 @@ public class CryptoNode extends Node {
         }
     }
 
-        private class getViews implements Task {
+    private class getViews implements Task {
 
         public void execute() {
             synchronized (LOCK) {
 
 
                 E_CryptoNodeID tempID;
-           //     Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
-              //  List<E_CryptoNodeID> sortedIDs;
+                //     Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
+                //  List<E_CryptoNodeID> sortedIDs;
 
                 int mycount = 1;
                 threshOrder = (0.5 - epsilon) * VOTERCOUNT;
@@ -477,11 +477,11 @@ public class CryptoNode extends Node {
                             //     System.out.println("I am " + isMal);
                         }
                         peerView.add(tempID);
-                       // IDAssignment.put(tempID, tempID.getOrder());
+                        // IDAssignment.put(tempID, tempID.getOrder());
                         mycount++;
                     }
                 }
-               
+
 //                //      System.out.println(nodeId.toString() + ":");
 ////                for (int i=0;i<sortedIDs.size();i++)
 ////                    System.out.println(sortedIDs.get(i).toString()+" ,");
@@ -517,10 +517,11 @@ public class CryptoNode extends Node {
             }
         }
     }
+
     private void receiveVoteDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         //if (!isLocalCountingOver) {
-        dump("Received a vote data message from " + msg.getSrc());
+        dump("Received a vote data message from " + msg.getSrc() + "with actual src: " + msg.getInfo().actualSrc);
 
         taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)));
 
@@ -534,7 +535,7 @@ public class CryptoNode extends Node {
 
         //if (!isLocalCountingOver) {
         synchronized (readyMap) {
-            dump("Received a vote echo message from " + msg.getSrc());
+            dump("Received a vote echo message from " + msg.getSrc() + "with actual src: " + msg.getInfo().actualSrc);
 
 
             if (!msg.getSrc().isMalicious) {
@@ -562,10 +563,10 @@ public class CryptoNode extends Node {
 
                 countList.get(seqNum).inc();
                 echoCountMap.put(actualSrc, countList);
-
+                dump("echoCount: " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2 + 1) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc,  msg.getInfo().seqNum)));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -577,7 +578,7 @@ public class CryptoNode extends Node {
     private void receiveVoteReadyMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         synchronized (readyMap) {
-            dump("Received a vote ready message from " + msg.getSrc());
+            dump("Received a vote ready message from " + msg.getSrc() + "with actual src: " + msg.getInfo().actualSrc);
 
 
             if (!msg.getSrc().isMalicious) {
@@ -620,7 +621,7 @@ public class CryptoNode extends Node {
 
                 countList.get(seqNum).inc();
                 readyCountMap.put(actualSrc, countList);
-
+                dump("readyCount: " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
                     taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)));
@@ -740,8 +741,6 @@ public class CryptoNode extends Node {
         }
         return ba.length;
     }
-
-
 
     private class BroadcastTask implements Task {
 
@@ -1393,7 +1392,6 @@ public class CryptoNode extends Node {
 //            }
 //        }
 //    }
-
     //    private class PreemptPartialTallyingTask implements Task {
 //
 //        public void execute() {
