@@ -778,6 +778,8 @@ public class CryptoNode extends Node {
                 try {
                     //send packet here
                     doSendUDP(mes);
+                     dump("Send a msg to" + mes.getDest() +" of type "+mes.getInfo().type + " with actual src: "+mes.getInfo().actualSrc);
+                   
     //                Thread.yield();
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
@@ -799,18 +801,18 @@ public class CryptoNode extends Node {
                 ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 
                 if (!(peerView.size() <= 1)) {
-                    Random generator = new Random();
+                    
                     for (E_CryptoNodeID peerId : peerView) {
                         dump("count: "+x);
-                        if (peerId.equals(nodeId)) {
-                            continue;
-                        }
+                   //     if (peerId.equals(nodeId)) {
+                   //         continue;
+                   //     }
                         dump("Send a '" + Emsg + "' ballot to " + peerId +" of type "+info.type + " with actual src: "+info.actualSrc);
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
-                        //    schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                            doSendUDP(mes);
+                           schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                            //doSendUDP(mes);
                   //          Thread.yield();
 
 
