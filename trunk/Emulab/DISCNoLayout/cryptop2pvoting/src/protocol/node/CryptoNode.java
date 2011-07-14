@@ -637,6 +637,7 @@ Random generator = new Random();
                 if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO)) {
                     deliveredList.set(seqNum, true);
                     deliveredMap.put(actualSrc, deliveredList);
+                    dump("delivered a ballot message from (" + actualSrc);
                     receiveBallot(msg);
                 }
 
