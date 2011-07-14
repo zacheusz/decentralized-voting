@@ -221,18 +221,18 @@ public class CryptoNode extends Node {
         E_CryptoNodeID tempID = null;
         mycount = 0;
         threshOrder = (0.5 - epsilon) * VOTERCOUNT;
-       
-        
+
+
         for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
             for (int j = 0; j < nodesPerMachine; j++) {
-                
+
                 tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
 
                 if (nodeId.equals(tempID)) {
                     dump("keynum: " + mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                     if (secKey == null) {
-                        taskManager.registerTask(new SelfDestructTask());                     
+                        taskManager.registerTask(new SelfDestructTask());
                     }
                     //dump ("mycount: "+mycount+"threshOrder: "+threshOrder);
                     nodeId.isMalicious = (mycount < threshOrder);
@@ -566,16 +566,16 @@ public class CryptoNode extends Node {
 
                 countList.get(seqNum).inc();
                 echoCountMap.put(actualSrc, countList);
-                dump("echoCount ("+actualSrc+"): " + countList.get(seqNum).value);
+                dump("echoCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
-                if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
+                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
                     taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
+            } else {
+                dump("node " + msg.getSrc() + " is malicious");
             }
-            else
-                dump("node "+msg.getSrc()+" is malicious");
         }
 
     }
@@ -594,7 +594,7 @@ public class CryptoNode extends Node {
                 ArrayList<Boolean> readyList = readyMap.get(actualSrc);
                 boolean sentReady = false;
                 boolean delivered = false;
-                ArrayList<Boolean> deliveredList = readyMap.get(actualSrc);
+                ArrayList<Boolean> deliveredList = deliveredMap.get(actualSrc);
 
 
                 if ((deliveredList == null) || deliveredList.isEmpty()) {
@@ -628,14 +628,15 @@ public class CryptoNode extends Node {
                 readyCountMap.put(actualSrc, countList);
                 dump("readyCount: " + countList.get(seqNum).value);
 
-                if (countList.get(seqNum).value >= Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
+                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
                     taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
 
-                if (countList.get(seqNum).value >= Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-
+                if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
+                    deliveredList.set(seqNum, true);
+                    deliveredMap.put(actualSrc, deliveredList);
                     receiveBallot(msg);
                 }
 
@@ -818,7 +819,7 @@ public class CryptoNode extends Node {
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
-                           // schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                            // schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
                             doSendUDP(mes);
                             //          Thread.yield();
 
