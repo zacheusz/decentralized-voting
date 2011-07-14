@@ -626,7 +626,7 @@ public class CryptoNode extends Node {
 
                 countList.get(seqNum).inc();
                 readyCountMap.put(actualSrc, countList);
-                dump("readyCount: " + countList.get(seqNum).value);
+                dump("readyCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
                     taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)));
