@@ -848,7 +848,8 @@ public class CryptoNode extends Node {
             taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
 
             taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)));
-
+            sequenceNumber++;
+            dump("sequence number: "+sequenceNumber);
 //            ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 //
 //            if (!(peerView.size() <= 1)) {
