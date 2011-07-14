@@ -525,8 +525,8 @@ public class CryptoNode extends Node {
         synchronized (BROADCASTLOCK) {
 
             dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
-
-            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)));
+Random generator = new Random(); 
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)),generator.nextInt(20));
 
         }
         //} else {
@@ -539,7 +539,7 @@ public class CryptoNode extends Node {
         //if (!isLocalCountingOver) {
         synchronized (readyMap) {
             dump("Received a vote echo message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
-
+Random generator = new Random(); 
 
             if (!msg.getSrc().isMalicious) {
 
@@ -569,7 +569,7 @@ public class CryptoNode extends Node {
                 dump("echoCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)),generator.nextInt(20));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -584,7 +584,7 @@ public class CryptoNode extends Node {
 
         synchronized (readyMap) {
             dump("Received a vote ready message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
-
+Random generator = new Random(); 
 
             if (!msg.getSrc().isMalicious) {
 
@@ -629,7 +629,7 @@ public class CryptoNode extends Node {
                 dump("readyCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)),generator.nextInt(20));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -820,10 +820,10 @@ public class CryptoNode extends Node {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
                             // schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                            // doSendUDP(mes);
-                            Timer timer = new Timer();
-                            timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(20*1000));
-                            //          Thread.yield();
+                             doSendUDP(mes);
+                          //  Timer timer = new Timer();
+                           // timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(20*1000));
+                                      Thread.yield();
 
 
                             //  doSendUDP(mes);
@@ -872,8 +872,8 @@ public class CryptoNode extends Node {
             startInstant = System.nanoTime();
 
             taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-
-            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)));
+        Random generator = new Random();
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)), generator.nextInt(20));
             sequenceNumber++;
 
             dump("sequence number: " + sequenceNumber);
