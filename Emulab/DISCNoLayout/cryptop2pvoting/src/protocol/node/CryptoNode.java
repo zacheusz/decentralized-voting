@@ -716,11 +716,12 @@ public class CryptoNode extends Node {
 
         BroadcastInfo info = null;
         BROADCAST_MSG mes = null;
-
+        int voteSent = 0;
+        
         private class BroadcastSenderTask extends TimerTask implements Runnable {
 
             BROADCAST_MSG senderMes;
-            int voteSent = 0;
+            
 
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
                 receivedCount2++;
