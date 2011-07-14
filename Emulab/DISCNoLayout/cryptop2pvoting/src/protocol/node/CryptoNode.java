@@ -774,7 +774,7 @@ public class CryptoNode extends Node {
         BroadcastInfo info = null;
         BROADCAST_MSG mes = null;
 
-        private class BroadcastSenderTask implements Runnable {
+        private class BroadcastSenderTask extends TimerTask implements Runnable {
 
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
                 receivedCount2++;
@@ -806,7 +806,7 @@ public class CryptoNode extends Node {
 
             synchronized (BROADCASTLOCK) {
                 int x = 0;
-                ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
+                //  ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 
                 if (!(peerView.size() <= 1)) {
 
@@ -820,7 +820,9 @@ public class CryptoNode extends Node {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
                             // schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                            doSendUDP(mes);
+                            // doSendUDP(mes);
+                            Timer timer = new Timer();
+                            timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(20*1000));
                             //          Thread.yield();
 
 
