@@ -1024,7 +1024,9 @@ public class CryptoNode extends Node {
 
                 //}
                 isFinalResultCalculated = true;
-                taskManager.registerTask(new TallySending());
+                 Random generator = new Random();
+
+                taskManager.registerTask(new TallySending(),generator.nextInt(20));
 
 //                             currentDecodingIndex++;
 //                    dump("sharesize2: " + currentDecodingIndex);
