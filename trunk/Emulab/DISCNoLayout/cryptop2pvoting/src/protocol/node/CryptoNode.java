@@ -910,7 +910,7 @@ Random generator = new Random();
 //            }
             isVoteTaskOver = true;
             //   taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
-            aggrLocalTally(Emsg);
+         //   aggrLocalTally(Emsg);
             taskManager.registerTask(new AttemptSelfDestruct());
             //     taskManager.registerTask(new CloseVoteTask());
 
