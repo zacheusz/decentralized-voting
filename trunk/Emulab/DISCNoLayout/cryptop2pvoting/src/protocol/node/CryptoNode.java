@@ -785,11 +785,13 @@ public class CryptoNode extends Node {
         public void execute() {
 
             synchronized (BROADCASTLOCK) {
+                int x=0;
                 ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 
                 if (!(peerView.size() <= 1)) {
                     Random generator = new Random();
                     for (E_CryptoNodeID peerId : peerView) {
+                        dump("count: "+x);
                         if (peerId.equals(nodeId)) {
                             continue;
                         }
@@ -806,6 +808,7 @@ public class CryptoNode extends Node {
                         } catch (Exception e) {
                             dump("TCP: cannot vote");
                         }
+                        x++;
                     }
 //                    MSVote += peerView.size() - 1;
 //                    SMSVote += getObjectSize(mes) * (peerView.size() - 1);
