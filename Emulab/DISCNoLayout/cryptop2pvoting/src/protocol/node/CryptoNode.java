@@ -773,7 +773,7 @@ public class CryptoNode extends Node {
 
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
                 receivedCount2++;
-                System.out.println("receivedCount: " + receivedCount2);
+                System.out.println("receivedCount2: " + receivedCount2);
                 mes = inMes;
             }
 
