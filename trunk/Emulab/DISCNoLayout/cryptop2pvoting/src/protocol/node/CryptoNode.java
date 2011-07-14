@@ -466,7 +466,7 @@ public class CryptoNode extends Node {
 
             dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
             Random generator = new Random();
-            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, msg.getInfo().vote, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
 
         }
         //} else {
