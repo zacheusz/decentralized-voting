@@ -526,7 +526,7 @@ public class CryptoNode extends Node {
 
             dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
             Random generator = new Random();
-            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)), generator.nextInt(20));
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)), generator.nextInt(40));
 
         }
         //} else {
@@ -569,7 +569,7 @@ public class CryptoNode extends Node {
                 dump("echoCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(20));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(40));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -629,7 +629,7 @@ public class CryptoNode extends Node {
                 dump("readyCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(20));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(40));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -874,7 +874,7 @@ public class CryptoNode extends Node {
 
             taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
             Random generator = new Random();
-            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)), generator.nextInt(20));
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)), generator.nextInt(40));
             sequenceNumber++;
 
             dump("sequence number: " + sequenceNumber);
@@ -940,6 +940,7 @@ public class CryptoNode extends Node {
 //                partialTally = encryptor.add(localTally, partialTally);
 //                taskManager.registerTask(new GlobalCountingTask());
 //            }
+                
 
                 isLocalCountingOver = true;
                 taskManager.registerTask(new TallyDecryptionSharing());
@@ -1026,7 +1027,7 @@ public class CryptoNode extends Node {
                 isFinalResultCalculated = true;
                  Random generator = new Random();
 
-                taskManager.registerTask(new TallySending(),generator.nextInt(20));
+                taskManager.registerTask(new TallySending(),generator.nextInt(40));
 
 //                             currentDecodingIndex++;
 //                    dump("sharesize2: " + currentDecodingIndex);
