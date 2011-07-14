@@ -204,11 +204,12 @@ public class CryptoNode extends Node {
     protected Map<E_CryptoNodeID, ArrayList<Boolean>> readyMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
     protected Map<E_CryptoNodeID, ArrayList<Boolean>> deliveredMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
     public int sequenceNumber = 0;
-    public static int receivedCount=0;
-
+    public static int receivedCount = 0;
+    public static int receivedCount2 = 0;
     // **************************************************************************
     // Constructors
     // **************************************************************************
+
     public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper) throws Exception {
 
         super(nodeId, networkSend);
@@ -241,8 +242,8 @@ public class CryptoNode extends Node {
 
             }
         }
-        dump ("peerview: ");
-        for (E_CryptoNodeID loopID: peerView){
+        dump("peerview: ");
+        for (E_CryptoNodeID loopID : peerView) {
             dump(loopID.toString());
         }
 
@@ -394,8 +395,8 @@ public class CryptoNode extends Node {
                     receiveBallot((BROADCAST_MSG) msg);
                     break;
                 case Message.BROADCAST_DATA_MSG:
-                    receiveBroadcast((BROADCAST_MSG)msg);
-                    
+                    receiveBroadcast((BROADCAST_MSG) msg);
+
                     break;
                 //         case Message.CRYPTO_INDIVIDUAL_TALLY_MSG:
                 //             receiveIndividualTally((CRYPTO_INDIVIDUAL_TALLY_MSG) msg);
@@ -519,13 +520,13 @@ public class CryptoNode extends Node {
     private void receiveVoteDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         //if (!isLocalCountingOver) {
-                synchronized (BROADCASTLOCK) {
+        synchronized (BROADCASTLOCK) {
 
-        dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
+            dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
 
-        taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)));
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)));
 
-                }
+        }
         //} else {
         //  dump("Discarded an ballot message (cause: sent too late)");
         // }
@@ -642,25 +643,25 @@ public class CryptoNode extends Node {
 
     private void receiveBroadcast(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
-       switch (msg.getInfo().type) {
-                        case Message.VOTE_DATA_MSG:
-                            receivedCount++;
-                            System.out.println ("receivedCount: "+receivedCount);
-                            receiveVoteDataMsg((BROADCAST_MSG) msg);
-                            break;
+        switch (msg.getInfo().type) {
+            case Message.VOTE_DATA_MSG:
 
-                        case Message.VOTE_ECHO_MSG:
-                            receiveVoteEchoMsg((BROADCAST_MSG) msg);
-                            break;
+                receiveVoteDataMsg((BROADCAST_MSG) msg);
+                break;
 
-                        case Message.VOTE_READY_MSG:
-                            receiveVoteReadyMsg((BROADCAST_MSG) msg);
-                            break;
-                        default:
-                            dump("Discarded a message from " + msg.getSrc() + " of type " + msg.getHeader() + "(cause: unknown type)");
+            case Message.VOTE_ECHO_MSG:
+                receiveVoteEchoMsg((BROADCAST_MSG) msg);
+                break;
 
-                    }
+            case Message.VOTE_READY_MSG:
+                receiveVoteReadyMsg((BROADCAST_MSG) msg);
+                break;
+            default:
+                dump("Discarded a message from " + msg.getSrc() + " of type " + msg.getHeader() + "(cause: unknown type)");
+
+        }
     }
+
     private void receiveBallot(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         if (!isLocalCountingOver) {
@@ -771,6 +772,8 @@ public class CryptoNode extends Node {
         private class BroadcastSenderTask implements Runnable {
 
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
+                receivedCount2++;
+                System.out.println("receivedCount: " + receivedCount2);
                 mes = inMes;
             }
 
@@ -778,9 +781,8 @@ public class CryptoNode extends Node {
                 try {
                     //send packet here
                     doSendUDP(mes);
-                     dump("Send a msg to" + mes.getDest() +" of type "+mes.getInfo().type + " with actual src: "+mes.getInfo().actualSrc);
-                   
-    //                Thread.yield();
+
+                    //                Thread.yield();
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -790,30 +792,31 @@ public class CryptoNode extends Node {
         }
 
         public BroadcastTask(BroadcastInfo inInfo) {
-            super();
+            receivedCount++;
+            System.out.println("receivedCount: " + receivedCount);
             this.info = inInfo;
         }
 
         public void execute() {
 
             synchronized (BROADCASTLOCK) {
-                int x=0;
+                int x = 0;
                 ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 
                 if (!(peerView.size() <= 1)) {
-                    
+
                     for (E_CryptoNodeID peerId : peerView) {
-                        dump("count: "+x);
-                   //     if (peerId.equals(nodeId)) {
-                   //         continue;
-                   //     }
-                        dump("Send a '" + Emsg + "' ballot to " + peerId +" of type "+info.type + " with actual src: "+info.actualSrc);
+                        dump("count: " + x);
+                        //     if (peerId.equals(nodeId)) {
+                        //         continue;
+                        //     }
+                        dump("Send a '" + Emsg + "' ballot to " + peerId + " of type " + info.type + " with actual src: " + info.actualSrc);
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
-                           schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                            schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
                             //doSendUDP(mes);
-                  //          Thread.yield();
+                            //          Thread.yield();
 
 
                             //  doSendUDP(mes);
@@ -865,8 +868,8 @@ public class CryptoNode extends Node {
 
             taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)));
             sequenceNumber++;
-            
-            dump("sequence number: "+sequenceNumber);
+
+            dump("sequence number: " + sequenceNumber);
 //            ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 //
 //            if (!(peerView.size() <= 1)) {
