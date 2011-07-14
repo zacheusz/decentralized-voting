@@ -626,7 +626,7 @@ public class CryptoNode extends Node {
 
             if (!isDecryptionSharingOver) {
 
-                //    dump("Received a decryption share (" + msg.getShare() + ") from " + msg.getSrc());
+                    dump("Received a decryption share (" + msg.getShare() + ") from " + msg.getSrc());
 
                 resultSharesList.add(msg.getShare());
 
