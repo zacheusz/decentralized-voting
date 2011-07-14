@@ -634,7 +634,7 @@ public class CryptoNode extends Node {
                     readyMap.put(actualSrc, readyList);
                 }
 
-                if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
+                if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO)) {
                     deliveredList.set(seqNum, true);
                     deliveredMap.put(actualSrc, deliveredList);
                     receiveBallot(msg);
