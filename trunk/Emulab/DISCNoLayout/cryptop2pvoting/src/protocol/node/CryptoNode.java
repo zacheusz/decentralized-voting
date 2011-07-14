@@ -222,8 +222,7 @@ public class CryptoNode extends Node {
         mycount = 0;
         threshOrder = (0.5 - epsilon) * VOTERCOUNT;
        
-        nodeId.isMalicious = (mycount < threshOrder);
-
+        
         for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
             for (int j = 0; j < nodesPerMachine; j++) {
                 
@@ -234,6 +233,7 @@ public class CryptoNode extends Node {
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                     if (secKey == null) {
                         taskManager.registerTask(new SelfDestructTask());
+                    nodeId.isMalicious = (mycount < threshOrder);
 
                     }
                 }
