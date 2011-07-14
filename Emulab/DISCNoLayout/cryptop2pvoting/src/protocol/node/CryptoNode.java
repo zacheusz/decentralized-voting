@@ -735,6 +735,7 @@ public class CryptoNode extends Node {
                     if (senderMes.getInfo().type == Message.VOTE_DATA_MSG) {
                         synchronized (VOTESENDINGLOCK) {
                             voteSent++;
+                            dump("voteSent: "+voteSent);
                             if (voteSent >= peerView.size()) {
                                 isVoteTaskOver = true;
                             }
@@ -1050,7 +1051,8 @@ public class CryptoNode extends Node {
                     dump("Send decryption share (" + nodeResultShare + ") to " + mes.getDest());
                     synchronized (SHARESENDINGLOCK) {
                         sentShares++;
-                        if (sentShares == peerView.size() - 1) {
+                        dump("sentShares: "+sentShares);
+                        if (sentShares >= peerView.size() - 1) {
                             isShareSendingOver = true;
                         }
                     }
