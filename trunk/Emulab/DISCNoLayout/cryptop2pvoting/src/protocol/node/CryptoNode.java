@@ -206,7 +206,7 @@ public class CryptoNode extends Node {
     public int sequenceNumber = 0;
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
-    public static int SENDING_INTERVAL=60;
+    public static int SENDING_INTERVAL=40;
     public static int nodeOrder=0;
     // **************************************************************************
     // Constructors
@@ -717,17 +717,17 @@ public class CryptoNode extends Node {
         BROADCAST_MSG mes = null;
 
         private class BroadcastSenderTask extends TimerTask implements Runnable {
-
+        BROADCAST_MSG senderMes;
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
                 receivedCount2++;
                 System.out.println("receivedCount2: " + receivedCount2);
-                mes = inMes;
+                senderMes = inMes;
             }
 
             public void run() {
                 try {
                     //send packet here
-                    doSendUDP(mes);
+                    doSendUDP(senderMes);
 
                     //                Thread.yield();
                 } catch (UnknownHostException ex) {
@@ -748,7 +748,7 @@ public class CryptoNode extends Node {
 
             synchronized (BROADCASTLOCK) {
                 int x = 0;
-                //  ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
+                  ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 
                 if (!(peerView.size() <= 1)) {
 
@@ -761,11 +761,11 @@ public class CryptoNode extends Node {
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
-                            // schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                             schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
                            // doSendUDP(mes);
-                              Timer timer = new Timer();
-                             timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL*1000));
-                          //  Thread.yield();
+                             //Timer timer = new Timer();
+                          //   timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL*1000));
+                           Thread.yield();
 
 
                             //  doSendUDP(mes);
@@ -1053,9 +1053,9 @@ public class CryptoNode extends Node {
                         try {
 
                             mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                            //     schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                            //   Thread.yield();
-                            doSendUDP(mes);
+                                 schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
+                               Thread.yield();
+                         //   doSendUDP(mes);
                             // Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot send decryption share");
