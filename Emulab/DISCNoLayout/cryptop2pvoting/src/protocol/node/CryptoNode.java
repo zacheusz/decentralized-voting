@@ -204,6 +204,7 @@ public class CryptoNode extends Node {
     protected Map<E_CryptoNodeID, ArrayList<Boolean>> readyMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
     protected Map<E_CryptoNodeID, ArrayList<Boolean>> deliveredMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
     public int sequenceNumber = 0;
+    public static int receivedCount=0;
 
     // **************************************************************************
     // Constructors
@@ -643,6 +644,8 @@ public class CryptoNode extends Node {
 
        switch (msg.getInfo().type) {
                         case Message.VOTE_DATA_MSG:
+                            receivedCount++;
+                            dump ("receivedCount: "+receivedCount);
                             receiveVoteDataMsg((BROADCAST_MSG) msg);
                             break;
 
