@@ -207,6 +207,7 @@ public class CryptoNode extends Node {
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
     public static int SENDING_INTERVAL=60;
+    public static int nodeOrder=0;
     // **************************************************************************
     // Constructors
     // **************************************************************************
@@ -222,6 +223,7 @@ public class CryptoNode extends Node {
         E_CryptoNodeID tempID = null;
         mycount = 0;
         threshOrder = (0.5 - epsilon) * VOTERCOUNT;
+        
 
 
         for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
@@ -232,6 +234,7 @@ public class CryptoNode extends Node {
                 if (nodeId.equals(tempID)) {
                     dump("keynum: " + mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
+                    nodeOrder=mycount;
                     if (secKey == null) {
                         taskManager.registerTask(new SelfDestructTask());
                     }
@@ -364,7 +367,7 @@ public class CryptoNode extends Node {
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PROXIES), GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY);
 //            taskManager.registerTask(new VoteTask(), VOTE_DELAY);
             //     taskManager.registerTask(new PreemptCloseLocalElectionTask(), CLOSE_VOTE_DELAY);
-            taskManager.registerTask(new VoteTask(), VOTE_DELAY);
+            taskManager.registerTask(new VoteTask(), VOTE_DELAY+(nodeOrder/10)*30*1000);
 
 //            taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
 //            taskManager.registerTask(new PreemptCloseGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
@@ -456,70 +459,7 @@ public class CryptoNode extends Node {
         }
     }
 
-    private class getViews implements Task {
-
-        public void execute() {
-            synchronized (LOCK) {
-
-
-                E_CryptoNodeID tempID;
-                //     Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
-                //  List<E_CryptoNodeID> sortedIDs;
-
-                int mycount = 1;
-                threshOrder = (0.5 - epsilon) * VOTERCOUNT;
-                boolean isMal;
-                for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
-                    for (int j = 0; j < nodesPerMachine; j++) {
-                        isMal = (mycount < threshOrder);
-                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j, isMal);
-
-                        if (tempID.equals(nodeId)) {
-                            nodeId.isMalicious = isMal;
-                            //     System.out.println("I am " + isMal);
-                        }
-                        peerView.add(tempID);
-                        // IDAssignment.put(tempID, tempID.getOrder());
-                        mycount++;
-                    }
-                }
-
-//                //      System.out.println(nodeId.toString() + ":");
-////                for (int i=0;i<sortedIDs.size();i++)
-////                    System.out.println(sortedIDs.get(i).toString()+" ,");
-////                
-//                // System.out.println(sortedIDs.size());
-//                nodeToCluster = new ClusterChoice(sortedIDs, nodeId);
-//                nodeId.groupId = nodeToCluster.myGroupID;
-////                if (nodeId.groupId == -1) {
-////                    System.out.println(nodeId.toString());
-////                }
-//                if (nodeId.groupId == 0) {
-//                    IAmThreshold = true;
-//
-//                    secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
-//                    //  System.out.println("keynum:" + nodeToCluster.keyNum);
-//                }
-//
-//                //        System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
-//                proxyView = nodeToCluster.get((nodeId.groupId + 1) % numClusters);
-////                   for (int i=0;i<proxyView.size();i++)
-////                    System.out.println(proxyView.toArray()[i].toString()+" ,");
-////             
-//                peerView = nodeToCluster.get((nodeId.groupId));
-//                //    peerView.remove(nodeId);
-//                clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
-//
-//                if (IAmThreshold) {
-//                    taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
-//
-//
-//                }
-                taskManager.registerTask(new VoteTask(), VOTE_DELAY);
-            }
-        }
-    }
-
+  
     private void receiveVoteDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         //if (!isLocalCountingOver) {
@@ -1756,4 +1696,68 @@ public class CryptoNode extends Node {
 //            }
 //        }
 //    }public int MRKeys=1;
+//      private class getViews implements Task {
+//
+//        public void execute() {
+//            synchronized (LOCK) {
+//
+//
+//                E_CryptoNodeID tempID;
+//                //     Map<E_CryptoNodeID, Integer> IDAssignment = new HashMap<E_CryptoNodeID, Integer>();
+//                //  List<E_CryptoNodeID> sortedIDs;
+//
+//                int mycount = 1;
+//                threshOrder = (0.5 - epsilon) * VOTERCOUNT;
+//                boolean isMal;
+//                for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
+//                    for (int j = 0; j < nodesPerMachine; j++) {
+//                        isMal = (mycount < threshOrder);
+//                        tempID = new E_CryptoNodeID("node-" + i, basicPort + j, isMal);
+//
+//                        if (tempID.equals(nodeId)) {
+//                            nodeId.isMalicious = isMal;
+//                            //     System.out.println("I am " + isMal);
+//                        }
+//                        peerView.add(tempID);
+//                        // IDAssignment.put(tempID, tempID.getOrder());
+//                        mycount++;
+//                    }
+//                }
+//
+////                //      System.out.println(nodeId.toString() + ":");
+//////                for (int i=0;i<sortedIDs.size();i++)
+//////                    System.out.println(sortedIDs.get(i).toString()+" ,");
+//////                
+////                // System.out.println(sortedIDs.size());
+////                nodeToCluster = new ClusterChoice(sortedIDs, nodeId);
+////                nodeId.groupId = nodeToCluster.myGroupID;
+//////                if (nodeId.groupId == -1) {
+//////                    System.out.println(nodeId.toString());
+//////                }
+////                if (nodeId.groupId == 0) {
+////                    IAmThreshold = true;
+////
+////                    secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + nodeToCluster.keyNum);
+////                    //  System.out.println("keynum:" + nodeToCluster.keyNum);
+////                }
+////
+////                //        System.out.println("next: "+(nodeId.groupId + 1) % numClusters);
+////                proxyView = nodeToCluster.get((nodeId.groupId + 1) % numClusters);
+//////                   for (int i=0;i<proxyView.size();i++)
+//////                    System.out.println(proxyView.toArray()[i].toString()+" ,");
+//////             
+////                peerView = nodeToCluster.get((nodeId.groupId));
+////                //    peerView.remove(nodeId);
+////                clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
+////
+////                if (IAmThreshold) {
+////                    taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
+////
+////
+////                }
+//                taskManager.registerTask(new VoteTask(), VOTE_DELAY);
+//            }
+//        }
+//    }
+//
 }
