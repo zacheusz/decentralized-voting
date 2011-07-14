@@ -518,11 +518,13 @@ public class CryptoNode extends Node {
     private void receiveVoteDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         //if (!isLocalCountingOver) {
+                synchronized (BROADCASTLOCK) {
+
         dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
 
         taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)));
 
-
+                }
         //} else {
         //  dump("Discarded an ballot message (cause: sent too late)");
         // }
@@ -857,6 +859,7 @@ public class CryptoNode extends Node {
 
             taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)));
             sequenceNumber++;
+            
             dump("sequence number: "+sequenceNumber);
 //            ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 //
