@@ -677,7 +677,7 @@ Random generator = new Random();
             SMRBallot += getObjectSize(msg);
 
         } else {
-            dump("Discarded an ballot message (cause: sent too late)");
+            dump("Discarded a ballot message from "+msg.getInfo().actualSrc+ " (cause: sent too late)");
         }
     }
 
