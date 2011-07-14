@@ -717,11 +717,10 @@ public class CryptoNode extends Node {
         BroadcastInfo info = null;
         BROADCAST_MSG mes = null;
         int voteSent = 0;
-        
+
         private class BroadcastSenderTask extends TimerTask implements Runnable {
 
             BROADCAST_MSG senderMes;
-            
 
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
                 receivedCount2++;
@@ -736,7 +735,7 @@ public class CryptoNode extends Node {
                     if (senderMes.getInfo().type == Message.VOTE_DATA_MSG) {
                         synchronized (VOTESENDINGLOCK) {
                             voteSent++;
-                            dump("voteSent: "+voteSent);
+                            dump("voteSent: " + voteSent);
                             if (voteSent >= peerView.size()) {
                                 isVoteTaskOver = true;
                                 taskManager.registerTask(new AttemptSelfDestruct());
@@ -1053,7 +1052,7 @@ public class CryptoNode extends Node {
                     dump("Send decryption share (" + nodeResultShare + ") to " + mes.getDest());
                     synchronized (SHARESENDINGLOCK) {
                         sentShares++;
-                        dump("sentShares: "+sentShares);
+                        dump("sentShares: " + sentShares);
                         if (sentShares >= peerView.size() - 1) {
                             isShareSendingOver = true;
                             taskManager.registerTask(new AttemptSelfDestruct());
