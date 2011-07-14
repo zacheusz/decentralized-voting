@@ -1109,8 +1109,9 @@ Random generator = new Random();
                         try {
 
                             mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                            schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                            Thread.yield();
+                       //     schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                         //   Thread.yield();
+                    doSendUDP(mes);
                             // Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot send decryption share");
