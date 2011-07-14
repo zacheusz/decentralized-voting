@@ -239,7 +239,7 @@ public class CryptoNode extends Node {
                         taskManager.registerTask(new SelfDestructTask());
                     }
                     //dump ("mycount: "+mycount+"threshOrder: "+threshOrder);
-                    nodeId.isMalicious = (mycount < threshOrder);
+                    nodeId.isMalicious = (mycount+1 < threshOrder);
 
                 }
                 peerView.add(tempID);
