@@ -239,7 +239,7 @@ public class CryptoNode extends Node {
                         taskManager.registerTask(new SelfDestructTask());
                     }
                     //dump ("mycount: "+mycount+"threshOrder: "+threshOrder);
-                    nodeId.isMalicious = (mycount+1 < threshOrder);
+                    nodeId.isMalicious = (mycount + 1 < threshOrder);
 
                 }
                 peerView.add(tempID);
@@ -509,7 +509,7 @@ public class CryptoNode extends Node {
                 dump("echoCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null,msg.getInfo().vote, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, msg.getInfo().vote, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -577,7 +577,7 @@ public class CryptoNode extends Node {
                 if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO)) {
                     deliveredList.set(seqNum, true);
                     deliveredMap.put(actualSrc, deliveredList);
-                    dump("delivered a ballot message "+ msg.getInfo().vote+" from (" + actualSrc);
+                    dump("delivered a ballot message " + msg.getInfo().vote + " from (" + actualSrc);
                     receiveBallot(msg);
                 }
 
@@ -626,7 +626,7 @@ public class CryptoNode extends Node {
 
             if (!isDecryptionSharingOver) {
 
-                    dump("Received a decryption share (" + msg.getShare() + ") from " + msg.getSrc());
+                dump("Received a decryption share (" + msg.getShare() + ") from " + msg.getSrc());
 
                 resultSharesList.add(msg.getShare());
 
@@ -1029,7 +1029,10 @@ public class CryptoNode extends Node {
             public void run() {
                 try {
                     //send packet here
+
+
                     doSendUDP(mes);
+                    dump("Send decryption share (" + nodeResultShare + ") to " + mes.getDest());
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -1050,7 +1053,6 @@ public class CryptoNode extends Node {
                         if (peerId.equals(nodeId)) {
                             continue;
                         }
-                        dump("Send decryption share (" + nodeResultShare + ") to " + peerId);
                         try {
 
                             mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
