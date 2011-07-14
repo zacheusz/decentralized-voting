@@ -198,6 +198,8 @@ public class CryptoNode extends Node {
     public boolean stopped = false;
     public double threshOrder;
     protected final Object BROADCASTLOCK = new Object();
+    protected final Object SHARESENDINGLOCK = new Object();
+    protected final Object VOTESENDINGLOCK = new Object();
     protected BROADCAST_MSG broadcastMsg;
     protected Map<E_CryptoNodeID, ArrayList<MutableInt>> echoCountMap = new HashMap<E_CryptoNodeID, ArrayList<MutableInt>>();
     protected Map<E_CryptoNodeID, ArrayList<MutableInt>> readyCountMap = new HashMap<E_CryptoNodeID, ArrayList<MutableInt>>();
@@ -208,10 +210,10 @@ public class CryptoNode extends Node {
     public static int receivedCount2 = 0;
     public static int SENDING_INTERVAL = 40;
     public static int nodeOrder = 0;
+
     // **************************************************************************
     // Constructors
     // **************************************************************************
-
     public CryptoNode(E_CryptoNodeID nodeId, TaskManager taskManager, NetworkSend networkSend, Stopper stopper) throws Exception {
 
         super(nodeId, networkSend);
@@ -718,6 +720,7 @@ public class CryptoNode extends Node {
         private class BroadcastSenderTask extends TimerTask implements Runnable {
 
             BROADCAST_MSG senderMes;
+            int voteSent = 0;
 
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
                 receivedCount2++;
@@ -729,6 +732,15 @@ public class CryptoNode extends Node {
                 try {
                     //send packet here
                     doSendUDP(senderMes);
+                    if (senderMes.getInfo().type == Message.VOTE_DATA_MSG) {
+                        synchronized (VOTESENDINGLOCK) {
+                            voteSent++;
+                            if (voteSent >= peerView.size()) {
+                                isVoteTaskOver = true;
+                            }
+                        }
+                    }
+
 
                     //                Thread.yield();
                 } catch (UnknownHostException ex) {
@@ -743,6 +755,7 @@ public class CryptoNode extends Node {
             receivedCount++;
             System.out.println("receivedCount: " + receivedCount);
             this.info = inInfo;
+
         }
 
         public void execute() {
@@ -850,7 +863,7 @@ public class CryptoNode extends Node {
 //                dump("Cannot vote: no peer view");
 //
 //            }
-            isVoteTaskOver = true;
+
             //   taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
             //   aggrLocalTally(Emsg);
             taskManager.registerTask(new AttemptSelfDestruct());
@@ -1018,6 +1031,8 @@ public class CryptoNode extends Node {
 
     private class TallySending implements Task {
 
+        private int sentShares = 0;
+
         private class ShareSenderTask implements Runnable {
 
             CRYPTO_DECRYPTION_SHARE_MSG mes = null;
@@ -1033,6 +1048,12 @@ public class CryptoNode extends Node {
 
                     doSendUDP(mes);
                     dump("Send decryption share (" + nodeResultShare + ") to " + mes.getDest());
+                    synchronized (SHARESENDINGLOCK) {
+                        sentShares++;
+                        if (sentShares == peerView.size() - 1) {
+                            isShareSendingOver = true;
+                        }
+                    }
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(CryptoNode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -1073,7 +1094,7 @@ public class CryptoNode extends Node {
                 //}
                 synchronized (LOCK) {
                     currentDecodingIndex++;
-                    isShareSendingOver = true;
+
 
                     dump("sharesize2: " + currentDecodingIndex);
                     MSShare += peerView.size() - 1;
