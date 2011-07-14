@@ -814,8 +814,8 @@ public class CryptoNode extends Node {
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
-                            schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                            //doSendUDP(mes);
+                           // schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                            doSendUDP(mes);
                             //          Thread.yield();
 
 
