@@ -525,8 +525,8 @@ public class CryptoNode extends Node {
         synchronized (BROADCASTLOCK) {
 
             dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
-Random generator = new Random(); 
-            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)),generator.nextInt(20));
+            Random generator = new Random();
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)), generator.nextInt(20));
 
         }
         //} else {
@@ -539,7 +539,7 @@ Random generator = new Random();
         //if (!isLocalCountingOver) {
         synchronized (readyMap) {
             dump("Received a vote echo message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
-Random generator = new Random(); 
+            Random generator = new Random();
 
             if (!msg.getSrc().isMalicious) {
 
@@ -569,7 +569,7 @@ Random generator = new Random();
                 dump("echoCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)),generator.nextInt(20));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(20));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -584,7 +584,7 @@ Random generator = new Random();
 
         synchronized (readyMap) {
             dump("Received a vote ready message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
-Random generator = new Random(); 
+            Random generator = new Random();
 
             if (!msg.getSrc().isMalicious) {
 
@@ -629,7 +629,7 @@ Random generator = new Random();
                 dump("readyCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)),generator.nextInt(20));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(20));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -677,7 +677,7 @@ Random generator = new Random();
             SMRBallot += getObjectSize(msg);
 
         } else {
-            dump("Discarded a ballot message from "+msg.getInfo().actualSrc+ " (cause: sent too late)");
+            dump("Discarded a ballot message from " + msg.getInfo().actualSrc + " (cause: sent too late)");
         }
     }
 
@@ -821,10 +821,10 @@ Random generator = new Random();
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
                             // schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                             doSendUDP(mes);
-                          //  Timer timer = new Timer();
-                           // timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(20*1000));
-                                      Thread.yield();
+                            doSendUDP(mes);
+                            //  Timer timer = new Timer();
+                            // timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(20*1000));
+                            Thread.yield();
 
 
                             //  doSendUDP(mes);
@@ -873,7 +873,7 @@ Random generator = new Random();
             startInstant = System.nanoTime();
 
             taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
-        Random generator = new Random();
+            Random generator = new Random();
             taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)), generator.nextInt(20));
             sequenceNumber++;
 
@@ -910,7 +910,7 @@ Random generator = new Random();
 //            }
             isVoteTaskOver = true;
             //   taskManager.registerTask(new PreemptPartialTallyingTask(), CLOSE_PARTIAL_TALLYING_DELAY);
-         //   aggrLocalTally(Emsg);
+            //   aggrLocalTally(Emsg);
             taskManager.registerTask(new AttemptSelfDestruct());
             //     taskManager.registerTask(new CloseVoteTask());
 
@@ -1109,9 +1109,9 @@ Random generator = new Random();
                         try {
 
                             mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                       //     schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
-                         //   Thread.yield();
-                    doSendUDP(mes);
+                            //     schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                            //   Thread.yield();
+                            doSendUDP(mes);
                             // Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot send decryption share");
