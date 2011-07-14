@@ -232,11 +232,11 @@ public class CryptoNode extends Node {
                     dump("keynum: " + mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
                     if (secKey == null) {
-                        taskManager.registerTask(new SelfDestructTask());
-                        dump ("mycount: "+mycount+"threshOrder: "+threshOrder);
+                        taskManager.registerTask(new SelfDestructTask());                     
+                    }
+                    //dump ("mycount: "+mycount+"threshOrder: "+threshOrder);
                     nodeId.isMalicious = (mycount < threshOrder);
 
-                    }
                 }
                 peerView.add(tempID);
                 mycount++;
