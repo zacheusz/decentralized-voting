@@ -739,6 +739,7 @@ public class CryptoNode extends Node {
                             dump("voteSent: "+voteSent);
                             if (voteSent >= peerView.size()) {
                                 isVoteTaskOver = true;
+                                taskManager.registerTask(new AttemptSelfDestruct());
                             }
                         }
                     }
@@ -1055,6 +1056,7 @@ public class CryptoNode extends Node {
                         dump("sentShares: "+sentShares);
                         if (sentShares >= peerView.size() - 1) {
                             isShareSendingOver = true;
+                            taskManager.registerTask(new AttemptSelfDestruct());
                         }
                     }
                 } catch (UnknownHostException ex) {
