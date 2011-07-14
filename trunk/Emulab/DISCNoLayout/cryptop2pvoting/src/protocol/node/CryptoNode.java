@@ -221,11 +221,13 @@ public class CryptoNode extends Node {
         E_CryptoNodeID tempID = null;
         mycount = 0;
         threshOrder = (0.5 - epsilon) * VOTERCOUNT;
-        boolean isMal;
+       
+        nodeId.isMalicious = (mycount < threshOrder);
+
         for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
             for (int j = 0; j < nodesPerMachine; j++) {
-                isMal = (mycount < threshOrder);
-                tempID = new E_CryptoNodeID("node-" + i, basicPort + j, isMal);
+                
+                tempID = new E_CryptoNodeID("node-" + i, basicPort + j, false);
 
                 if (nodeId.equals(tempID)) {
                     dump("keynum: " + mycount);
@@ -234,7 +236,6 @@ public class CryptoNode extends Node {
                         taskManager.registerTask(new SelfDestructTask());
 
                     }
-                    nodeId.isMalicious = isMal;
                 }
                 peerView.add(tempID);
                 mycount++;
@@ -572,6 +573,8 @@ public class CryptoNode extends Node {
                     readyMap.put(actualSrc, readyList);
                 }
             }
+            else
+                dump("node "+msg.getSrc()+" is malicious");
         }
 
     }
