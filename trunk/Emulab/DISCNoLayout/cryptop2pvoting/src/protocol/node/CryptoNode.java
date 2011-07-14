@@ -206,8 +206,8 @@ public class CryptoNode extends Node {
     public int sequenceNumber = 0;
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
-    public static int SENDING_INTERVAL=40;
-    public static int nodeOrder=0;
+    public static int SENDING_INTERVAL = 40;
+    public static int nodeOrder = 0;
     // **************************************************************************
     // Constructors
     // **************************************************************************
@@ -223,7 +223,7 @@ public class CryptoNode extends Node {
         E_CryptoNodeID tempID = null;
         mycount = 0;
         threshOrder = (0.5 - epsilon) * VOTERCOUNT;
-        
+
 
 
         for (int i = 1; i <= VOTERCOUNT / nodesPerMachine; i++) {
@@ -234,7 +234,7 @@ public class CryptoNode extends Node {
                 if (nodeId.equals(tempID)) {
                     dump("keynum: " + mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
-                    nodeOrder=mycount;
+                    nodeOrder = mycount;
                     if (secKey == null) {
                         taskManager.registerTask(new SelfDestructTask());
                     }
@@ -367,7 +367,7 @@ public class CryptoNode extends Node {
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PROXIES), GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY);
 //            taskManager.registerTask(new VoteTask(), VOTE_DELAY);
             //     taskManager.registerTask(new PreemptCloseLocalElectionTask(), CLOSE_VOTE_DELAY);
-            taskManager.registerTask(new VoteTask(), VOTE_DELAY+(nodeOrder/10)*30*1000);
+            taskManager.registerTask(new VoteTask(), VOTE_DELAY + (nodeOrder / 10) * 30 * 1000);
 
 //            taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
 //            taskManager.registerTask(new PreemptCloseGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
@@ -459,7 +459,6 @@ public class CryptoNode extends Node {
         }
     }
 
-  
     private void receiveVoteDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         //if (!isLocalCountingOver) {
@@ -578,7 +577,7 @@ public class CryptoNode extends Node {
                 if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO)) {
                     deliveredList.set(seqNum, true);
                     deliveredMap.put(actualSrc, deliveredList);
-                    dump("delivered a ballot message from (" + actualSrc);
+                    dump("delivered a ballot message "+ msg.getInfo().vote+" from (" + actualSrc);
                     receiveBallot(msg);
                 }
 
@@ -717,7 +716,9 @@ public class CryptoNode extends Node {
         BROADCAST_MSG mes = null;
 
         private class BroadcastSenderTask extends TimerTask implements Runnable {
-        BROADCAST_MSG senderMes;
+
+            BROADCAST_MSG senderMes;
+
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
                 receivedCount2++;
                 System.out.println("receivedCount2: " + receivedCount2);
@@ -748,7 +749,7 @@ public class CryptoNode extends Node {
 
             synchronized (BROADCASTLOCK) {
                 int x = 0;
-                  ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
+                ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
 
                 if (!(peerView.size() <= 1)) {
 
@@ -761,11 +762,11 @@ public class CryptoNode extends Node {
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
-                             schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
-                           // doSendUDP(mes);
-                             //Timer timer = new Timer();
-                          //   timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL*1000));
-                           Thread.yield();
+                            schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
+                            // doSendUDP(mes);
+                            //Timer timer = new Timer();
+                            //   timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL*1000));
+                            Thread.yield();
 
 
                             //  doSendUDP(mes);
@@ -881,7 +882,7 @@ public class CryptoNode extends Node {
 //                partialTally = encryptor.add(localTally, partialTally);
 //                taskManager.registerTask(new GlobalCountingTask());
 //            }
-                
+
 
                 isLocalCountingOver = true;
                 taskManager.registerTask(new TallyDecryptionSharing());
@@ -966,9 +967,9 @@ public class CryptoNode extends Node {
 
                 //}
                 isFinalResultCalculated = true;
-                 Random generator = new Random();
+                Random generator = new Random();
 
-                taskManager.registerTask(new TallySending(),generator.nextInt(SENDING_INTERVAL));
+                taskManager.registerTask(new TallySending(), generator.nextInt(SENDING_INTERVAL));
 
 //                             currentDecodingIndex++;
 //                    dump("sharesize2: " + currentDecodingIndex);
@@ -1053,9 +1054,9 @@ public class CryptoNode extends Node {
                         try {
 
                             mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                                 schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
-                               Thread.yield();
-                         //   doSendUDP(mes);
+                            schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
+                            Thread.yield();
+                            //   doSendUDP(mes);
                             // Thread.sleep(10);
                         } catch (Exception e) {
                             dump("TCP: cannot send decryption share");
@@ -1128,9 +1129,9 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-              //  if (nodeId.name.equals("node-1") && nodeId.port == basicPort) {
-                    paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
-            //    }
+                //  if (nodeId.name.equals("node-1") && nodeId.port == basicPort) {
+                paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
+                //    }
 
 
 
