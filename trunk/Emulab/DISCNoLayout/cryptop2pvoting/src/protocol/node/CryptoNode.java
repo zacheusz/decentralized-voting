@@ -1186,9 +1186,9 @@ public class CryptoNode extends Node {
 
         public void execute() {
             synchronized (LOCK) {
-                if (nodeId.name.equals("node-1") && nodeId.port == basicPort) {
+              //  if (nodeId.name.equals("node-1") && nodeId.port == basicPort) {
                     paillierp.testingPaillier.TestingRest.getResult(finalResult, VOTECOUNT, votes);
-                }
+            //    }
 
 
 
