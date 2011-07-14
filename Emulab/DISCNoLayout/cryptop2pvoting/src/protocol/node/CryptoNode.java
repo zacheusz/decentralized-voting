@@ -240,7 +240,10 @@ public class CryptoNode extends Node {
 
             }
         }
-
+        dump ("peerview: ");
+        for (E_CryptoNodeID loopID: peerView){
+            dump(loopID.toString());
+        }
 
 
 
