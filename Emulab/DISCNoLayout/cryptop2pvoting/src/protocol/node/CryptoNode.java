@@ -641,11 +641,12 @@ public class CryptoNode extends Node {
     }
 
     private void receiveBroadcast(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
-
+receivedCount++;
+                            dump ("receivedCount: "+receivedCount);
        switch (msg.getInfo().type) {
                         case Message.VOTE_DATA_MSG:
-                            receivedCount++;
-                            dump ("receivedCount: "+receivedCount);
+                         //   receivedCount++;
+                        //    dump ("receivedCount: "+receivedCount);
                             receiveVoteDataMsg((BROADCAST_MSG) msg);
                             break;
 
