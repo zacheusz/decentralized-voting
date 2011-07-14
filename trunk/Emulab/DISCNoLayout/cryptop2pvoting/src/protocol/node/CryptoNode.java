@@ -393,22 +393,8 @@ public class CryptoNode extends Node {
                     receiveBallot((BROADCAST_MSG) msg);
                     break;
                 case Message.BROADCAST_DATA_MSG:
-                    switch (((BROADCAST_MSG) msg).getInfo().type) {
-                        case Message.VOTE_DATA_MSG:
-                            receiveVoteDataMsg((BROADCAST_MSG) msg);
-                            break;
-
-                        case Message.VOTE_ECHO_MSG:
-                            receiveVoteEchoMsg((BROADCAST_MSG) msg);
-                            break;
-
-                        case Message.VOTE_READY_MSG:
-                            receiveVoteReadyMsg((BROADCAST_MSG) msg);
-                            break;
-                        default:
-                            dump("Discarded a message from " + msg.getSrc() + " of type " + msg.getHeader() + "(cause: unknown type)");
-
-                    }
+                    receiveBroadcast((BROADCAST_MSG)msg);
+                    
                     break;
                 //         case Message.CRYPTO_INDIVIDUAL_TALLY_MSG:
                 //             receiveIndividualTally((CRYPTO_INDIVIDUAL_TALLY_MSG) msg);
@@ -651,6 +637,25 @@ public class CryptoNode extends Node {
 
     }
 
+    private void receiveBroadcast(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
+
+       switch (msg.getInfo().type) {
+                        case Message.VOTE_DATA_MSG:
+                            receiveVoteDataMsg((BROADCAST_MSG) msg);
+                            break;
+
+                        case Message.VOTE_ECHO_MSG:
+                            receiveVoteEchoMsg((BROADCAST_MSG) msg);
+                            break;
+
+                        case Message.VOTE_READY_MSG:
+                            receiveVoteReadyMsg((BROADCAST_MSG) msg);
+                            break;
+                        default:
+                            dump("Discarded a message from " + msg.getSrc() + " of type " + msg.getHeader() + "(cause: unknown type)");
+
+                    }
+    }
     private void receiveBallot(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         if (!isLocalCountingOver) {
