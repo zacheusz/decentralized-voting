@@ -1239,7 +1239,7 @@ public class CryptoNode extends Node {
 //                        }
                         try {
                             Random generator = new Random();
-                            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(nodeResultShare, null, Message.VOTE_DATA_MSG, nodeId, 1)), generator.nextInt(SENDING_INTERVAL));
+                            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(nodeResultShare, null, Message.SHARE_DATA_MSG, nodeId, 1)), generator.nextInt(SENDING_INTERVAL));
                             sequenceNumber++;
                             readyToSend = false;
 
