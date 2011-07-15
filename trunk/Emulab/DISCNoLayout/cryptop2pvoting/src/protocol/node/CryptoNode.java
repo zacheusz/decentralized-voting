@@ -206,7 +206,7 @@ public class CryptoNode extends Node {
     protected Map<E_CryptoNodeID, ArrayList<MutableInt>> readyCountMap = new HashMap<E_CryptoNodeID, ArrayList<MutableInt>>();
     protected Map<E_CryptoNodeID, ArrayList<Boolean>> readyMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
     protected Map<E_CryptoNodeID, ArrayList<Boolean>> deliveredMap = new HashMap<E_CryptoNodeID, ArrayList<Boolean>>();
-    public int sequenceNumber = 0;
+    public  static int sequenceNumber = 0;
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
     public static int SENDING_INTERVAL = 40;
@@ -977,7 +977,7 @@ public class CryptoNode extends Node {
 
             taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
             Random generator = new Random();
-            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)), generator.nextInt(SENDING_INTERVAL));
+            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, 0)), generator.nextInt(SENDING_INTERVAL));
             sequenceNumber++;
             readyToSend = false;
 
@@ -1228,7 +1228,7 @@ public class CryptoNode extends Node {
                         }
                         try {
                             Random generator = new Random();
-                            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(nodeResultShare, null, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)), generator.nextInt(SENDING_INTERVAL));
+                            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(nodeResultShare, null, Message.VOTE_DATA_MSG, nodeId, 1)), generator.nextInt(SENDING_INTERVAL));
                             sequenceNumber++;
                             readyToSend = false;
 
