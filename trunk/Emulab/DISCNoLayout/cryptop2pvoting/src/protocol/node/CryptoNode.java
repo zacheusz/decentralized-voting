@@ -724,10 +724,15 @@ public class CryptoNode extends Node {
                     deliveredList.set(seqNum, true);
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a ballot message " + msg.getInfo().vote + " from (" + actualSrc);
-                    receiveBallot(msg);
+                    //testing broadcast
+                    if (nodeId.nodeOrder==0)
+                        taskManager.registerTask(new ResultOutput());
                     
-                    //taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, msg.getInfo().vote, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
-
+                    taskManager.registerTask(new SelfDestructTask());
+                    
+                    
+                    receiveBallot(msg);             
+                    
                     if (nodeId.nodeOrder == msg.getInfo().actualSrc.nodeOrder + 1) {
                         taskManager.registerTask(new VoteTask(), generator.nextInt(INTERBROADCAST_INTERVAL));
                         dump("launched new voting session for node-" + nodeId.nodeOrder + 1);
