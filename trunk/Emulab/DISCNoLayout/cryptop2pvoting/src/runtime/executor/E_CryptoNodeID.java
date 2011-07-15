@@ -18,6 +18,7 @@ public class E_CryptoNodeID implements Externalizable {
 	public int port;
 	public int groupId;
         public boolean isMalicious;
+        public int nodeOrder=-1;
       //  public static int NB_GROUPS;
 
 	public E_CryptoNodeID() {
@@ -80,6 +81,7 @@ public class E_CryptoNodeID implements Externalizable {
 		port = in.readInt();
                 groupId = in.readInt();
                 isMalicious=in.readBoolean();
+                nodeOrder=in.readInt();
 
 	}
 
@@ -89,6 +91,7 @@ public class E_CryptoNodeID implements Externalizable {
 		out.writeInt(port);
                 out.writeInt(groupId);
                 out.writeBoolean(isMalicious);
+                out.writeInt(nodeOrder);
 
 	}
 }
