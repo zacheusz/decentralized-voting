@@ -586,10 +586,14 @@ public class CryptoNode extends Node {
                     deliveredList.set(seqNum, true);
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a share message " + msg.getInfo().share + " from (" + actualSrc);
-                    receiveDecryptionShare(msg);
+                    if (!actualSrc.isMalicious)
+                        receiveDecryptionShare(msg);
+                    else
+                        dump("but discared the share message " + msg.getInfo().share + " from malicious (" + actualSrc);
+                    
                     if (nodeId.nodeOrder == msg.getInfo().actualSrc.nodeOrder + 1) {
                         taskManager.registerTask(new TallyDecryptionSharing(), generator.nextInt(INTERBROADCAST_INTERVAL));
-                        dump("launched new sharing session for node-" + nodeId.nodeOrder + 1);
+                        dump("launched new sharing session for node-" + (nodeId.nodeOrder + 1));
                     }
 
                     readyToSend = true;
@@ -801,6 +805,7 @@ public class CryptoNode extends Node {
                     dump("CloseTallyDecryptionSharing");
                     //actually close the Tally Decryption Sharing session
                     isDecryptionSharingOver = true;
+                    isShareSendingOver=true; //ensured by broadcast (no need)
                     taskManager.registerTask(new TallyDecryption());
 
                 }
@@ -1075,7 +1080,7 @@ public class CryptoNode extends Node {
                 finalEncryptedResult = localTally;
                 if (nodeId.nodeOrder == 0) {
                     taskManager.registerTask(new TallyDecryptionSharing());
-                }
+                } 
 
                 //else do nothing
             }
