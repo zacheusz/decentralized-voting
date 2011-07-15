@@ -863,6 +863,7 @@ public class CryptoNode extends Node {
         BroadcastInfo info = null;
         BROADCAST_MSG mes = null;
         int voteSent = 0;
+        int shareSent = 0;
 
         private class BroadcastSenderTask extends TimerTask implements Runnable {
 
@@ -884,6 +885,16 @@ public class CryptoNode extends Node {
                             dump("voteSent: " + voteSent);
                             if (voteSent >= peerView.size()) {
                                 isVoteTaskOver = true;
+                                taskManager.registerTask(new AttemptSelfDestruct());
+                            }
+                        }
+                    }
+                    else if(senderMes.getInfo().type == Message.SHARE_DATA_MSG){
+                         synchronized (SHARESENDINGLOCK) {
+                            shareSent++;
+                            dump("shareSent: " + shareSent);
+                            if (shareSent >= peerView.size()) {
+                                isShareSendingOver = true;
                                 taskManager.registerTask(new AttemptSelfDestruct());
                             }
                         }
@@ -1122,9 +1133,9 @@ public class CryptoNode extends Node {
                 nodeResultShare = secKey.decrypt(finalEncryptedResult);
                 ShareCompTime += System.nanoTime() - startT;
                 // synchronized (LOCK) {
-                synchronized (LOCK) {
-                    resultSharesList.add(nodeResultShare);
-                }
+//                synchronized (LOCK) {
+//                    resultSharesList.add(nodeResultShare);
+//                }
 
 
                 //}
@@ -1223,9 +1234,9 @@ public class CryptoNode extends Node {
 
 
                     for (E_CryptoNodeID peerId : peerView) {
-                        if (peerId.equals(nodeId)) {
-                            continue;
-                        }
+//                        if (peerId.equals(nodeId)) {
+//                            continue;
+//                        }
                         try {
                             Random generator = new Random();
                             taskManager.registerTask(new BroadcastTask(new BroadcastInfo(nodeResultShare, null, Message.VOTE_DATA_MSG, nodeId, 1)), generator.nextInt(SENDING_INTERVAL));
