@@ -119,6 +119,7 @@ public class CryptoNode extends Node {
     protected static boolean isLocalCountingOver = false;
     protected static boolean IsPartialTallyingOver = false;
     protected static boolean isShareSendingOver = false;
+    protected static boolean startedShareSending = false;
     protected static boolean isDecryptionSharingOver = false;
     protected static boolean isFinalResultCalculated = false;
     protected static boolean isTallyDecryptionOver = false;
@@ -572,7 +573,7 @@ public class CryptoNode extends Node {
                 dump("readyCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
                 if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
-                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(msg.getInfo().share, null, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(msg.getInfo().share, null, Message.SHARE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
@@ -1213,7 +1214,8 @@ public class CryptoNode extends Node {
         }
 
         public void execute() {
-            if (!isShareSendingOver) {
+            if (!startedShareSending) {
+                startedShareSending = true;
                 CRYPTO_DECRYPTION_SHARE_MSG mes = null;
 
                 if (!(peerView.size() <= 1)) {
