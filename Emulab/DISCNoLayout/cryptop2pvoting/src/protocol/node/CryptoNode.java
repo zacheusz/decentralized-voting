@@ -209,9 +209,10 @@ public class CryptoNode extends Node {
     public static int sequenceNumber = 0;
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
-    public static int SENDING_INTERVAL = 80;
-    public static int MINI_SENDING_INTERVAL = 5;
-    public static int nodeOrder = 0;
+    public static int SENDING_INTERVAL = 1;
+    public static int MINI_SENDING_INTERVAL = 1;
+    public static int INTERBROADCAST_INTERVAL = 10;
+    //public static int nodeOrder = 0;
     public static boolean readyToSend = true;
 
     // **************************************************************************
@@ -239,7 +240,7 @@ public class CryptoNode extends Node {
                 if (nodeId.equals(tempID)) {
                     dump("keynum: " + mycount);
                     secKey = (PaillierThreshold) CryptoGossipLauncher.getObject(secKeyFile + mycount);
-                    nodeOrder = mycount;
+                    nodeId.nodeOrder = mycount;
                     if (secKey == null) {
                         taskManager.registerTask(new SelfDestructTask());
                     }
@@ -372,8 +373,10 @@ public class CryptoNode extends Node {
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PROXIES), GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY);
 //            taskManager.registerTask(new VoteTask(), VOTE_DELAY);
             //     taskManager.registerTask(new PreemptCloseLocalElectionTask(), CLOSE_VOTE_DELAY);
-            taskManager.registerTask(new VoteTask(), VOTE_DELAY + (nodeOrder / 10) * 150 * 1000);
-
+            //  taskManager.registerTask(new VoteTask(), VOTE_DELAY + (nodeId.nodeOrder / 10) * 150 * 1000);
+            if (nodeId.nodeOrder == 0) {
+                taskManager.registerTask(new VoteTask(), VOTE_DELAY);
+            }
 //            taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
 //            taskManager.registerTask(new PreemptCloseGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
 //            taskManager.registerTask(new PreemptCloseTallyDecryptionSharing(), CLOSE_DecryptionSharing_DELAY);
@@ -584,6 +587,11 @@ public class CryptoNode extends Node {
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a share message " + msg.getInfo().share + " from (" + actualSrc);
                     receiveDecryptionShare(msg);
+                    if (nodeId.nodeOrder == msg.getInfo().actualSrc.nodeOrder + 1) {
+                        taskManager.registerTask(new TallyDecryptionSharing(), generator.nextInt(INTERBROADCAST_INTERVAL));
+                        dump("launched new sharing session for node-" + nodeId.nodeOrder + 1);
+                    }
+
                     readyToSend = true;
                 }
 
@@ -713,6 +721,11 @@ public class CryptoNode extends Node {
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a ballot message " + msg.getInfo().vote + " from (" + actualSrc);
                     receiveBallot(msg);
+                    if (nodeId.nodeOrder == msg.getInfo().actualSrc.nodeOrder + 1) {
+                        taskManager.registerTask(new VoteTask(), generator.nextInt(INTERBROADCAST_INTERVAL));
+                        dump("launched new voting session for node-" + nodeId.nodeOrder + 1);
+                    }
+
                     readyToSend = true;
                 }
 
@@ -1058,8 +1071,11 @@ public class CryptoNode extends Node {
 
 
                 isLocalCountingOver = true;
-                taskManager.registerTask(new TallyDecryptionSharing());
+
                 finalEncryptedResult = localTally;
+                if (nodeId.nodeOrder == 0) {
+                    taskManager.registerTask(new TallyDecryptionSharing());
+                }
 
                 //else do nothing
             }
@@ -1142,7 +1158,7 @@ public class CryptoNode extends Node {
                 isFinalResultCalculated = true;
                 Random generator = new Random();
 
-                taskManager.registerTask(new TallySending(), SENDING_INTERVAL+(nodeOrder / 10) * 200 * 1000);
+                taskManager.registerTask(new TallySending(), SENDING_INTERVAL);
 
 //                             currentDecodingIndex++;
 //                    dump("sharesize2: " + currentDecodingIndex);
