@@ -102,7 +102,7 @@ public class CryptoNode extends Node {
     public static boolean isMalicious;
     public static int order;
     public static int numReceivedViews = 0;
-    public static double threshold = 1;
+    public static double threshold = 0.9;
     public static boolean receivedAllViews = false;
     public static boolean isViewDiffusionOver = false;
     public static boolean isFirstView = true;
@@ -209,9 +209,9 @@ public class CryptoNode extends Node {
     public static int sequenceNumber = 0;
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
-    public static int SENDING_INTERVAL = 1;
-    public static int MINI_SENDING_INTERVAL = 1;
-    public static int INTERBROADCAST_INTERVAL = 10;
+    public static int SENDING_INTERVAL = 3;
+    public static int MINI_SENDING_INTERVAL = 3;
+    public static int INTERBROADCAST_INTERVAL = 15;
     //public static int nodeOrder = 0;
     public static boolean readyToSend = true;
 
