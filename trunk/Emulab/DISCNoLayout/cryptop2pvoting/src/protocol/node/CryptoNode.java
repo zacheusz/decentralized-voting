@@ -210,6 +210,7 @@ public class CryptoNode extends Node {
     public static int receivedCount2 = 0;
     public static int SENDING_INTERVAL = 40;
     public static int nodeOrder = 0;
+    public static boolean readyToSend = true;
 
     // **************************************************************************
     // Constructors
@@ -399,9 +400,9 @@ public class CryptoNode extends Node {
 //                case Message.HITV:
 //                    receiveHITV(((HITV_MSG) msg));
 //                    break;
-                case Message.CRYPTO_BALLOT:
-                    receiveBallot((BROADCAST_MSG) msg);
-                    break;
+//                case Message.CRYPTO_BALLOT:
+//                    receiveBallot((BROADCAST_MSG) msg);
+//                    break;
                 case Message.BROADCAST_DATA_MSG:
                     receiveBroadcast((BROADCAST_MSG) msg);
 
@@ -412,9 +413,9 @@ public class CryptoNode extends Node {
 //                case Message.CRYPTO_PARTIAL_TALLY_MSG:
 //                    receivePartialTally((CRYPTO_PARTIAL_TALLY_MSG) msg);
 //                    break;
-                case Message.CRYPTO_DECRYPTION_SHARE_MSG:
-                    receiveDecryptionShare((CRYPTO_DECRYPTION_SHARE_MSG) msg);
-                    break;
+//                case Message.CRYPTO_DECRYPTION_SHARE_MSG:
+//                    receiveDecryptionShare((CRYPTO_DECRYPTION_SHARE_MSG) msg);
+//                    break;
 //                case Message.CRYPTO_FINAL_RESULT_MSG:
 //                    receiveFinalResult((CRYPTO_FINAL_RESULT_MSG) msg);
 //                    break;
@@ -459,6 +460,135 @@ public class CryptoNode extends Node {
         public int get() {
             return value;
         }
+    }
+
+    private void receiveShareDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
+
+        //if (!isLocalCountingOver) {
+        //    synchronized (BROADCASTLOCK) {
+
+        dump("Received a share data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
+        Random generator = new Random();
+        taskManager.registerTask(new BroadcastTask(new BroadcastInfo(msg.getInfo().share, null, Message.SHARE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
+
+        //     }
+        //} else {
+        //  dump("Discarded an ballot message (cause: sent too late)");
+        // }
+    }
+
+    private void receiveShareEchoMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
+
+        //if (!isLocalCountingOver) {
+        synchronized (readyMap) {
+            dump("Received a share echo message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
+            Random generator = new Random();
+
+            if (!msg.getSrc().isMalicious) {
+
+                E_CryptoNodeID actualSrc = msg.getInfo().actualSrc;
+                int seqNum = msg.getInfo().seqNum;
+                ArrayList<MutableInt> countList = echoCountMap.get(actualSrc);
+                ArrayList<Boolean> readyList = readyMap.get(actualSrc);
+                boolean sentReady = false;
+
+                if ((readyList == null) || readyList.isEmpty()) {
+                    readyList = new ArrayList<Boolean>();
+                    readyList.add(Boolean.FALSE);
+                    readyList.add(Boolean.FALSE);
+                } else {
+                    sentReady = readyList.get(seqNum);
+                }
+
+
+                if ((countList == null) || countList.isEmpty()) {
+                    countList = new ArrayList<MutableInt>();
+                    countList.add(new MutableInt());
+                    countList.add(new MutableInt());
+                }
+
+                countList.get(seqNum).inc();
+                echoCountMap.put(actualSrc, countList);
+                dump("echoCount (" + actualSrc + "): " + countList.get(seqNum).value);
+
+                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(msg.getInfo().share, null, Message.SHARE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
+                    readyList.set(seqNum, Boolean.TRUE);
+                    readyMap.put(actualSrc, readyList);
+                }
+            } else {
+                dump("node " + msg.getSrc() + " is malicious");
+            }
+        }
+
+    }
+
+    private void receiveShareReadyMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
+
+        synchronized (readyMap) {
+            dump("Received a share ready message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
+            Random generator = new Random();
+
+            if (!msg.getSrc().isMalicious) {
+
+                E_CryptoNodeID actualSrc = msg.getInfo().actualSrc;
+                int seqNum = msg.getInfo().seqNum;
+                ArrayList<MutableInt> countList = readyCountMap.get(actualSrc);
+                ArrayList<Boolean> readyList = readyMap.get(actualSrc);
+                boolean sentReady = false;
+                boolean delivered = false;
+                ArrayList<Boolean> deliveredList = deliveredMap.get(actualSrc);
+
+
+                if ((deliveredList == null) || deliveredList.isEmpty()) {
+                    deliveredList = new ArrayList<Boolean>();
+                    deliveredList.add(Boolean.FALSE);
+                    deliveredList.add(Boolean.FALSE);
+                } else {
+                    delivered = deliveredList.get(seqNum);
+                }
+                if (delivered) {
+                    //add statistics
+                    return;
+                }
+
+                if ((readyList == null) || readyList.isEmpty()) {
+                    readyList = new ArrayList<Boolean>();
+                    readyList.add(Boolean.FALSE);
+                    readyList.add(Boolean.FALSE);
+                } else {
+                    sentReady = readyList.get(seqNum);
+                }
+
+
+                if ((countList == null) || countList.isEmpty()) {
+                    countList = new ArrayList<MutableInt>();
+                    countList.add(new MutableInt());
+                    countList.add(new MutableInt());
+                }
+
+                countList.get(seqNum).inc();
+                readyCountMap.put(actualSrc, countList);
+                dump("readyCount (" + actualSrc + "): " + countList.get(seqNum).value);
+
+                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
+                    taskManager.registerTask(new BroadcastTask(new BroadcastInfo(msg.getInfo().share, null, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
+                    readyList.set(seqNum, Boolean.TRUE);
+                    readyMap.put(actualSrc, readyList);
+                }
+
+                if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO)) {
+                    deliveredList.set(seqNum, true);
+                    deliveredMap.put(actualSrc, deliveredList);
+                    dump("delivered a share message " + msg.getInfo().share + " from (" + actualSrc);
+                    receiveDecryptionShare(msg);
+                    readyToSend = true;
+                }
+
+            }
+        }
+
+
     }
 
     private void receiveVoteDataMsg(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
@@ -581,6 +711,7 @@ public class CryptoNode extends Node {
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a ballot message " + msg.getInfo().vote + " from (" + actualSrc);
                     receiveBallot(msg);
+                    readyToSend = true;
                 }
 
             }
@@ -592,6 +723,7 @@ public class CryptoNode extends Node {
     private void receiveBroadcast(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
 
         switch (msg.getInfo().type) {
+
             case Message.VOTE_DATA_MSG:
 
                 receiveVoteDataMsg((BROADCAST_MSG) msg);
@@ -603,6 +735,19 @@ public class CryptoNode extends Node {
 
             case Message.VOTE_READY_MSG:
                 receiveVoteReadyMsg((BROADCAST_MSG) msg);
+                break;
+
+            case Message.SHARE_DATA_MSG:
+
+                receiveShareDataMsg((BROADCAST_MSG) msg);
+                break;
+
+            case Message.SHARE_ECHO_MSG:
+                receiveShareEchoMsg((BROADCAST_MSG) msg);
+                break;
+
+            case Message.SHARE_READY_MSG:
+                receiveShareReadyMsg((BROADCAST_MSG) msg);
                 break;
             default:
                 dump("Discarded a message from " + msg.getSrc() + " of type " + msg.getHeader() + "(cause: unknown type)");
@@ -623,14 +768,14 @@ public class CryptoNode extends Node {
         }
     }
 
-    private void receiveDecryptionShare(CRYPTO_DECRYPTION_SHARE_MSG msg) throws NoSuchAlgorithmException {
+    private void receiveDecryptionShare(BROADCAST_MSG msg) throws NoSuchAlgorithmException {
         synchronized (LOCK) {
 
             if (!isDecryptionSharingOver) {
 
-                dump("Received a decryption share (" + msg.getShare() + ") from " + msg.getSrc());
+                dump("Received a decryption share (" + msg.getInfo().share + ") from " + msg.getInfo().actualSrc);
 
-                resultSharesList.add(msg.getShare());
+                resultSharesList.add(msg.getInfo().share);
 
                 currentDecodingIndex++;
                 dump("sharesize1: " + currentDecodingIndex);
@@ -833,6 +978,7 @@ public class CryptoNode extends Node {
             Random generator = new Random();
             taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, Emsg, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)), generator.nextInt(SENDING_INTERVAL));
             sequenceNumber++;
+            readyToSend = false;
 
             dump("sequence number: " + sequenceNumber);
 //            ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1000);
@@ -1071,7 +1217,7 @@ public class CryptoNode extends Node {
                 CRYPTO_DECRYPTION_SHARE_MSG mes = null;
 
                 if (!(peerView.size() <= 1)) {
-                    ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1);
+                    //     ScheduledThreadPoolExecutor schedThPoolExec = new ScheduledThreadPoolExecutor(1);
 
 
                     for (E_CryptoNodeID peerId : peerView) {
@@ -1079,10 +1225,16 @@ public class CryptoNode extends Node {
                             continue;
                         }
                         try {
+                            Random generator = new Random();
+                            taskManager.registerTask(new BroadcastTask(new BroadcastInfo(nodeResultShare, null, Message.VOTE_DATA_MSG, nodeId, sequenceNumber)), generator.nextInt(SENDING_INTERVAL));
+                            sequenceNumber++;
+                            readyToSend = false;
 
-                            mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
-                            schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
-                            Thread.yield();
+                            dump("sequence number: " + sequenceNumber);
+
+                            //    mes = new CRYPTO_DECRYPTION_SHARE_MSG(nodeId, peerId, nodeResultShare);
+                            //         schedThPoolExec.schedule(new ShareSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
+                            //         Thread.yield();
                             //   doSendUDP(mes);
                             // Thread.sleep(10);
                         } catch (Exception e) {
