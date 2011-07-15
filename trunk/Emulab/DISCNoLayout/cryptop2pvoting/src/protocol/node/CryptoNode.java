@@ -728,7 +728,7 @@ public class CryptoNode extends Node {
                     if (nodeId.nodeOrder==0)
                         taskManager.registerTask(new ResultOutput());
                     
-                    taskManager.registerTask(new SelfDestructTask());
+                    taskManager.registerTask(new SelfDestructTask(),15*1000);
                     
                     
                     receiveBallot(msg);             
