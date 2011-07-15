@@ -372,7 +372,7 @@ public class CryptoNode extends Node {
 //            taskManager.registerTask(new GetViewFromBootstrapTask(GetViewFromBootstrapTask.PROXIES), GET_PROXY_VIEW_FROM_BOOTSTRAP_DELAY);
 //            taskManager.registerTask(new VoteTask(), VOTE_DELAY);
             //     taskManager.registerTask(new PreemptCloseLocalElectionTask(), CLOSE_VOTE_DELAY);
-            taskManager.registerTask(new VoteTask(), VOTE_DELAY + (nodeOrder / 10) * 30 * 1000);
+            taskManager.registerTask(new VoteTask(), VOTE_DELAY + (nodeOrder / 10) * 150 * 1000);
 
 //            taskManager.registerTask(new PreemptCloseLocalCountingTask(), CLOSE_COUNTING_DELAY);
 //            taskManager.registerTask(new PreemptCloseGlobalCountingTask(), CLOSE_GLOBAL_COUNTING_DELAY);
@@ -1142,7 +1142,7 @@ public class CryptoNode extends Node {
                 isFinalResultCalculated = true;
                 Random generator = new Random();
 
-                taskManager.registerTask(new TallySending(), generator.nextInt(SENDING_INTERVAL));
+                taskManager.registerTask(new TallySending(), SENDING_INTERVAL+(nodeOrder / 10) * 150 * 1000);
 
 //                             currentDecodingIndex++;
 //                    dump("sharesize2: " + currentDecodingIndex);
