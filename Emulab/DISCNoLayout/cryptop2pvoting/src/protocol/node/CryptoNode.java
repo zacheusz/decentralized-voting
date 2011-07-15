@@ -725,6 +725,7 @@ public class CryptoNode extends Node {
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a ballot message " + msg.getInfo().vote + " from (" + actualSrc);
                     receiveBallot(msg);
+                    
                     //taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, msg.getInfo().vote, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
 
                     if (nodeId.nodeOrder == msg.getInfo().actualSrc.nodeOrder + 1) {
