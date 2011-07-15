@@ -210,6 +210,7 @@ public class CryptoNode extends Node {
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
     public static int SENDING_INTERVAL = 80;
+    public static int MINI_SENDING_INTERVAL = 5;
     public static int nodeOrder = 0;
     public static boolean readyToSend = true;
 
@@ -933,7 +934,7 @@ public class CryptoNode extends Node {
                         try {
                             mes = new BROADCAST_MSG(nodeId, peerId, info);
 
-                            schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL), TimeUnit.SECONDS);
+                            schedThPoolExec.schedule(new BroadcastSenderTask(mes), generator.nextInt(MINI_SENDING_INTERVAL), TimeUnit.SECONDS);
                             // doSendUDP(mes);
                             //Timer timer = new Timer();
                             //   timer.schedule(new BroadcastSenderTask(mes), generator.nextInt(SENDING_INTERVAL*1000));
