@@ -735,7 +735,7 @@ public class CryptoNode extends Node {
                     endInstant = System.nanoTime();
                     runningTime = endInstant - startInstant + viewDuration;
                     //     dump("Running Time: "+runningTime);
-                    specialDump("\r"+"running time: "+runningTime+ "\r");
+                    dump("\r"+"running time: "+runningTime+ "\r");
                     
                     taskManager.registerTask(new SelfDestructTask(),30*1000);
                     
