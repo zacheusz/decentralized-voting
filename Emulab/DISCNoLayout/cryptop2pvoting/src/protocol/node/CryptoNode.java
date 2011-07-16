@@ -740,15 +740,15 @@ public class CryptoNode extends Node {
                     
                     taskManager.registerTask(new SelfDestructTask(),30*1000);
                     
-                    
-                    receiveBallot(msg);             
-                    
-                    if (nodeId.nodeOrder == msg.getInfo().actualSrc.nodeOrder + 1) {
-                        taskManager.registerTask(new VoteTask(), generator.nextInt(INTERBROADCAST_INTERVAL));
-                        dump("launched new voting session for node-" + nodeId.nodeOrder + 1);
-                    }
-
-                    readyToSend = true;
+                  //unremove these later  
+//                    receiveBallot(msg);             
+//                    
+//                    if (nodeId.nodeOrder == msg.getInfo().actualSrc.nodeOrder + 1) {
+//                        taskManager.registerTask(new VoteTask(), generator.nextInt(INTERBROADCAST_INTERVAL));
+//                        dump("launched new voting session for node-" + nodeId.nodeOrder + 1);
+//                    }
+//
+//                    readyToSend = true;
                 }
 
             }
