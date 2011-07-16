@@ -209,8 +209,8 @@ public class CryptoNode extends Node {
     public static int sequenceNumber = 0;
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
-    public static int SENDING_INTERVAL = 3;
-    public static int MINI_SENDING_INTERVAL = 3;
+    public static int SENDING_INTERVAL = 5;
+    public static int MINI_SENDING_INTERVAL = 5;
     public static int INTERBROADCAST_INTERVAL = 15;
     //public static int nodeOrder = 0;
     public static boolean readyToSend = true;
@@ -898,7 +898,7 @@ public class CryptoNode extends Node {
 
             public BroadcastSenderTask(BROADCAST_MSG inMes) {
                 receivedCount2++;
-                System.out.println("receivedCount2: " + receivedCount2);
+                //System.out.println("receivedCount2: " + receivedCount2);
                 senderMes = inMes;
             }
 
@@ -938,7 +938,7 @@ public class CryptoNode extends Node {
 
         public BroadcastTask(BroadcastInfo inInfo) {
             receivedCount++;
-            System.out.println("receivedCount: " + receivedCount);
+           // System.out.println("receivedCount: " + receivedCount);
             this.info = inInfo;
 
         }
