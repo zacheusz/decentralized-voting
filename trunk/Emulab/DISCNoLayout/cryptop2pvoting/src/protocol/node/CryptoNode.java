@@ -609,6 +609,10 @@ public class CryptoNode extends Node {
 
         //if (!isLocalCountingOver) {
         synchronized (BROADCASTLOCK) {
+            
+            if (nodeId.nodeOrder!=0)
+                startInstant = System.nanoTime();
+
 
             dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
             Random generator = new Random();
@@ -725,10 +729,15 @@ public class CryptoNode extends Node {
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a ballot message " + msg.getInfo().vote + " from (" + actualSrc);
                     //testing broadcast
-                    if (nodeId.nodeOrder==0)
-                        taskManager.registerTask(new ResultOutput());
+                   // if (nodeId.nodeOrder==0)
+                     //   taskManager.registerTask(new ResultOutput());
                     
-                    taskManager.registerTask(new SelfDestructTask(),15*1000);
+                    endInstant = System.nanoTime();
+                    runningTime = endInstant - startInstant + viewDuration;
+                    //     dump("Running Time: "+runningTime);
+                    specialDump("\r"+"running time: "+runningTime+ "\r");
+                    
+                    taskManager.registerTask(new SelfDestructTask(),30*1000);
                     
                     
                     receiveBallot(msg);             
