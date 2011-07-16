@@ -72,7 +72,7 @@ public class E_CryptoThreadPerTaskTaskManager implements TaskManager {
 			long lateness = System.currentTimeMillis()
 					- scheduledExecutionTime();
 
-			if (lateness >= 10000) {
+			if (lateness >= 100000) {
 				String header = "";
 				OperatingSystemMXBean mxb = ManagementFactory
 						.getOperatingSystemMXBean();
@@ -92,7 +92,7 @@ public class E_CryptoThreadPerTaskTaskManager implements TaskManager {
 						+ lateness + " ms !!! (Huge CPU load? Load: "
 						+ mxb.getSystemLoadAverage() + ")\033[0m");
 
-				System.exit(-1);
+				//System.exit(-1);
 				// } else {
 				// System.out.println("Task: " + t + " late by " +
 				// lateness
