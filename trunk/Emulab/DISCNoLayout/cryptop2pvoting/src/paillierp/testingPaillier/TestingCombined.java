@@ -25,9 +25,9 @@ public class TestingCombined {
             arguments.put(args[i], args[i + 1]);
             i++;
         }
-         int bits_num =512;
-        int servers = 3;
-        int threshold = 1;
+         int bits_num =256;
+        int servers = 1000;
+        int threshold = 501;
         int rounds = 1;
         int candidatesLength = 2;
 
