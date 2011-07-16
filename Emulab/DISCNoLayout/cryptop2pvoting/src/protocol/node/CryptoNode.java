@@ -516,7 +516,7 @@ public class CryptoNode extends Node {
                 echoCountMap.put(actualSrc, countList);
                 dump("echoCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
-                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
+                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO)*threshold / 2) && !sentReady) {
                     taskManager.registerTask(new BroadcastTask(new BroadcastInfo(msg.getInfo().share, null, Message.SHARE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
@@ -576,13 +576,13 @@ public class CryptoNode extends Node {
                 readyCountMap.put(actualSrc, countList);
                 dump("readyCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
-                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
+                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO)*threshold && !sentReady) {
                     taskManager.registerTask(new BroadcastTask(new BroadcastInfo(msg.getInfo().share, null, Message.SHARE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
 
-                if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO)) {
+                if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO*threshold)) {
                     deliveredList.set(seqNum, true);
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a share message " + msg.getInfo().share + " from (" + actualSrc);
@@ -654,7 +654,7 @@ public class CryptoNode extends Node {
                 echoCountMap.put(actualSrc, countList);
                 dump("echoCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
-                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2) && !sentReady) {
+                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * (1 + MALICIOUS_RATIO) / 2*threshold) && !sentReady) {
                     taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, msg.getInfo().vote, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
@@ -714,13 +714,13 @@ public class CryptoNode extends Node {
                 readyCountMap.put(actualSrc, countList);
                 dump("readyCount (" + actualSrc + "): " + countList.get(seqNum).value);
 
-                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO) && !sentReady) {
+                if (countList.get(seqNum).value > Math.floor(VOTERCOUNT * MALICIOUS_RATIO*threshold) && !sentReady) {
                     taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, msg.getInfo().vote, Message.VOTE_READY_MSG, actualSrc, msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
                     readyList.set(seqNum, Boolean.TRUE);
                     readyMap.put(actualSrc, readyList);
                 }
 
-                if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO)) {
+                if (countList.get(seqNum).value > Math.floor(2 * VOTERCOUNT * MALICIOUS_RATIO*threshold)) {
                     deliveredList.set(seqNum, true);
                     deliveredMap.put(actualSrc, deliveredList);
                     dump("delivered a ballot message " + msg.getInfo().vote + " from (" + actualSrc);
