@@ -613,8 +613,8 @@ public class CryptoNode extends Node {
             if (nodeId.nodeOrder!=0)
                 startInstant = System.nanoTime();
             else 
-                dump ("transfer time: "+(System.nanoTime() - startInstant));
-
+                dump ("\r"+"transfer time: "+(System.nanoTime() - startInstant)+ "\r");
+                   
             dump("Received a vote data message from " + msg.getSrc() + " with actual src: " + msg.getInfo().actualSrc);
             Random generator = new Random();
             taskManager.registerTask(new BroadcastTask(new BroadcastInfo(null, msg.getInfo().vote, Message.VOTE_ECHO_MSG, msg.getSrc(), msg.getInfo().seqNum)), generator.nextInt(SENDING_INTERVAL));
