@@ -209,8 +209,8 @@ public class CryptoNode extends Node {
     public static int sequenceNumber = 0;
     public static int receivedCount = 0;
     public static int receivedCount2 = 0;
-    public static int SENDING_INTERVAL = 5;
-    public static int MINI_SENDING_INTERVAL = 5;
+    public static int SENDING_INTERVAL = 10;
+    public static int MINI_SENDING_INTERVAL = 2;
     public static int INTERBROADCAST_INTERVAL = 15;
     //public static int nodeOrder = 0;
     public static boolean readyToSend = true;
