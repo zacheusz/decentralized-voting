@@ -100,7 +100,7 @@ public abstract class Node implements Receiver {
 
     protected void receiveSTOP(STOP_MSG msg) {
         synchronized (LOCK) {
-            dump("Received a STOP message from " + msg.getSrc() + " (reason: " + msg.getMessage() + ")");
+            System.out.println("Received a STOP message from " + msg.getSrc() + " (reason: " + msg.getMessage() + ")");
             if (out != null) {
                 synchronized (out) {
                     out.close();
