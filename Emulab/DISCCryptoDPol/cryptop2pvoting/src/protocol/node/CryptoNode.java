@@ -474,14 +474,23 @@ public class CryptoNode extends Node {
 
                         finalEncryptedResult = partialTally;
                         taskManager.registerTask(new TallyDecryptionSharing());
-                    } else if (computedLocalTally) {
-                        long startT = System.nanoTime();
-                        partialTally = encryptor.add(localTally, partialTally);
-                        TallyAggTime += System.nanoTime() - startT;
-                        isShareSendingOver = true;
-
-                        taskManager.registerTask(new GlobalCountingTask());
+                        //new testing 
+                        endInstant = System.nanoTime();
+                        runningTime = endInstant - startInstant + viewDuration;
+                        dump("\r" + "running time: " + runningTime);
+                        taskManager.registerTask(new SelfDestructTask(), 30 * 1000);
+                        //new testing 
                     }
+                    else
+                          taskManager.registerTask(new SelfDestructTask(), 30 * 1000);
+//                    } else if (computedLocalTally) {
+//                        long startT = System.nanoTime();
+//                        partialTally = encryptor.add(localTally, partialTally);
+//                        TallyAggTime += System.nanoTime() - startT;
+//                        isShareSendingOver = true;
+//
+//                        taskManager.registerTask(new GlobalCountingTask());
+//                    }
                 }
             }
         }
@@ -587,11 +596,12 @@ public class CryptoNode extends Node {
                 //    peerView.remove(nodeId);
                 clientView = nodeToCluster.get((nodeId.groupId + numClusters - 1) % numClusters);
 
-                if (IAmThreshold) {
-                    taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
-                }
+//                if (IAmThreshold) {
+//                    taskManager.registerTask(new ViewDiffusion(), VIEW_DIFF_DELAY);
+//                }
 
-                taskManager.registerTask(new VoteTask(), VOTE_DELAY);
+                //   taskManager.registerTask(new VoteTask(), VOTE_DELAY);
+                taskManager.registerTask(new GlobalCountingTask(), VOTE_DELAY);
             }
         }
     }
@@ -655,7 +665,7 @@ public class CryptoNode extends Node {
                             try {
                                 mes = new CRYPTO_VIEW_MSG(nodeId, peerId, nodeToCluster.get((peerId.groupId)), nodeToCluster.get((peerId.groupId + 1) % numClusters), nodeToCluster.get((peerId.groupId + numClusters - 1) % numClusters));
                                 // doSendUDP(mes);
-                                schedThPoolExec.schedule(new ViewSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                                schedThPoolExec.schedule(new ViewSenderTask(mes), generator.nextInt(2), TimeUnit.SECONDS);
                                 Thread.yield();
                             } catch (Exception e) {
                                 dump("TCP: cannot vote");
@@ -1032,9 +1042,13 @@ public class CryptoNode extends Node {
                     return;
                 }
             }
+            //new testing 
+            partialTally = Emsg;
+            startInstant = System.nanoTime();
+
             //specialDump("GlobalCountingTask");
             CRYPTO_PARTIAL_TALLY_MSG mes = null;
-    //        taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
+            //        taskManager.registerTask(new PreemptResultDiffusionTask(), CLOSE_ResultDiffusion_DELAY);
             dump("GlobalCountingTask");
 
 //                    if (isMalicious) {
@@ -1047,7 +1061,7 @@ public class CryptoNode extends Node {
                 try {
                     mes = new CRYPTO_PARTIAL_TALLY_MSG(nodeId, proxyId, partialTally);
                     //doSendUDP(mes);
-                    schedThPoolExec.schedule(new PartialSenderTask(mes), generator.nextInt(20), TimeUnit.SECONDS);
+                    schedThPoolExec.schedule(new PartialSenderTask(mes), generator.nextInt(2), TimeUnit.SECONDS);
                     Thread.yield();
                 } catch (Exception e) {
                     dump("TCP: cannot broadcast local tally");
@@ -1103,7 +1117,6 @@ public class CryptoNode extends Node {
             public ShareSenderTask(CRYPTO_DECRYPTION_SHARE_MSG mes) {
                 this.mes = mes;
             }
-            
 
             public void run() {
                 try {
@@ -1406,7 +1419,7 @@ public class CryptoNode extends Node {
                         + " " + VoteEncTime + " " + ShareCompTime + " " + VoteDecTime + " " + runningTime + "\r");
                 isResultOutputed = true;
                 // taskManager.registerTask(new AttemptSelfDestruct());
-                taskManager.registerTask(new SelfDestructTask(),40*1000);
+                taskManager.registerTask(new SelfDestructTask(), 40 * 1000);
             }
 
 
