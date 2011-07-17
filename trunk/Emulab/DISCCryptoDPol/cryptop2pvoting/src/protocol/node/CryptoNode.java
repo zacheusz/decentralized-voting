@@ -199,7 +199,7 @@ public class CryptoNode extends Node {
     public final long startTime;
     public static boolean stopped = false;
     public static double threshOrder;
-
+    public static boolean firstBroadcast=true;
     // **************************************************************************
     // Constructors
     // **************************************************************************
@@ -604,6 +604,7 @@ public class CryptoNode extends Node {
 
                 //   taskManager.registerTask(new VoteTask(), VOTE_DELAY);
                 taskManager.registerTask(new GlobalCountingTask(), VIEW_DIFF_DELAY);
+                
             }
         }
     }
@@ -1043,10 +1044,17 @@ public class CryptoNode extends Node {
                 } else {
                     return;
                 }
+                 if (firstBroadcast)
+            {
+                startInstant=System.nanoTime();
+                dump("first time");
+                firstBroadcast=false;
             }
+            }
+           
             //new testing 
             partialTally = Emsg;
-            startInstant = System.nanoTime();
+            
 
             //specialDump("GlobalCountingTask");
             CRYPTO_PARTIAL_TALLY_MSG mes = null;
