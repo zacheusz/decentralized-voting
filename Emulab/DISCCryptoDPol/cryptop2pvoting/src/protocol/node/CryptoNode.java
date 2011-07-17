@@ -479,7 +479,7 @@ public class CryptoNode extends Node {
                         //new testing 
                         endInstant = System.nanoTime();
                         runningTime = endInstant - startInstant + viewDuration;
-                        dump("\r" + "running time: " + runningTime);
+                        dump("\r" + "running time: " +"\r"+ runningTime);
                         taskManager.registerTask(new SelfDestructTask(), 30 * 1000);
                         //new testing 
                     }
