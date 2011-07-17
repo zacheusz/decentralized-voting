@@ -48,6 +48,7 @@ public class CryptoPrepareTrusted {
                 Trusted trusted;
                 PublicKey pub; // the public key is shared by all the voters
                 */
+                 long startInstant = System.nanoTime();
                 int i;
                 String[] vote_names = new String[CryptoNode.VOTECOUNT]; //candidates
                 for (i = 0; i < CryptoNode.VOTECOUNT; i++)
@@ -63,7 +64,7 @@ public class CryptoPrepareTrusted {
                 
                 PaillierPrivateThresholdKey[] keys =KeyGen.PaillierThresholdKey(bits, CryptoNode.VOTERCOUNT, CryptoNode.MINTALLIES, rnd.nextLong());
 
-
+                System.out.println ("\r"+"transfer time: "+(System.nanoTime() - startInstant)+ "\r");
          //       writeToFile("keys/pubKey",pub);
              //   SecretKey sec;
                 PaillierThreshold p;
@@ -76,6 +77,7 @@ public class CryptoPrepareTrusted {
                      p=new PaillierThreshold(keys[i]);
                      writeToFile("secKey"+i,p ); //"keys"+CryptoNode.VOTERCOUNT+
                  }
+                 System.out.println ("\r"+"after writing transfer time: "+(System.nanoTime() - startInstant)+ "\r");
            // }
 
 
