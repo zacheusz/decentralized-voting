@@ -288,6 +288,7 @@ public class CryptoNode extends Node {
 //        nodesPerCluster = (int) test;
 
         MINTALLIES = nodesPerCluster / 2 + 1;
+        System.out.println("npc: "+CryptoNode.nodesPerCluster+ "mint: "+ CryptoNode.MINTALLIES+"voters: "+CryptoNode.VOTERCOUNT+"nc "+CryptoNode.numClusters);
         //  System.out.println("min:" + MINTALLIES);
         VIEW_DIFF_DELAY = 15 + 1000 * VOTERCOUNT / 2000 * 1000;
         VOTE_DELAY = VIEW_DIFF_DELAY * 3 / 2;
