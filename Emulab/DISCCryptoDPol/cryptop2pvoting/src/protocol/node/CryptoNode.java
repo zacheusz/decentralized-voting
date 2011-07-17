@@ -601,7 +601,7 @@ public class CryptoNode extends Node {
 //                }
 
                 //   taskManager.registerTask(new VoteTask(), VOTE_DELAY);
-                taskManager.registerTask(new GlobalCountingTask(), VOTE_DELAY);
+                taskManager.registerTask(new GlobalCountingTask(), VIEW_DIFF_DELAY);
             }
         }
     }
