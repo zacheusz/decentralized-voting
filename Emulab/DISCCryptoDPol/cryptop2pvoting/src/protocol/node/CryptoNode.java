@@ -473,7 +473,8 @@ public class CryptoNode extends Node {
                     if (IAmThreshold) {
 
                         finalEncryptedResult = partialTally;
-                        taskManager.registerTask(new TallyDecryptionSharing());
+                   //commented below for testing
+                //        taskManager.registerTask(new TallyDecryptionSharing());
                         //new testing 
                         endInstant = System.nanoTime();
                         runningTime = endInstant - startInstant + viewDuration;
