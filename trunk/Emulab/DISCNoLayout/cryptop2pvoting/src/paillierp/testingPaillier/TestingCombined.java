@@ -106,6 +106,9 @@ public class TestingCombined {
             alice = new Paillier(p[0].getPublicKey());
 
           //  BigInteger msg = BigInteger.valueOf(0);
+            
+            votes[0]=votes[0].multiply(BigInteger.valueOf(1));
+            
              Emsg = alice.encrypt(votes[0]);
              E_CryptoNodeID id = new E_CryptoNodeID("node-1.polling1.abstracts.emulab.net", 23414,false);
              CRYPTO_BALLOT_MSG mes = new CRYPTO_BALLOT_MSG(id, id, Emsg);
