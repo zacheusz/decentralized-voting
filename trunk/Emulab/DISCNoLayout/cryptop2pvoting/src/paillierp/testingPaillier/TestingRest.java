@@ -29,7 +29,7 @@ public class TestingRest {
 
 
       
-        int bits_num = Integer.parseInt(arguments.get("-bitsnum"));
+     //   int bits_num = Integer.parseInt(arguments.get("-bitsnum"));
         int servers = Integer.parseInt(arguments.get("-servers"));
         //int threshold = Integer.parseInt(arguments.get("-threshold"));
          int threshold = servers/2+1;
